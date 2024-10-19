@@ -78,7 +78,7 @@ async def run_assistant(thread, name):
         return new_message
     except Exception as e:
         logging.error(f"Error en run_assistant: {e}")
-        return "Lo sentimos, ocurrió un error al procesar tu solicitud. Si lo deseas, puedes contactarte con nuestro Product Manager +56940000303."
+        return "Lo sentimos, ocurrió un error al procesar tu solicitud."
 
 async def generate_response(message_body, user_id, name):
     try:
