@@ -1,0 +1,132 @@
+{
+  "fecha_corte": "2026-09-30",
+  "cliente": {"nombre": "DJOYAS", "razon_social": "Distribuidora de Joyas", "sitio": "distribuidoradejoyas.cl", "plataforma": "PrestaShop", "pais": "Chile", "moneda": "CLP"},
+  "periodos": {"m30": {"inicio": "2026-08-31", "fin": "2026-09-29"}, "m7": {"inicio": "2026-09-23", "fin": "2026-09-29"}},
+  "fuentes": ["Meta MCP (cuenta DJOYAS Ads 1497045771133996)", "AgencyAnalytics · Google Ads (integración 4395372)", "AgencyAnalytics · GA4 (integración 4395374)", "Plan de escalado FV 30/09/2026 (número mágico)"],
+  "negocio": {
+    "ticket_promedio": 129325,
+    "margen_bruto": 0.45,
+    "roas_equilibrio": 2.22,
+    "numero_magico": 3.17,
+    "ciclo_recompra_dias": 75,
+    "backend": {"pedidos_30d": null, "ingresos_30d": null, "ingresos_nuevos_30d": null, "nota": "pendiente de Jorge: pedidos e ingresos reales de PrestaShop 31/08-29/09"},
+    "fecha_especial": {"nombre": "CyberMonday 2026", "inicio": null, "fin": null, "nota": "confirmar fechas; la campaña CYBER & BLACK ya está activa"}
+  },
+  "meta": {
+    "ad_account_id": "1497045771133996",
+    "entidades": [
+      {"id": "120243891183400597", "nombre": "3.3 MOFU · Cliente Hab y Grande (ABO)", "campana": "3. MOFU - Ventas ABO x SARAHI", "etapa": "MOFU", "nivel_presupuesto": "adset", "presupuesto_diario": 14000,
+       "optimization_goal": "OFFSITE_CONVERSIONS", "attribution_setting": "1d_view_7d_click_1d_ev", "learning": {"status": "LEARNING", "conversions": 9, "last_sig_edit_ts": 1790536357},
+       "m7": {"gasto": 80134, "impresiones": 23828, "alcance": 6577, "frecuencia": 3.62, "cpm": 3363, "lpv": 773, "compras": 14, "cpa": 5724, "roas": 27.73},
+       "m30": {"gasto": 290825, "impresiones": 110560, "alcance": 20267, "frecuencia": 5.46, "cpm": 2630, "lpv": 2345, "atc": 1074, "ic": 169, "compras": 51, "valor": 6970400, "cpa": 5702, "roas": 23.97},
+       "cambios_presupuesto": [{"fecha": "2026-09-07", "de": 6000, "a": 8000, "actor": "Jorge Urra"}, {"fecha": "2026-09-14", "de": 8000, "a": 10000, "actor": "Jorge Urra"}, {"fecha": "2026-09-15", "de": 10000, "a": 12000, "actor": "Jorge Urra"}, {"fecha": "2026-09-30", "de": 12000, "a": 14000, "actor": "Jorge Urra"}]},
+      {"id": "120250060947790597", "nombre": "3.1 MOFU · Testeo (ABO)", "campana": "3. MOFU - Ventas ABO x SARAHI", "etapa": "MOFU", "nivel_presupuesto": "adset", "presupuesto_diario": 28000,
+       "optimization_goal": "VALUE", "attribution_setting": "1d_view_7d_click", "learning": {"status": "SUCCESS", "conversions": null, "last_sig_edit_ts": 1790536360},
+       "m7": {"gasto": 196169, "impresiones": 56126, "alcance": 9427, "frecuencia": 5.95, "cpm": 3495, "lpv": 1105, "compras": 40, "cpa": 4904, "roas": 51.81},
+       "m30": {"gasto": 778893, "impresiones": 245844, "alcance": 20678, "frecuencia": 11.89, "cpm": 3168, "lpv": 4275, "atc": 2635, "ic": 453, "compras": 187, "valor": 34856272, "cpa": 4165, "roas": 44.75},
+       "cambios_presupuesto": [{"fecha": "2026-09-03", "de": 20000, "a": 22000, "actor": "Jorge Urra"}, {"fecha": "2026-09-07", "de": 22000, "a": 24000, "actor": "Jorge Urra"}, {"fecha": "2026-09-10", "de": 24000, "a": 26000, "actor": "Jorge Urra"}, {"fecha": "2026-09-23", "de": 26000, "a": 28000, "actor": "Jorge Urra"}, {"fecha": "2026-09-28", "de": 28000, "a": 25000, "actor": "Jorge Urra"}, {"fecha": "2026-09-29", "de": 25000, "a": 26000, "actor": "Jorge Urra"}, {"fecha": "2026-09-30", "de": 26000, "a": 28000, "actor": "Jorge Urra"}]},
+      {"id": "120235514174450597", "nombre": "4. BOFU · Ventas CBO", "campana": "4. BOFU - Ventas CBO x SARAHI", "etapa": "BOFU", "nivel_presupuesto": "campaign", "presupuesto_diario": 17000,
+       "optimization_goal": "VALUE", "attribution_setting": "7d_click", "learning": {"status": null, "conversions": 467, "last_sig_edit_ts": 1790796957},
+       "m7": {"gasto": 108257, "impresiones": 27231, "alcance": 4878, "frecuencia": 5.58, "cpm": 3976, "lpv": 794, "compras": 8, "cpa": 13532, "roas": 22.69},
+       "m30": {"gasto": 412406, "impresiones": 134275, "alcance": 13795, "frecuencia": 9.73, "cpm": 3071, "lpv": 3221, "atc": 1281, "ic": 189, "compras": 48, "valor": 11567777, "cpa": 8592, "roas": 28.05},
+       "cambios_presupuesto": [{"fecha": "2026-09-07", "de": 10000, "a": 12000, "actor": "Jorge Urra"}, {"fecha": "2026-09-10", "de": 12000, "a": 14000, "actor": "Jorge Urra"}, {"fecha": "2026-09-21", "de": 14000, "a": 16000, "actor": "Jorge Urra"}, {"fecha": "2026-09-30", "de": 16000, "a": 17000, "actor": "Jorge Urra"}]},
+      {"id": "120250142536410597", "nombre": "2. TOFU · Ventas CBO NUEVOS", "campana": "2. TOFU - Ventas CBO NUEVOS x SARAHI", "etapa": "TOFU", "nivel_presupuesto": "campaign", "presupuesto_diario": 45000,
+       "optimization_goal": "OFFSITE_CONVERSIONS", "attribution_setting": "1d_view_7d_click_1d_ev", "learning": {"status": "LEARNING", "conversions": 3, "last_sig_edit_ts": 1790536354},
+       "m7": {"gasto": 301152, "impresiones": 134408, "alcance": 50566, "frecuencia": 2.66, "cpm": 2241, "lpv": 3292, "compras": 11, "cpa": 27377, "roas": 3.96},
+       "m30": {"gasto": 1067760, "impresiones": 479602, "alcance": 151906, "frecuencia": 3.16, "cpm": 2226, "lpv": 11185, "atc": 2377, "ic": 217, "compras": 46, "valor": 5201916, "cpa": 23212, "roas": 4.87},
+       "cambios_presupuesto": [{"fecha": "2026-09-07", "de": 28000, "a": 30000, "actor": "Jorge Urra"}, {"fecha": "2026-09-10", "de": 30000, "a": 32000, "actor": "Jorge Urra"}, {"fecha": "2026-09-14", "de": 32000, "a": 33000, "actor": "Jorge Urra"}, {"fecha": "2026-09-15", "de": 33000, "a": 34000, "actor": "Jorge Urra"}, {"fecha": "2026-09-21", "de": 34000, "a": 36000, "actor": "Jorge Urra"}, {"fecha": "2026-09-22", "de": 36000, "a": 38000, "actor": "Jorge Urra"}, {"fecha": "2026-09-23", "de": 38000, "a": 40000, "actor": "Jorge Urra"}, {"fecha": "2026-09-24", "de": 40000, "a": 42000, "actor": "Jorge Urra"}, {"fecha": "2026-09-27", "de": 42000, "a": 45000, "actor": "Jorge Urra"}]},
+      {"id": "120226057098710597", "nombre": "CYBER & BLACK · Cyber 2-26 (CBO)", "campana": "CYBER & BLACK", "etapa": "EVENTO", "nivel_presupuesto": "campaign", "presupuesto_diario": 13048,
+       "optimization_goal": "OFFSITE_CONVERSIONS", "attribution_setting": "1d_view_7d_click_1d_ev", "learning": {"status": "LEARNING", "conversions": 3, "last_sig_edit_ts": 1790687302},
+       "m7": {"gasto": 27602, "impresiones": 5426, "alcance": 497, "frecuencia": 10.92, "cpm": 5087, "lpv": 198, "compras": 5, "cpa": 5520, "roas": 27.17},
+       "m30": {"gasto": 27602, "impresiones": 5426, "alcance": 497, "frecuencia": 10.92, "cpm": 5087, "lpv": 198, "atc": 166, "ic": 9, "compras": 5, "valor": 750055, "cpa": 5520, "roas": 27.17},
+       "cambios_presupuesto": [{"fecha": "2026-09-28", "de": 5000, "a": 8000, "actor": "Jorge Urra"}, {"fecha": "2026-09-28", "de": 8000, "a": 8240, "actor": "Meta"}, {"fecha": "2026-09-29", "de": 8240, "a": 10000, "actor": "Jorge Urra"}, {"fecha": "2026-09-29", "de": 10000, "a": 13048, "actor": "Meta"}]},
+      {"id": "120249398960960597", "nombre": "1.1 TOFU · Tráfico a IG - Stgo (tráfico)", "campana": "1.1 TOFU - Tráfico a IG - Stgo x SARAHI", "etapa": "TOFU", "nivel_presupuesto": "campaign", "presupuesto_diario": 4000, "es_ventas": false,
+       "optimization_goal": "PROFILE_VISIT", "attribution_setting": "1d_click", "m7": {"gasto": 28178, "frecuencia": 1.26, "compras": null, "roas": null}, "m30": {"gasto": 98484, "frecuencia": 1.40, "compras": 2, "valor": 210400, "roas": 2.14}},
+      {"id": "120251826352240597", "nombre": "1.1 TOFU · Interacción a IG - Chile (interacción)", "campana": "1.1 TOFU - Interacción a IG - Chile x SARAHI", "etapa": "TOFU", "nivel_presupuesto": "campaign", "presupuesto_diario": 3000, "es_ventas": false,
+       "optimization_goal": "PROFILE_AND_PAGE_ENGAGEMENT", "attribution_setting": "1d_click", "m7": {"gasto": 19865, "frecuencia": 1.42, "compras": null, "roas": null}, "m30": {"gasto": 92180, "frecuencia": 1.32, "compras": null, "roas": null}},
+      {"id": "120242006634650597", "nombre": "E. MOFU · Interacción (interacción)", "campana": "E. MOFU - Interacción x SARAHI", "etapa": "MOFU", "nivel_presupuesto": "campaign", "presupuesto_diario": 6000, "es_ventas": false,
+       "optimization_goal": "POST_ENGAGEMENT", "attribution_setting": "1d_view_7d_click", "m7": {"gasto": 0, "frecuencia": 0, "compras": null, "roas": null}, "m30": {"gasto": 43159, "frecuencia": 1.41, "compras": null, "roas": null}}
+    ],
+    "cuenta": {
+      "m30": {"gasto": 2887200, "compras": 352, "valor": 61167934, "roas": 21.19},
+      "m7": {"gasto": 813066, "compras": 78},
+      "semanas": [
+        {"inicio": "2026-08-31", "fin": "2026-09-06", "dias": 7, "gasto": 587590, "alcance": 89716, "frecuencia": 2.84, "compras": 90, "valor": 17680426},
+        {"inicio": "2026-09-07", "fin": "2026-09-13", "dias": 7, "gasto": 635142, "alcance": 84556, "frecuencia": 3.21, "compras": 92, "valor": 13689861},
+        {"inicio": "2026-09-14", "fin": "2026-09-20", "dias": 7, "gasto": 673710, "alcance": 80746, "frecuencia": 3.28, "compras": 71, "valor": 10604974},
+        {"inicio": "2026-09-21", "fin": "2026-09-27", "dias": 7, "gasto": 746253, "alcance": 113333, "frecuencia": 2.88, "compras": 70, "valor": 9212562},
+        {"inicio": "2026-09-28", "fin": "2026-09-29", "dias": 2, "parcial": true, "gasto": 244505, "alcance": 46919, "frecuencia": 2.14, "compras": 29, "valor": 9979111}
+      ]
+    },
+    "experimentos": {
+      "activos": 0,
+      "lift_elegible": false,
+      "requisitos_faltantes": ["≥ USD 5.000 de gasto en 90 días", "≥ 500 conversiones optimizadas en la misma ventana", "EMQ ≥ 5 vía Conversions API con email/teléfono hasheados"],
+      "estudios": [{"nombre": "Prueba de Marca DJOYAS v1", "tipo": "Brand Lift", "periodo": "2024-04-30 → 2024-06-29", "holdout": "10 %", "resultado": "Recuerdo de anuncio +13,9 pp (conf. 99 %), conocimiento de marca +9,7 pp (95,5 %), intención de compra +5,8 pp (89 %)"}],
+      "estudios_finalizados_conversion_lift": []
+    },
+    "datasets": [{"id": "386901925693275", "nombre": "Píxel DJOYAS - Activo", "web_ultimo_evento": "2026-09-30", "servidor_ultimo_evento": "2026-09-30"}],
+    "ventanas_disponibles": false
+  },
+  "google": {
+    "integration_campaign_id": 4395372,
+    "campanas": [
+      {"nombre": "1. Search - Marca x SARAHI", "tipo": "search", "es_marca": true, "presupuesto_diario": 30000,
+       "m30": {"costo": 686887, "impresiones": 10472, "clics": 5437, "ctr": 51.92, "cpc": 126, "conv": 171.0, "valor": 20512759, "roas": 29.86, "cpa": 4017, "is": 81.09, "lost_is_budget": 9.68, "lost_is_rank": 9.23},
+       "m7": {"costo": 174139, "clics": 1581, "conv": 23.9, "valor": 3619915, "roas": 20.79, "is": 84.22, "lost_is_budget": 9.09, "lost_is_rank": 6.68}},
+      {"nombre": "2. Search - Genérica x SARAHI", "tipo": "search", "presupuesto_diario": 18000,
+       "m30": {"costo": 462567, "impresiones": 14447, "clics": 2797, "ctr": 19.36, "cpc": 165, "conv": 26.4, "valor": 2175549, "roas": 4.70, "cpa": 17494, "is": 24.49, "lost_is_budget": 43.17, "lost_is_rank": 32.34},
+       "m7": {"costo": 125481, "clics": 701, "conv": 5.5, "valor": 491832, "roas": 3.92, "is": 21.49, "lost_is_budget": 52.14, "lost_is_rank": 26.38}},
+      {"nombre": "3. PMax x SARAHI", "tipo": "performance_max", "presupuesto_diario": 22000,
+       "m30": {"costo": 429868, "impresiones": 129385, "clics": 5490, "ctr": 4.24, "cpc": 78, "conv": 35.3, "valor": 5587902, "roas": 13.00, "cpa": 12187, "is": 9.99, "lost_is_budget": 67.14, "lost_is_rank": 28.5, "view_through": 251},
+       "m7": {"costo": 142717, "clics": 1141, "conv": 8.5, "valor": 1684098, "roas": 11.80, "is": 12.18, "lost_is_budget": 19.43, "lost_is_rank": 68.39}},
+      {"nombre": "4. PMax - Visita a tiendas x SARAHI", "tipo": "performance_max", "presupuesto_diario": 2000, "es_ventas": false,
+       "m30": {"costo": 61747, "clics": 770, "conv": 284.3, "valor": 2843, "roas": 0.05, "cpa": 217},
+       "m7": {"costo": 13907, "clics": 207, "conv": 60.6, "valor": 606, "roas": 0.04}}
+    ],
+    "totales": {"m30": {"costo": 1641068, "conv": 517.0, "valor": 28279052, "roas": 17.23, "is": 18.07, "lost_is_budget": 48.41, "lost_is_rank": 33.52}, "m7": {"costo": 456244, "conv": 98.5, "valor": 5796451, "roas": 12.70}},
+    "semanas": [
+      {"inicio": "2026-08-31", "fin": "2026-09-06", "gasto": 307177, "conv": 161.7, "valor": 8976553},
+      {"inicio": "2026-09-07", "fin": "2026-09-13", "gasto": 355331, "conv": 129.9, "valor": 7196294},
+      {"inicio": "2026-09-14", "fin": "2026-09-20", "gasto": 401374, "conv": 90.2, "valor": 5235450},
+      {"inicio": "2026-09-21", "fin": "2026-09-27", "gasto": 440444, "conv": 122.8, "valor": 4893952}
+    ]
+  },
+  "ga4": {
+    "integration_campaign_id": 4395374,
+    "canales": [
+      {"canal": "Paid Search", "m30": {"sesiones": 11081, "usuarios": 5272, "nuevos": 3447, "engagement_rate": 96.22, "session_cvr": 100, "compras": 156, "ingresos": 19809822}, "m7": {"sesiones": 2986, "nuevos": 883, "compras": 37, "ingresos": 6703104}},
+      {"canal": "Organic Search", "m30": {"sesiones": 22729, "usuarios": 17004, "nuevos": 14515, "engagement_rate": 97.7, "session_cvr": 100, "compras": 109, "ingresos": 17693792}, "m7": {"sesiones": 6243, "nuevos": 3937, "compras": 13, "ingresos": 2392889}},
+      {"canal": "Paid Social", "m30": {"sesiones": 23116, "usuarios": 15901, "nuevos": 12878, "engagement_rate": 98.96, "session_cvr": 99.93, "compras": 63, "ingresos": 6963541}, "m7": {"sesiones": 7012, "nuevos": 4135, "compras": 13, "ingresos": 1467084}},
+      {"canal": "Direct", "m30": {"sesiones": 9418, "usuarios": 6545, "nuevos": 6135, "engagement_rate": 98.13, "session_cvr": 100, "compras": 62, "ingresos": 8310493}, "m7": {"sesiones": 2244, "nuevos": 1495, "compras": 22, "ingresos": 2810898}},
+      {"canal": "Referral", "m30": {"sesiones": 2094, "usuarios": 975, "nuevos": 526, "engagement_rate": 95.89, "session_cvr": 100, "compras": 45, "ingresos": 4940230}, "m7": {"sesiones": 489, "compras": 11, "ingresos": 1480923}},
+      {"canal": "Unassigned", "m30": {"sesiones": 2033, "usuarios": 1531, "nuevos": 1060, "engagement_rate": 89.52, "session_cvr": 97.29, "compras": 25, "ingresos": 2860515}, "m7": {"sesiones": 636, "compras": 4, "ingresos": 514577}},
+      {"canal": "Organic Social", "m30": {"sesiones": 7360, "usuarios": 6281, "nuevos": 5474, "engagement_rate": 98.25, "session_cvr": 100, "compras": 20, "ingresos": 1819098}, "m7": {"sesiones": 1953, "compras": 5, "ingresos": 534453}},
+      {"canal": "Cross-network", "m30": {"sesiones": 5190, "usuarios": 3885, "nuevos": 2979, "engagement_rate": 98.86, "session_cvr": 99.96, "compras": 10, "ingresos": 1788229}, "m7": {"sesiones": 1101, "compras": 1, "ingresos": 43614}},
+      {"canal": "Organic Shopping", "m30": {"sesiones": 1089, "compras": 6, "ingresos": 345808, "engagement_rate": 96.33, "session_cvr": 100}, "m7": {"sesiones": 319, "compras": 1, "ingresos": 53277}},
+      {"canal": "AI Assistant", "m30": {"sesiones": 381, "compras": 2, "ingresos": 161344, "engagement_rate": 97.9, "session_cvr": 100}, "m7": {"sesiones": 78, "compras": 0, "ingresos": 0}},
+      {"canal": "Paid Other", "m30": {"sesiones": 561, "compras": 0, "ingresos": 0, "engagement_rate": 99.47, "session_cvr": 100}, "m7": {"sesiones": 87, "compras": 0, "ingresos": 0}}
+    ],
+    "totales": {
+      "m30": {"sesiones": 84766, "usuarios": 55296, "nuevos": 48044, "compras": 510, "ingresos": 64692872, "compradores_nuevos": 310, "compradores": 457, "atc": 62049, "checkouts": 1165},
+      "m7": {"sesiones": 23270, "usuarios": 16499, "nuevos": 13031, "compras": 107, "ingresos": 16000819, "compradores_nuevos": 69, "compradores": 106, "atc": 17059}
+    },
+    "source_medium": [
+      {"sm": "google / cpc", "m30": {"sesiones": 15513, "nuevos": 6314, "compras": 174, "ingresos": 26503089, "compradores_nuevos": 99, "compradores": 158}, "m7": {"compras": 38, "ingresos": 5175094}},
+      {"sm": "(direct) / (none)", "m30": {"sesiones": 13842, "compras": 137, "ingresos": 16642332, "compradores_nuevos": 82, "compradores": 116}, "m7": {"compras": 39, "ingresos": 5910898}},
+      {"sm": "google / organic", "m30": {"sesiones": 22900, "compras": 87, "ingresos": 9841909, "compradores_nuevos": 53, "compradores": 82}, "m7": {"compras": 11, "ingresos": 2605453}},
+      {"sm": "ig / paid", "m30": {"sesiones": 14166, "nuevos": 9347, "compras": 29, "ingresos": 3058742, "compradores_nuevos": 22, "compradores": 26}, "m7": {"compras": 8, "ingresos": 928947}},
+      {"sm": "fb / paid", "m30": {"sesiones": 5584, "nuevos": 3505, "compras": 6, "ingresos": 1074591, "compradores_nuevos": 4, "compradores": 4}, "m7": {"compras": 0, "ingresos": 0}},
+      {"sm": "an / paid", "m30": {"sesiones": 421, "compras": 0, "ingresos": 0}, "m7": {"compras": 0}},
+      {"sm": "ig / social", "m30": {"sesiones": 5083, "compras": 17, "ingresos": 1501397}, "m7": {"compras": 3, "ingresos": 311738}},
+      {"sm": "m.facebook.com / referral", "m30": {"sesiones": 1081, "compras": 5, "ingresos": 665870}, "m7": {"compras": 1}}
+    ],
+    "semanas": [
+      {"inicio": "2026-08-31", "fin": "2026-09-06", "sesiones": 19587, "compras": 146, "ingresos": 20569570, "compras_paid_social": 18, "ingresos_paid_social": 2123977, "compras_paid_search": 47},
+      {"inicio": "2026-09-07", "fin": "2026-09-13", "sesiones": 18268, "compras": 129, "ingresos": 14974999, "compras_paid_social": 14, "ingresos_paid_social": 1458594, "compras_paid_search": 46},
+      {"inicio": "2026-09-14", "fin": "2026-09-20", "sesiones": 17455, "compras": 90, "ingresos": 9604034, "compras_paid_social": 16, "ingresos_paid_social": 1623614, "compras_paid_search": 17},
+      {"inicio": "2026-09-21", "fin": "2026-09-27", "sesiones": 22033, "compras": 103, "ingresos": 11671337, "compras_paid_social": 10, "ingresos_paid_social": 1118875, "compras_paid_search": 29}
+    ],
+    "alertas_calidad": []
+  }
+}
