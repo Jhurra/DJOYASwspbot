@@ -57,13 +57,13 @@ Si Jorge no responde, continuar con GA4 como verdad de pedidos y con el número 
 
 ### Etapa 1 · Lectura de Meta (MCP)
 
-Todas las llamadas llevan `client_conversation_id` (20 caracteres, el mismo toda la conversación), `client_model` y `advertiser_request` con las palabras de Jorge. Ventanas: `last_7d` y `last_30d`.
+Todas las llamadas llevan `client_conversation_id` (20 caracteres, el mismo toda la conversación), `client_model` y `advertiser_request` con las palabras de Jorge. Ventanas: `last_7d` y `last_30d` (la serie semanal de cuenta usa `last_90d`).
 
 1. `ads_get_ad_entities` nivel **adset**, 7 d y 30 d, filtro `adset.effective_status IN ["ACTIVE"]`, campos: `id, name, effective_status, daily_budget, optimization_goal, attribution_setting, learning_stage_info, amount_spent, impressions, reach, frequency, cpm, ctr, omni_landing_page_view, omni_add_to_cart, omni_initiated_checkout, omni_purchase, offsite_conversion_fb_pixel_purchase_values, cost_per_omni_purchase, purchase_roas`.
-2. `ads_get_ad_entities` nivel **campaign**, 7 d y 30 d, mismos campos más `objective` (aquí vive el presupuesto de las CBO).
-3. `ads_get_ad_entities` nivel **ad_account**, `date_preset: last_30d` (o `last_90d`), `time_increment: "7"` → serie semanal de `amount_spent, reach, frequency, link_click, omni_purchase, offsite_conversion_fb_pixel_purchase_values, purchase_roas`. Base del ROAS marginal.
+2. `ads_get_ad_entities` nivel **campaign**, 7 d y 30 d, campos `id, name, effective_status, objective, daily_budget, lifetime_budget, bid_strategy, amount_spent, impressions, reach, frequency, cpm, ctr, omni_landing_page_view, omni_add_to_cart, omni_initiated_checkout, omni_purchase, offsite_conversion_fb_pixel_purchase_values, cost_per_omni_purchase, purchase_roas` (aquí vive el presupuesto de las CBO; `optimization_goal`, `attribution_setting` y `learning_stage_info` solo existen a nivel adset y el tool los rechaza).
+3. `ads_get_ad_entities` nivel **ad_account**, `date_preset: last_90d`, `time_increment: "7"` → serie semanal de `amount_spent, reach, frequency, link_click, omni_purchase, offsite_conversion_fb_pixel_purchase_values, purchase_roas`. Base del ROAS marginal.
 4. `ads_account_get_activity_logs` con `event_category: "budget"`, `start_time` = hoy − 45 días → cada cambio de presupuesto con fecha, valor anterior y nuevo, y actor. De aquí salen "días desde la última subida", el ritmo real de subidas (más de 2 en 14 días congela) y si una automatización mueve el presupuesto.
-5. `ads_experiment_list_tests` y `ads_experiment_check_eligibility` con `ad_account_id: "act_<id>"` → estudios de lift previos o activos y elegibilidad para Conversion Lift (se cita literal).
+5. `ads_experiment_list_tests` y `ads_experiment_check_eligibility` con `ad_account_id: "act_<id>"` → estudios de lift previos o activos y elegibilidad para Conversion Lift (se cita literal). Si el plan va a proponer un A/B nativo, repetir `ads_experiment_check_eligibility` con `ad_entity_ids: ["<adset estándar>", "<adset incremental>"]`: sin dos entidades el tool salta la elegibilidad del split test.
 6. Opcional: `ads_get_datasets` + `ads_get_dataset_quality` (EMQ) cuando se vaya a recomendar lift o atribución incremental.
 
 Si `ads_get_ad_entities` devuelve `next_actions`, agotar las acciones de solo lectura antes de seguir. Si el MCP de Meta no responde, usar el fallback de AgencyAnalytics (`facebook-ads / ad-analytics`) y declarar que aprendizaje, atribución en uso e historial de presupuesto quedan en verificación manual; sin esas fuentes el semáforo no puede dar verde excelente.
@@ -79,6 +79,9 @@ Si `ads_get_ad_entities` devuelve `next_actions`, agotar las acciones de solo le
 5. Recomendado para el tablero: GA4 por canal en cada una de las últimas 4 semanas (una llamada por semana, mismas fechas que la serie de Meta).
 
 Gates de calidad (el script también los detecta): `engagement_rate` > 95 % o `session_conversion_rate` > 50 % en todos los canales → GA4 tiene un evento de conversión mal marcado; se usan transacciones e ingresos, nunca `conversions`. Campañas de Google cuya conversión no es una venta (visitas a tienda, llamadas) se marcan `es_ventas: false`.
+
+
+Serie semanal de Google (`google.semanas`): una consulta por semana con `groupBy: ["campaign"]` y `start_date`/`end_date` de lunes a domingo, sumando solo las campañas de venta (las de visitas a tienda, llamadas o WhatsApp quedan fuera, como en el ROAS). Así el tablero compara conversiones de venta con conversiones de venta.
 
 ### Etapa 3 · Cálculo determinista
 
@@ -151,7 +154,7 @@ El detalle está en `references/atribucion-incremental.md`. Lo que la skill hace
 | Amarillo | bajo el número mágico en 7 d o 30 d | optimizar |
 | Rojo | bajo el equilibrio | volver al presupuesto previo o bajar 20 % |
 
-Caps (un escalón menos cada uno): CPA sobre el máximo, < 25 compras con paso ≥ 30 %, ROAS 7 d cae > 20 % vs 30 d, frecuencia en aviso, frecuencia 30 d en el tope, aprendizaje, ROAS marginal de cuenta bajo el equilibrio, central de la etapa bajo el número mágico. Tope por atribución de cuenta: amarillo ≤ 20 %; rojo ≤ 15 % en público nuevo y 0 % en públicos calientes hasta tener factor medido. Google: +20 % con cuota perdida por presupuesto ≥ 20 % y ROAS 30 d sobre objetivo, un cambio por semana los lunes; limitada por ranking → puja, no presupuesto; marca se cubre, no se escala. Umbrales completos en `references/umbrales-y-semaforo.md`.
+Caps (un escalón menos cada uno): CPA sobre el máximo, < 25 compras con paso ≥ 30 %, ROAS 7 d cae > 20 % vs 30 d, frecuencia en aviso, frecuencia 30 d en el tope, aprendizaje, ROAS marginal de cuenta bajo el equilibrio, central de la etapa bajo el número mágico. Tope por atribución de cuenta: amarillo ≤ 20 %; rojo ≤ 15 % en público nuevo y 0 % en públicos calientes (≤ 15 % solo si su piso pesimista, GA4 último clic, supera el número mágico) hasta tener factor medido; sin GA4 ni pedidos, ≤ 15 % para todos. Google: +20 % con cuota perdida por presupuesto ≥ 20 % y ROAS 30 d sobre objetivo, un cambio por semana los lunes; limitada por ranking → puja, no presupuesto; marca se cubre, no se escala. Umbrales completos en `references/umbrales-y-semaforo.md`.
 
 ---
 
@@ -176,12 +179,12 @@ Campos monetarios en la moneda de la cuenta (número, sin formato). Porcentajes 
     "entidades": [{
       "id": "", "nombre": "", "campana": "", "etapa": "TOFU|MOFU|BOFU|EVENTO", "nivel_presupuesto": "campaign|adset",
       "presupuesto_diario": 0, "es_ventas": true, "optimization_goal": "", "attribution_setting": "",
-      "learning": {"status": "LEARNING|SUCCESS|LEARNING_LIMITED|null", "conversions": null, "last_sig_edit_ts": null},
+      "learning": {"status": "LEARNING|SUCCESS|FAIL (= aprendizaje limitado)|WAIVING|null", "conversions": null, "last_sig_edit_ts": null},
       "m7":  {"gasto": 0, "impresiones": 0, "alcance": 0, "frecuencia": 0, "cpm": 0, "ctr": null, "lpv": 0, "atc": 0, "ic": 0, "compras": 0, "valor": 0, "cpa": 0, "roas": 0},
       "m30": {"…": "mismos campos"},
       "cambios_presupuesto": [{"fecha": "AAAA-MM-DD", "de": 0, "a": 0, "actor": ""}],
       "ventanas": {"1d_click": {"compras": null, "valor": null}, "7d_click": {}, "1d_view": {}, "28d_click": {}},
-      "incremental": {"factor_medido": null, "fuente": ""}
+      "incremental": {"factor_medido": null, "fuente": "", "fecha": "AAAA-MM-DD"}
     }],
     "cuenta": {"m30": {"gasto": 0, "compras": 0, "valor": 0, "roas": 0}, "m7": {}, "semanas": [{"inicio": "", "fin": "", "dias": 7, "parcial": false, "evento": false, "gasto": 0, "alcance": 0, "frecuencia": 0, "compras": 0, "valor": 0}]},
     "experimentos": {"activos": 0, "lift_elegible": null, "requisitos_faltantes": [], "estudios": [{"nombre": "", "tipo": "", "periodo": "", "holdout": "", "resultado": ""}], "estudios_finalizados_conversion_lift": []},
@@ -208,6 +211,8 @@ Campos monetarios en la moneda de la cuenta (número, sin formato). Porcentajes 
 }
 ```
 
+Campos de diagnóstico que se guardan para la narrativa pero no entran al cálculo: `impresiones, alcance, cpm, lpv, atc, ic, cpa` de Meta, `view_through` de Google, `datasets` y `cliente.sitio/plataforma`. `ventanas` sí entra: la fracción 1 d clic / 7 d clic hace de piso alternativo del ROAS incremental cuando no hay GA4. `incremental.factor_medido` vale 90 días desde `fecha`; vencido, el script vuelve a las cotas y lo avisa.
+
 Ejemplo completo con datos reales: `examples/data-djoyas.json`.
 
 ## Esquema de `narrativa.json`
@@ -232,7 +237,7 @@ Ejemplo: `examples/narrativa-djoyas.json`.
 1. **Cero invención.** Si una fuente no responde, la sección dice "sin datos" y el hueco va a límites. La elegibilidad de lift se cita literal. Este plan mueve presupuesto real.
 2. **La escalera respeta el historial.** Los días desde la última subida se leen del activity log, no se preguntan. Más de 2 subidas en 14 días congela 7 días: con cambios diarios no hay ROAS legible por nivel.
 3. **No cambiar de nivel** (CBO sigue CBO, ABO sigue ABO) ni subir dos palancas a la vez en Google (presupuesto y tROAS). Un cambio por campaña por semana en Google, siempre lunes.
-4. **El ROAS de plataforma no decide solo.** Con atribución de cuenta en rojo, los públicos calientes no reciben subida vertical hasta tener un factor medido. Un índice de sobre-reclamo sobre 1 se decide con MER.
+4. **El ROAS de plataforma no decide solo.** Con atribución de cuenta en rojo, los públicos calientes no reciben subida vertical hasta tener un factor medido, salvo que su piso pesimista (GA4 último clic) ya supere el número mágico: entonces, paso corto de 15 % como máximo. Un índice de sobre-reclamo sobre 1 se decide con MER.
 5. **Los supuestos no mueven presupuesto.** Las cotas salen de datos (GA4, pedidos, deduplicación); las bandas y umbrales son calibrables y se declaran. Nunca un prior sin fuente en el gate principal.
 6. **La marca en Google se cubre, no se escala.** Su ROAS no justifica adquisición; su tendencia es termómetro de Meta, informativo, nunca gate.
 7. **Lo que escala de verdad es horizontal.** Todo plan vertical lleva su plan horizontal al lado; si lo vertical se frena, lo horizontal ya está construido.

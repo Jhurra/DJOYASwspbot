@@ -69,7 +69,8 @@
           "lpv": 773,
           "compras": 14,
           "cpa": 5724,
-          "roas": 27.73
+          "roas": 27.73,
+          "ctr": 3.95
         },
         "m30": {
           "gasto": 290825,
@@ -83,7 +84,8 @@
           "compras": 51,
           "valor": 6970400,
           "cpa": 5702,
-          "roas": 23.97
+          "roas": 23.97,
+          "ctr": 3.15
         },
         "cambios_presupuesto": [
           {
@@ -135,7 +137,8 @@
           "lpv": 1105,
           "compras": 40,
           "cpa": 4904,
-          "roas": 51.81
+          "roas": 51.81,
+          "ctr": 3.4
         },
         "m30": {
           "gasto": 778893,
@@ -149,7 +152,8 @@
           "compras": 187,
           "valor": 34856272,
           "cpa": 4165,
-          "roas": 44.75
+          "roas": 44.75,
+          "ctr": 3.08
         },
         "cambios_presupuesto": [
           {
@@ -219,7 +223,8 @@
           "lpv": 794,
           "compras": 8,
           "cpa": 13532,
-          "roas": 22.69
+          "roas": 22.69,
+          "ctr": 4.68
         },
         "m30": {
           "gasto": 412406,
@@ -233,7 +238,8 @@
           "compras": 48,
           "valor": 11567777,
           "cpa": 8592,
-          "roas": 28.05
+          "roas": 28.05,
+          "ctr": 3.8
         },
         "cambios_presupuesto": [
           {
@@ -285,7 +291,8 @@
           "lpv": 3292,
           "compras": 11,
           "cpa": 27377,
-          "roas": 3.96
+          "roas": 3.96,
+          "ctr": 4.39
         },
         "m30": {
           "gasto": 1067760,
@@ -299,7 +306,8 @@
           "compras": 46,
           "valor": 5201916,
           "cpa": 23212,
-          "roas": 4.87
+          "roas": 4.87,
+          "ctr": 4.31
         },
         "cambios_presupuesto": [
           {
@@ -381,7 +389,8 @@
           "lpv": 198,
           "compras": 5,
           "cpa": 5520,
-          "roas": 27.17
+          "roas": 27.17,
+          "ctr": 5.31
         },
         "m30": {
           "gasto": 27602,
@@ -395,7 +404,8 @@
           "compras": 5,
           "valor": 750055,
           "cpa": 5520,
-          "roas": 27.17
+          "roas": 27.17,
+          "ctr": 5.31
         },
         "cambios_presupuesto": [
           {
@@ -438,14 +448,16 @@
           "gasto": 28178,
           "frecuencia": 1.26,
           "compras": null,
-          "roas": null
+          "roas": null,
+          "ctr": 5.22
         },
         "m30": {
           "gasto": 98484,
           "frecuencia": 1.4,
           "compras": 2,
           "valor": 210400,
-          "roas": 2.14
+          "roas": 2.14,
+          "ctr": 4.92
         }
       },
       {
@@ -462,13 +474,15 @@
           "gasto": 19865,
           "frecuencia": 1.42,
           "compras": null,
-          "roas": null
+          "roas": null,
+          "ctr": 2.25
         },
         "m30": {
           "gasto": 92180,
           "frecuencia": 1.32,
           "compras": null,
-          "roas": null
+          "roas": null,
+          "ctr": 3.2
         }
       },
       {
@@ -485,13 +499,15 @@
           "gasto": 0,
           "frecuencia": 0,
           "compras": null,
-          "roas": null
+          "roas": null,
+          "ctr": null
         },
         "m30": {
           "gasto": 43159,
           "frecuencia": 1.41,
           "compras": null,
-          "roas": null
+          "roas": null,
+          "ctr": 1.3
         }
       }
     ],
@@ -724,32 +740,45 @@
       {
         "inicio": "2026-08-31",
         "fin": "2026-09-06",
-        "gasto": 307177,
-        "conv": 161.7,
-        "valor": 8976553
+        "gasto": 293100,
+        "conv": 76.1,
+        "valor": 9142543,
+        "parcial": false
       },
       {
         "inicio": "2026-09-07",
         "fin": "2026-09-13",
-        "gasto": 355331,
-        "conv": 129.9,
-        "valor": 7196294
+        "gasto": 339846,
+        "conv": 64.9,
+        "valor": 7195644,
+        "parcial": false
       },
       {
         "inicio": "2026-09-14",
         "fin": "2026-09-20",
-        "gasto": 401374,
-        "conv": 90.2,
-        "valor": 5235450
+        "gasto": 386307,
+        "conv": 45.2,
+        "valor": 5235000,
+        "parcial": false
       },
       {
         "inicio": "2026-09-21",
         "fin": "2026-09-27",
-        "gasto": 440444,
-        "conv": 122.8,
-        "valor": 4893952
+        "gasto": 427610,
+        "conv": 36.2,
+        "valor": 4989739,
+        "parcial": false
+      },
+      {
+        "inicio": "2026-09-28",
+        "fin": "2026-09-29",
+        "gasto": 132459,
+        "conv": 13.2,
+        "valor": 2031510,
+        "parcial": true
       }
-    ]
+    ],
+    "semanas_nota": "solo campañas de venta (sin '4. PMax - Visita a tiendas'); una consulta por semana en AgencyAnalytics, totales del conector"
   },
   "ga4": {
     "integration_campaign_id": 4395374,
@@ -1138,19 +1167,23 @@
       "frecuencia": {
         "TOFU": {
           "aviso": 1.75,
-          "tope": 3.0
+          "tope": 3.0,
+          "tope_30d": 4.5
         },
         "MOFU": {
           "aviso": 4.0,
-          "tope": 6.0
+          "tope": 6.0,
+          "tope_30d": 9.0
         },
         "BOFU": {
           "aviso": 5.0,
-          "tope": 10.0
+          "tope": 10.0,
+          "tope_30d": 15.0
         },
         "EVENTO": {
           "aviso": 5.0,
-          "tope": 10.0
+          "tope": 10.0,
+          "tope_30d": 15.0
         }
       },
       "caida_roas_tendencia": 0.2,
@@ -1166,6 +1199,7 @@
         "sobre_reclamo_aviso": 0.9,
         "ia_alta": 2.0,
         "ia_media": 5.0,
+        "factor_vigencia_dias": 90,
         "cap_amarillo": 0.2,
         "cap_rojo": 0.15,
         "ventana_ratio_dias": 28
@@ -1194,10 +1228,12 @@
         "dif_ingresos_backend_max": 0.15
       },
       "redondeo_presupuesto": 100,
+      "tope_multiplo_escalera": 2.0,
       "runbook_max_filas": 8
     },
     "negocio": {
       "numero_magico_origen": "entregado por el cliente / plan vigente",
+      "roas_equilibrio_origen": "entregado por el cliente",
       "ticket_promedio": 129325.0,
       "margen_bruto": 0.45,
       "roas_equilibrio": 2.22,
@@ -1230,8 +1266,8 @@
           "gasto_7d": 80134.0,
           "gasto_30d": 290825.0,
           "cpa_7d": 5724.0,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 3.95,
+          "ctr_30d": 3.15,
           "presupuesto_pre_ultima_subida": 12000.0,
           "frecuencia_7d": 3.62,
           "frecuencia_30d": 5.46,
@@ -1269,7 +1305,8 @@
             "central": 2.61,
             "techo": 14.37,
             "ia": 30.3,
-            "confianza": "baja"
+            "confianza": "baja",
+            "fraccion_1d_click": null
           },
           "central_cumple": false,
           "piso_cumple": false,
@@ -1300,8 +1337,8 @@
           "gasto_7d": 196169.0,
           "gasto_30d": 778893.0,
           "cpa_7d": 4904.0,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 3.4,
+          "ctr_30d": 3.08,
           "presupuesto_pre_ultima_subida": 26000.0,
           "frecuencia_7d": 5.95,
           "frecuencia_30d": 11.89,
@@ -1323,7 +1360,7 @@
           "optimization_goal": "VALUE",
           "es_ventas": true,
           "motivos": [
-            "ROAS 7 d 51.81x = 16.3 veces el número mágico (3.17x); colchón 999 % → paso base 35 %"
+            "ROAS 7 d 51.81x = 16.3 veces el número mágico (3.17x); colchón 1.534 % → paso base 35 %"
           ],
           "avisos": [
             "3 subidas en 14 días: congelar 7 días para que el ROAS por nivel sea legible"
@@ -1331,7 +1368,7 @@
           "bloqueos": [],
           "caps": [
             "frecuencia 7 d 5.95 sobre el aviso temprano 4.0 (tope 6.0)",
-            "frecuencia 30 d 11.9 en el tope de la etapa: público chico",
+            "frecuencia 30 d 11.9 sobre el tope de 30 d de la etapa (9): público chico",
             "ROAS marginal de la cuenta bajo el equilibrio en la última semana completa (alerta preventiva)",
             "atribución de cuenta en rojo y piso pesimista bajo el número mágico: sin subida vertical hasta tener un factor medido"
           ],
@@ -1341,7 +1378,8 @@
             "central": 4.88,
             "techo": 26.85,
             "ia": 30.3,
-            "confianza": "baja"
+            "confianza": "baja",
+            "fraccion_1d_click": null
           },
           "central_cumple": true,
           "piso_cumple": false,
@@ -1372,8 +1410,8 @@
           "gasto_7d": 108257.0,
           "gasto_30d": 412406.0,
           "cpa_7d": 13532.0,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 4.68,
+          "ctr_30d": 3.8,
           "presupuesto_pre_ultima_subida": 16000.0,
           "frecuencia_7d": 5.58,
           "frecuencia_30d": 9.73,
@@ -1411,7 +1449,8 @@
             "central": 2.14,
             "techo": 11.76,
             "ia": 30.3,
-            "confianza": "baja"
+            "confianza": "baja",
+            "fraccion_1d_click": null
           },
           "central_cumple": false,
           "piso_cumple": false,
@@ -1442,8 +1481,8 @@
           "gasto_7d": 301152.0,
           "gasto_30d": 1067760.0,
           "cpa_7d": 27377.0,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 4.39,
+          "ctr_30d": 4.31,
           "presupuesto_pre_ultima_subida": 42000.0,
           "frecuencia_7d": 2.66,
           "frecuencia_30d": 3.16,
@@ -1473,7 +1512,6 @@
           "bloqueos": [],
           "caps": [
             "frecuencia 7 d 2.66 sobre el aviso temprano 1.75 (tope 3.0)",
-            "frecuencia 30 d 3.2 en el tope de la etapa: público chico",
             "conjunto en fase de aprendizaje: una subida grande la reinicia",
             "ROAS marginal de la cuenta bajo el equilibrio en la última semana completa (alerta preventiva)"
           ],
@@ -1482,8 +1520,9 @@
             "piso": 3.38,
             "central": 3.38,
             "techo": 3.38,
-            "ia": 1.0,
-            "confianza": "alta"
+            "ia": null,
+            "confianza": "no verificable",
+            "fraccion_1d_click": null
           },
           "central_cumple": true,
           "piso_cumple": true,
@@ -1514,8 +1553,8 @@
           "gasto_7d": 27602.0,
           "gasto_30d": 27602.0,
           "cpa_7d": 5520.0,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 5.31,
+          "ctr_30d": 5.31,
           "presupuesto_pre_ultima_subida": 8240.0,
           "frecuencia_7d": 10.92,
           "frecuencia_30d": 10.92,
@@ -1548,7 +1587,8 @@
             "central": 2.56,
             "techo": 14.08,
             "ia": 30.3,
-            "confianza": "baja"
+            "confianza": "baja",
+            "fraccion_1d_click": null
           },
           "central_cumple": false,
           "piso_cumple": false,
@@ -1566,13 +1606,13 @@
           "presupuesto_diario": 4000.0,
           "roas_7d": null,
           "roas_30d": 2.14,
-          "compras_7d": null,
+          "compras_7d": 0.0,
           "compras_30d": 2.0,
           "gasto_7d": 28178.0,
           "gasto_30d": 98484.0,
           "cpa_7d": null,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 5.22,
+          "ctr_30d": 4.92,
           "presupuesto_pre_ultima_subida": null,
           "frecuencia_7d": 1.26,
           "frecuencia_30d": 1.4,
@@ -1610,13 +1650,13 @@
           "presupuesto_diario": 3000.0,
           "roas_7d": null,
           "roas_30d": null,
-          "compras_7d": null,
-          "compras_30d": null,
+          "compras_7d": 0.0,
+          "compras_30d": 0.0,
           "gasto_7d": 19865.0,
           "gasto_30d": 92180.0,
           "cpa_7d": null,
-          "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_7d": 2.25,
+          "ctr_30d": 3.2,
           "presupuesto_pre_ultima_subida": null,
           "frecuencia_7d": 1.42,
           "frecuencia_30d": 1.32,
@@ -1654,13 +1694,13 @@
           "presupuesto_diario": 6000.0,
           "roas_7d": null,
           "roas_30d": null,
-          "compras_7d": null,
-          "compras_30d": null,
+          "compras_7d": 0.0,
+          "compras_30d": 0.0,
           "gasto_7d": 0.0,
           "gasto_30d": 43159.0,
           "cpa_7d": null,
           "ctr_7d": null,
-          "ctr_30d": null,
+          "ctr_30d": 1.3,
           "presupuesto_pre_ultima_subida": null,
           "frecuencia_7d": 0.0,
           "frecuencia_30d": 1.41,
@@ -1795,6 +1835,7 @@
         "roas_var": -0.59,
         "roas_marginal_ultimo": -19.19,
         "semanas_marginal_negativo": 3,
+        "semanas_marginal_negativo_total": 3,
         "lectura": "Retornos decrecientes: el gasto sube y el valor de cada peso adicional está bajo el equilibrio (alerta preventiva: la serie mezcla eventos y cambios diarios, no es un test de escalón limpio)"
       }
     },
@@ -1874,7 +1915,7 @@
               "checkpoint": "2026-10-11",
               "decision": "2026-10-12",
               "condicion": "ROAS 30 d ≥ 3.17x, ROAS 7 d no cae > 25 % y la cuota perdida por presupuesto sigue > 10 %",
-              "reversion": "si el ROAS cae > 20 % y queda bajo objetivo. volver a $18.000"
+              "reversion": "si el ROAS cae > 20 % y queda bajo objetivo, volver a $18.000"
             },
             {
               "n": 2,
@@ -1885,7 +1926,7 @@
               "checkpoint": "2026-10-18",
               "decision": "2026-10-19",
               "condicion": "ROAS 30 d ≥ 3.17x, ROAS 7 d no cae > 25 % y la cuota perdida por presupuesto sigue > 10 %",
-              "reversion": "si el ROAS cae > 20 % y queda bajo objetivo. volver a $21.600"
+              "reversion": "si el ROAS cae > 20 % y queda bajo objetivo, volver a $21.600"
             },
             {
               "n": 3,
@@ -1896,7 +1937,7 @@
               "checkpoint": "2026-10-25",
               "decision": "2026-10-26",
               "condicion": "ROAS 30 d ≥ 3.17x, ROAS 7 d no cae > 25 % y la cuota perdida por presupuesto sigue > 10 %",
-              "reversion": "si el ROAS cae > 20 % y queda bajo objetivo. volver a $25.900"
+              "reversion": "si el ROAS cae > 20 % y queda bajo objetivo, volver a $25.900"
             }
           ],
           "colchon_30d": 0.483,
@@ -2465,8 +2506,10 @@
           "piso": 4.15,
           "central": 4.15,
           "techo": 4.15,
-          "ia": 1.0,
-          "confianza": "alta",
+          "piso_ga4_sin_recorte": 5.65,
+          "particion_inconsistente": true,
+          "ia": null,
+          "confianza": "no verificable",
           "ratio_piso": 0.8529,
           "ratio_techo": 0.8529,
           "ratio_central": 0.8529
@@ -2479,6 +2522,8 @@
           "piso": 0.61,
           "central": 3.38,
           "techo": 18.58,
+          "piso_ga4_sin_recorte": 0.61,
+          "particion_inconsistente": false,
           "ia": 30.3,
           "confianza": "baja",
           "ratio_piso": 0.0171,
@@ -2493,6 +2538,8 @@
           "piso": 2.41,
           "central": 5.32,
           "techo": 11.75,
+          "piso_ga4_sin_recorte": 2.41,
+          "particion_inconsistente": false,
           "ia": 4.9,
           "confianza": "media",
           "ratio_piso": 0.1138,
@@ -2522,7 +2569,7 @@
         "nivel": 1,
         "descripcion": "Triangulación (correlacional)",
         "evidencia": [
-          "Triangulación plataforma vs GA4 vs pedidos reales (28 d)"
+          "Triangulación plataforma vs GA4 vs pedidos reales (30 d)"
         ]
       },
       "lift": {
@@ -2563,9 +2610,9 @@
         {
           "orden": 3,
           "tipo": "Geo-holdout de públicos calientes",
-          "cuando": "semana 1, tras el A/B",
-          "que": "elegir desde GA4 por región 1-2 regiones con 15-20 % de los pedidos; excluirlas de MOFU + BOFU juntos 4 semanas; diferencia en diferencias contra el resto. Declarar el efecto mínimo detectable con la varianza semanal regional observada; extender a 28 d si efecto esperado / desviación < 2",
-          "fuente": "GA4 conversion-analytics filtro region + exclusión geográfica",
+          "cuando": "al cerrar el A/B nativo (14 días después de su arranque, semana 4)",
+          "que": "elegir desde GA4 (traffic-analytics por región) 1-2 regiones con 15-20 % de los pedidos; excluirlas de MOFU + BOFU juntos 4 semanas; diferencia en diferencias contra el resto. Declarar el efecto mínimo detectable con la varianza semanal regional observada; extender a 28 d si efecto esperado / desviación < 2",
+          "fuente": "GA4 traffic-analytics group_by region (transactions, purchase_revenue, first_time_purchasers) + exclusión geográfica",
           "pendiente_requisitos": false
         },
         {
@@ -2580,7 +2627,7 @@
           "orden": 5,
           "tipo": "Apagado controlado (último recurso)",
           "cuando": "solo si el geo-holdout no es viable",
-          "que": "pausar MOFU + BOFU juntos ≥ 14 días fuera de eventos y leer la recompra total en backend y GA4 contra un control sintético (Google + orgánico). Potencia estimada hoy: 6.2 desviaciones semanales (concluyente)",
+          "que": "pausar MOFU + BOFU juntos ≥ 14 días fuera de eventos y leer la recompra total en backend y GA4 contra un control sintético (Google + orgánico). Potencia estimada hoy: 0.6 desviaciones semanales con la cota central, 0.1 con el piso (no concluyente: no usar como estimador)",
           "fuente": "backend + GA4 Direct / Organic / Email",
           "pendiente_requisitos": false
         },
@@ -2602,19 +2649,19 @@
             "parcial": false,
             "evento": false,
             "gasto_meta": 587590.0,
-            "gasto_google": 307177.0,
-            "gasto_total": 894767.0,
+            "gasto_google": 293100.0,
+            "gasto_total": 880690.0,
             "compras_meta": 90.0,
             "roas_meta": 30.09,
             "roas_marginal_meta": null,
-            "conv_google": 161.7,
-            "roas_google": 29.22,
+            "conv_google": 76.1,
+            "roas_google": 31.19,
             "pedidos_ga4": 146.0,
             "ingresos_ga4": 20569570.0,
-            "mer": 22.99,
+            "mer": 23.36,
             "compras_paid_social_ga4": 18.0,
             "ratio_meta_ga4": 5.0,
-            "ruido_ratio": 0.47,
+            "ruido_ratio": 2.4,
             "mer_marginal": null
           },
           {
@@ -2623,20 +2670,20 @@
             "parcial": false,
             "evento": false,
             "gasto_meta": 635142.0,
-            "gasto_google": 355331.0,
-            "gasto_total": 990473.0,
+            "gasto_google": 339846.0,
+            "gasto_total": 974988.0,
             "compras_meta": 92.0,
             "roas_meta": 21.55,
             "roas_marginal_meta": -83.92,
-            "conv_google": 129.9,
-            "roas_google": 20.25,
+            "conv_google": 64.9,
+            "roas_google": 21.17,
             "pedidos_ga4": 129.0,
             "ingresos_ga4": 14974999.0,
-            "mer": 15.12,
+            "mer": 15.36,
             "compras_paid_social_ga4": 14.0,
             "ratio_meta_ga4": 6.57,
-            "ruido_ratio": 0.53,
-            "mer_marginal": -58.46
+            "ruido_ratio": 3.5,
+            "mer_marginal": -59.33
           },
           {
             "semana": "2026-09-14 → 2026-09-20",
@@ -2644,20 +2691,20 @@
             "parcial": false,
             "evento": false,
             "gasto_meta": 673710.0,
-            "gasto_google": 401374.0,
-            "gasto_total": 1075084.0,
+            "gasto_google": 386307.0,
+            "gasto_total": 1060017.0,
             "compras_meta": 71.0,
             "roas_meta": 15.74,
             "roas_marginal_meta": -79.99,
-            "conv_google": 90.2,
-            "roas_google": 13.04,
+            "conv_google": 45.2,
+            "roas_google": 13.55,
             "pedidos_ga4": 90.0,
             "ingresos_ga4": 9604034.0,
-            "mer": 8.93,
+            "mer": 9.06,
             "compras_paid_social_ga4": 16.0,
             "ratio_meta_ga4": 4.44,
-            "ruido_ratio": 0.5,
-            "mer_marginal": -63.48
+            "ruido_ratio": 2.2,
+            "mer_marginal": -63.17
           },
           {
             "semana": "2026-09-21 → 2026-09-27",
@@ -2665,20 +2712,20 @@
             "parcial": false,
             "evento": false,
             "gasto_meta": 746253.0,
-            "gasto_google": 440444.0,
-            "gasto_total": 1186697.0,
+            "gasto_google": 427610.0,
+            "gasto_total": 1173863.0,
             "compras_meta": 70.0,
             "roas_meta": 12.35,
             "roas_marginal_meta": -19.19,
-            "conv_google": 122.8,
-            "roas_google": 11.11,
+            "conv_google": 36.2,
+            "roas_google": 11.67,
             "pedidos_ga4": 103.0,
             "ingresos_ga4": 11671337.0,
-            "mer": 9.84,
+            "mer": 9.94,
             "compras_paid_social_ga4": 10.0,
             "ratio_meta_ga4": 7.0,
-            "ruido_ratio": 0.63,
-            "mer_marginal": 18.52
+            "ruido_ratio": 4.4,
+            "mer_marginal": 18.16
           },
           {
             "semana": "2026-09-28 → 2026-09-29",
@@ -2686,13 +2733,13 @@
             "parcial": true,
             "evento": false,
             "gasto_meta": 244505.0,
-            "gasto_google": null,
-            "gasto_total": 244505.0,
+            "gasto_google": 132459.0,
+            "gasto_total": 376964.0,
             "compras_meta": 29.0,
             "roas_meta": 40.81,
             "roas_marginal_meta": null,
-            "conv_google": null,
-            "roas_google": null,
+            "conv_google": 13.2,
+            "roas_google": 15.34,
             "pedidos_ga4": null,
             "ingresos_ga4": null,
             "mer": null,
@@ -2731,7 +2778,7 @@
       {
         "nivel": "rojo",
         "senal": "Atribución de cuenta en rojo",
-        "donde": "Meta reporta 5.59x las compras que GA4 atribuye a Paid Social; 584.7 reclamadas vs 510.0 pedidos",
+        "donde": "Meta reporta 5.6x las compras que GA4 atribuye a Paid Social; 585 reclamadas vs 510 pedidos",
         "accion": "Decidir por MER; público nuevo con paso máximo 15 %; públicos calientes sin subida vertical hasta medir (A/B nativo, geo-holdout)"
       },
       {
@@ -2785,7 +2832,7 @@
       {
         "nivel": "amarillo",
         "senal": "Gasto sin retorno medible",
-        "donde": "campañas de tráfico e interacción: $233.823 en 30 d (13000/día)",
+        "donde": "campañas de tráfico e interacción: $233.823 en 30 d ($13.000/día)",
         "accion": "Primera fuente de financiamiento del escalón de adquisición sin subir el gasto total (decisión de Jorge)"
       },
       {
@@ -2810,6 +2857,28 @@
     "runbook": {
       "filas": [
         {
+          "plataforma": "Meta",
+          "entidad": "CYBER & BLACK · Cyber 2-26 (CBO)",
+          "hoy": 13048.0,
+          "nuevo": 13048.0,
+          "fecha": "2026-09-30",
+          "orden": "2026-09-30",
+          "condicion": "frecuencia 7 d 10.9 sobre el tope 10: ampliar público o bajar presupuesto · una automatización de Meta mueve el presupuesto: desactivarla y fijar presupuesto manual",
+          "reversion": "—",
+          "accion": "corregir"
+        },
+        {
+          "plataforma": "Meta",
+          "entidad": "3 campañas de tráfico e interacción",
+          "hoy": 13000,
+          "nuevo": null,
+          "fecha": "2026-09-30",
+          "orden": "2026-09-30",
+          "condicion": "gasto sin retorno medible ($233.823 en 30 d): decidir si financian el escalón de adquisición",
+          "reversion": "—",
+          "accion": "decidir"
+        },
+        {
           "plataforma": "Google",
           "entidad": "2. Search - Genérica x SARAHI",
           "hoy": 18000.0,
@@ -2817,7 +2886,7 @@
           "fecha": "2026-10-05",
           "orden": "2026-10-05",
           "condicion": "ROAS 30 d ≥ 3.17x, ROAS 7 d no cae > 25 % y la cuota perdida por presupuesto sigue > 10 %",
-          "reversion": "si el ROAS cae > 20 % y queda bajo objetivo. volver a $18.000",
+          "reversion": "si el ROAS cae > 20 % y queda bajo objetivo, volver a $18.000",
           "accion": "subir 20 %"
         },
         {
@@ -2874,21 +2943,10 @@
           "condicion": "Verde con avisos · mantener y escalar horizontal",
           "reversion": "—",
           "accion": "mantener"
-        },
-        {
-          "plataforma": "Meta",
-          "entidad": "2. TOFU · Ventas CBO NUEVOS",
-          "hoy": 45000.0,
-          "nuevo": 45000.0,
-          "fecha": "2026-09-30",
-          "orden": "9999",
-          "condicion": "Verde justo · mantener y escalar horizontal",
-          "reversion": "—",
-          "accion": "mantener"
         }
       ],
-      "omitidas": 0,
-      "linea_meta": "sin subidas",
+      "omitidas": 1,
+      "linea_meta": "sin subidas, 1 corrección(es) el lunes",
       "linea_google": "2. Search - Genérica subir 20 % el 5 oct"
     },
     "calendario": [
@@ -2922,7 +2980,6 @@
         "evento": false,
         "acciones": [
           "Google · 2. Search - Genérica x SARAHI: subida 3 a $31.100/día el lunes 19 oct",
-          "Medición · Geo-holdout de públicos calientes: elegir desde GA4 por región 1-2 regiones con 15-20 % de los pedidos",
           "Medición · actualizar el tablero semanal: gasto, compras, pedidos, MER, ratio Meta/GA4 (28 d), impresiones de marca en Google"
         ]
       },
@@ -2932,6 +2989,7 @@
         "fin": "2026-10-27",
         "evento": false,
         "acciones": [
+          "Medición · Geo-holdout de públicos calientes (arranca al cerrar el A/B): elegir desde GA4 (traffic-analytics por región) 1-2 regiones con 15-20 % de los pedidos",
           "Medición · actualizar el tablero semanal: gasto, compras, pedidos, MER, ratio Meta/GA4 (28 d), impresiones de marca en Google"
         ]
       }
@@ -2953,9 +3011,10 @@
         "fuera": 3
       },
       "alertas_rojas": 2,
-      "linea": "Meta: sin subidas · Google: 2. Search - Genérica subir 20 % el 5 oct · Atribución: rojo (ratio 5.59x, sobre-reclamo 1.15) · MER 14.29x"
+      "linea": "Meta: sin subidas, 1 corrección(es) el lunes · Google: 2. Search - Genérica subir 20 % el 5 oct · Atribución: rojo (ratio 5.59x, sobre-reclamo 1.15) · MER 14.29x"
     },
     "faltantes": [
+      "cotas TOFU: GA4 asigna a esta etapa más ingresos (5.65x) que el techo deduplicado (4.15x): la partición nuevos→TOFU / recurrentes→calientes sobreasigna; pedir utm_campaign por campaña de Meta",
       "fecha_especial.inicio/fin (CyberMonday 2026): sin fechas no se puede aplicar la excepción de cadencia ni proteger las pruebas",
       "negocio.backend.pedidos_30d / ingresos_30d: GA4 hace de verdad provisional"
     ]

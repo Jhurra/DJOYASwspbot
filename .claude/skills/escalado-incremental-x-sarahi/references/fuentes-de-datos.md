@@ -16,7 +16,7 @@ Todo número del plan tiene que venir de una de estas fuentes o de Jorge. Leer e
 | 8 | AgencyAnalytics Google Ads por campaña | costo, conversiones, valor, ROAS, IS, Lost IS | 30d y 7d |
 | 9 | AgencyAnalytics GA4 por canal | sesiones, compras, ingresos, compradores nuevos | 30d y 7d |
 | 10 | AgencyAnalytics GA4 por source/medium | compras de ig/fb/an paid y google/cpc para triangular | 30d |
-| 11 | Jorge (backend PrestaShop) | pedidos reales, ingresos, % clientes nuevos, margen, ticket | 30d |
+| 11 | Jorge (backend de la tienda: PrestaShop, Shopify, WooCommerce…) | pedidos reales, ingresos, % clientes nuevos, margen, ticket | 30d |
 
 Si una fuente falla, se sigue con las demás y la sección afectada del HTML dice "sin datos: verificación manual". Nunca se rellena con estimaciones.
 
@@ -26,7 +26,7 @@ Todas las tools requieren `client_conversation_id` (20 caracteres alfanuméricos
 
 ### Cuenta
 
-`ads_get_ad_accounts` → elegir la cuenta cuyo nombre coincide con el cliente **y** `is_queryable: true` **y** `account_status: ACTIVE`. Las cuentas "OFF" cerradas tienen nombre parecido y fallan. DJOYAS Ads = `1497045771133996`.
+`ads_get_ad_accounts` → elegir la cuenta cuyo nombre coincide con el cliente **y** `is_queryable: true` **y** `account_status: ACTIVE`. Las cuentas "OFF" o cerradas suelen tener nombre parecido y fallan; el id de la cuenta de cada cliente vive en su `data-<marca>.json` (`meta.ad_account_id`), no en esta referencia.
 
 ### Entidades y métricas
 
@@ -40,10 +40,10 @@ Campos verificados por nivel:
 | `objective` | sí | — | — | OUTCOME_SALES, OUTCOME_ENGAGEMENT, OUTCOME_TRAFFIC… |
 | `daily_budget`, `lifetime_budget`, `budget_remaining` | sí (CBO) | sí (ABO) | — | `{"value":"45000","unit":"CLP"}`; null cuando el presupuesto vive en el otro nivel |
 | `optimization_goal` | — | sí | — | OFFSITE_CONVERSIONS, VALUE, LANDING_PAGE_VIEWS, POST_ENGAGEMENT… |
-| `attribution_setting` | — | sí | — | `1d_click`, `7d_click`, `1d_view_7d_click`, `1d_view_7d_click_1d_ev`, `incrementality` |
-| `learning_stage_info` | — | sí | — | `{status: LEARNING|SUCCESS, conversions, last_sig_edit_ts (epoch), attribution_windows}` |
+| `attribution_setting` | — | sí | — | `1d_click`, `7d_click`, `1d_view_1d_click`, `1d_view_7d_click`, `1d_view_7d_click_1d_ev`, `skan`, `incrementality` |
+| `learning_stage_info` | — | sí | — | `{status: LEARNING|SUCCESS|FAIL|WAIVING, conversions, last_sig_edit_ts (epoch), attribution_windows}`. `FAIL` = aprendizaje limitado (Meta nunca devuelve `LEARNING_LIMITED`); `WAIVING` = sin fase de aprendizaje |
 | `bid_strategy` | sí | sí | — | LOWEST_COST_WITHOUT_CAP, COST_CAP, LOWEST_COST_WITH_MIN_ROAS |
-| `amount_spent`, `impressions`, `reach`, `frequency`, `cpm`, `cpc`, `ctr` | sí | sí | sí | moneda como `{value, unit}`; `ctr` entra al JSON como `ctr` en m7/m30 para la regla de fatiga |
+| `amount_spent`, `impressions`, `reach`, `frequency`, `cpm`, `cpc`, `ctr` | sí | sí | sí | moneda como `{value, unit}`; `ctr` es CTR (todos los clics, no solo enlace) y entra al JSON como `ctr` en m7/m30: la regla de fatiga compara 7 d contra 30 d de esa misma métrica, así que la definición no importa mientras sea la misma en ambas ventanas |
 | `link_click`, `outbound_clicks`, `omni_landing_page_view` | sí | sí | sí | |
 | `omni_add_to_cart`, `omni_initiated_checkout`, `omni_purchase` | sí | sí | sí | `omni_purchase` = compras (alias `purchases`) |
 | `offsite_conversion_fb_pixel_purchase_values` | sí | sí | sí | valor de compras web en CLP (alias `website_purchase_value`) |
@@ -55,8 +55,8 @@ No existen vía MCP (no pedirlos): comparación de ventanas de atribución por c
 Trampas:
 
 - Las campañas de interacción y tráfico devuelven `omni_purchase: null`: no son "ROAS 0", están fuera del plan de ventas. Reportarlas como gasto sin ROAS.
-- `frequency` a 30 días en retargeting llega a 10-12 y no es comparable con la de 7 días; el semáforo usa 7 días y muestra 30 como contexto.
-- Un conjunto con `learning_stage_info.status = LEARNING` y `conversions < 10` sigue en aprendizaje aunque lleve semanas: cualquier subida lo reinicia.
+- `frequency` a 30 días en retargeting llega a 10-12 y no es comparable con la de 7 días: los topes de la etapa se aplican a 7 días (aviso y bloqueo); la de 30 días solo baja un escalón cuando supera el tope, como señal de público chico.
+- Un conjunto con `learning_stage_info.status = LEARNING` y `conversions < 10` sigue en aprendizaje aunque lleve semanas: cualquier subida lo reinicia. `status = FAIL` es "aprendizaje limitado" y bloquea la subida vertical.
 - `last_sig_edit_ts` es la última edición significativa (presupuesto, puja, público, anuncios). Convertir a fecha y calcular días hasta hoy.
 - `time_increment` va como string (`"7"`), no como número.
 - Los números vienen con formato chileno en algunos campos (puntos de miles, comas decimales): usar `parse_num()` del script.
@@ -69,7 +69,7 @@ Con esto el script calcula por entidad: fecha de la última subida, % de cambio,
 
 ### Experimentos e incrementalidad nativa
 
-- `ads_experiment_list_tests(ad_account_id: "act_<id>")` → estudios LIFT y SPLIT_TEST con estado, celdas y objetivos. `has_active_study: true` bloquea cambios de presupuesto en las campañas del estudio.
+- `ads_experiment_list_tests(ad_account_id: "act_<id>")` → estudios `LIFT` y `SPLIT_TEST_V2` con estado, celdas y objetivos. `has_active_study: true` bloquea cambios de presupuesto en las campañas del estudio.
 - `ads_experiment_check_eligibility(ad_account_id: "act_<id>")` → `lift.eligible` y `checks`. Requisitos del Conversion Lift self-serve: ≥ USD 5.000 de gasto en 90 días, ≥ 500 conversiones optimizadas en la ventana, EMQ ≥ 5 vía CAPI.
 - `ads_experiment_lift_get_test(study_id)` → resultados: conversiones incrementales, costo por conversión incremental, ROAS incremental (o lift de marca en puntos porcentuales).
 - `ads_experiment_lift_create_test(ad_account_id, study_name, start_time, end_time)` → crea el estudio. **Solo con confirmación explícita de Jorge.**
@@ -84,7 +84,7 @@ Cuando Jorge exporta el CSV de comparación de ventanas, las columnas se cargan 
 
 ## 2. AgencyAnalytics
 
-Un cliente por consulta. Flujo: `search_clients(query: "<marca>")` → `clientId` y `providers`. Luego `browse_client_data_sources(clientId, message, requireDateRange: true)` para obtener los `integration_campaign_id` de Google Ads y GA4 (cambian por cliente).
+Un cliente por consulta. Flujo: `search_clients(query: "<marca>")` → `id` (es el `clientId` de las demás tools) y `providers`. Luego `browse_client_data_sources(clientId, message, requireDateRange: true)` para obtener los `integration_campaign_id` de Google Ads y GA4 (cambian por cliente).
 
 ### Google Ads
 
@@ -101,7 +101,7 @@ read_client_data_source(
   limit: 50)
 ```
 
-Devuelve CSV más una sección `Totals:`; usar los totales del conector, no sumar filas. `conv_value_per_cost` es el ROAS. `budget` es diario. Se piden **dos ventanas** (30 d y 7 d): el ROAS de 30 d decide la rentabilidad y la cuota de impresiones de 7 d diagnostica la restricción. `conversions_by_conv_date` sirve para distinguir rezago de conversión de una caída real en la ventana de 7 d.
+Devuelve CSV más una sección `Totals:`; usar los totales del conector, no sumar filas. Para `google.semanas` se repite la misma consulta por semana (lunes a domingo, más la semana parcial) y se suman solo las campañas de venta: `groupBy: ["campaign", "date"]` falla en este conector. `conv_value_per_cost` es el ROAS. `budget` es diario. Se piden **dos ventanas** (30 d y 7 d): el ROAS de 30 d decide la rentabilidad y la cuota de impresiones de 7 d diagnostica la restricción. `conversions_by_conv_date` sirve para distinguir rezago de conversión de una caída real en la ventana de 7 d.
 
 ### GA4 por canal (compras, ingresos, sesiones)
 
@@ -134,7 +134,7 @@ Con UTMs de campaña bien puestas, el filtro `utm_campaign: ["<nombre>"]` (array
 
 ### Meta agregado vía AgencyAnalytics (fallback si el MCP de Meta no responde)
 
-provider `facebook-ads`, asset `ad-analytics`, `groupBy: ["campaign"]` o `["date"]`, campos `amount_spent, impressions, ctr, cpm, frequency, landing_page_views, add_to_cart, checkout_initiated, purchases, purchases_conversion_value, purchases_roas`. No trae presupuestos, aprendizaje ni atribución: el plan se marca como "lectura parcial".
+provider `facebook-ads`, asset `ad-analytics`, `groupBy: ["campaign"]` o `["date"]`, campos `amount_spent, impressions, ctr, cpm, frequency, landing_page_views, add_to_cart, checkout_initiated, purchases, purchases_conversion_value, purchases_roas, attribution_setting, objective`. Sí trae `attribution_setting` y `objective` por campaña; no trae presupuestos ni aprendizaje: esos dos quedan en verificación manual y el plan se marca como "lectura parcial".
 
 ## 3. Persistencia entre corridas
 

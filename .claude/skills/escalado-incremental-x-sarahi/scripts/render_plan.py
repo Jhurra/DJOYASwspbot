@@ -44,6 +44,11 @@ def money(v, signo=False, moneda="$"):
     return f"{pre}{moneda}{s}"
 
 
+def xnum(v, nd=1):
+    """Ratio con sufijo x; None → '—'."""
+    return "—" if v is None else f"{num(v, nd)}x"
+
+
 def num(v, nd=0):
     if v is None:
         return "—"
@@ -125,8 +130,17 @@ def pill_nivel(nivel):
     return f'<span class="pill {tono}"><i></i>{esc(str(nivel).capitalize())}</span>'
 
 
+NIVEL_PPTO = {"adset": "conjunto (ABO)", "campaign": "campaña (CBO)"}
+APRENDIZAJE = {"LEARNING": "en aprendizaje", "SUCCESS": "estable", "LEARNING_LIMITED": "aprendizaje limitado", "FAIL": "aprendizaje limitado", "SIN_APRENDIZAJE": "sin fase de aprendizaje", "WAIVING": "sin fase de aprendizaje"}
+TIPO_GOOGLE = {"generica": "genérica", "pmax": "PMax", "marca": "marca", "shopping": "Shopping", "display": "Display", "video": "Video", "demand_gen": "Demand Gen"}
+
+
+def etiqueta(mapa, v):
+    return mapa.get(v, v or "—") if v else "—"
+
+
 def pill_conf(conf):
-    tono = {"alta": "ok", "media": "warn", "baja": "bad"}.get(conf, "muted")
+    tono = {"alta": "ok", "media": "warn", "baja": "bad", "no verificable": "muted"}.get(conf, "muted")
     return f'<span class="pill {tono}"><i></i>confianza {esc(conf or "—")}</span>'
 
 
@@ -169,12 +183,17 @@ def sec_runbook(D, N, data):
     inner = f'<div class="linea">{esc(linea)}</div>'
     rows = []
     for f in R.get("filas") or []:
-        cambio = money(f.get("hoy")) if f.get("accion") == "mantener" else f"{money(f.get('hoy'))} → <strong>{money(f.get('nuevo'))}</strong>"
-        rows.append([esc(f.get("plataforma")), f"<strong>{esc(f.get('entidad'))}</strong>", esc(f.get("accion")), cambio, fecha_larga(f.get("fecha")) if f.get("accion") != "mantener" else "—", esc(f.get("condicion")), esc(f.get("reversion"))])
+        acc = f.get("accion") or ""
+        if acc in ("mantener", "corregir") or f.get("nuevo") is None:
+            cambio = money(f.get("hoy")) + (" <span class=mut>(sin cambio de monto)</span>" if acc == "corregir" else "")
+        else:
+            cambio = f"{money(f.get('hoy'))} → <strong>{money(f.get('nuevo'))}</strong>"
+        rows.append([esc(f.get("plataforma")), f"<strong>{esc(f.get('entidad'))}</strong>", f"<strong>{esc(acc)}</strong>" if acc not in ("mantener",) else esc(acc), cambio,
+                     fecha_larga(f.get("fecha")) if acc != "mantener" else "—", esc(f.get("condicion")), esc(f.get("reversion"))])
     if rows:
         inner += table(["Plataforma", "Entidad", "Acción", "Presupuesto diario", "Fecha", "Condición", "Reversión"], rows, "compact")
     if R.get("omitidas"):
-        inner += f'<p class="mut">{R["omitidas"]} entidad(es) más sin cambios; ver secciones 07 y 08.</p>'
+        inner += f'<p class="mut">{R["omitidas"]} entidad(es) más sin cambios; ver secciones 08 y 09.</p>'
     ver = (N.get("resumen") or {}).get("veredicto")
     if ver:
         inner += f'<p class="lead">{esc(ver)}</p>'
@@ -193,11 +212,12 @@ def sec_resumen(D, N, data):
         kpi("Presupuesto Google / día", money(R.get("presupuesto_google_hoy")), f"→ {money(R.get('presupuesto_google_tras_subida_1'))} tras la subida 1", "peri"),
         kpi("MER 30 días", roas(m.get("mer_30d")), f"ingresos totales / pauta total · equilibrio {roas(m.get('mer_equilibrio'))} · objetivo {roas(m.get('mer_objetivo'))}", "lime"),
         kpi("aMER 30 días", roas(m.get("amer_30d")), "ingresos de clientes nuevos / pauta total", "ink"),
-        kpi("Atribución de cuenta", (sem or "sin datos").capitalize(), f"ratio Meta/GA4 {num(t.get('ratio_meta_vs_ga4_canal'), 1)}x · sobre-reclamo {num(t.get('indice_sobre_reclamo'), 2)}", {"rojo": "bad", "amarillo": "orange", "verde": "ok"}.get(sem, "ink")),
+        kpi("Atribución de cuenta", (sem or "sin datos").capitalize(), f"ratio Meta/GA4 {xnum(t.get('ratio_meta_vs_ga4_canal'))} · sobre-reclamo {num(t.get('indice_sobre_reclamo'), 2)}", {"rojo": "bad", "amarillo": "orange", "verde": "ok"}.get(sem, "ink")),
         kpi("ROAS real de Meta", f"{roas(t.get('roas_meta_pesimista_ga4'))} – {roas(t.get('roas_meta_optimista'))}", f"cota GA4 último clic → Ads Manager · central {roas(((A.get('cotas_etapa') or {}).get('CUENTA') or {}).get('central'))}", "ink"),
     ]
     inner = f'<div class="kpis six">{"".join(kpis)}</div>'
     inner += nota(esc(t.get("semaforo_atribucion_lectura") or ""), {"rojo": "warn", "amarillo": "warn"}.get(sem, "muted"))
+    inner += '<p class="mut">Glosario: número mágico = ROAS objetivo del plan · MER = ingresos totales de la tienda / pauta total · aMER = ingresos de clientes nuevos / pauta total · ROAS marginal = valor adicional / gasto adicional entre dos semanas · CBO / ABO = presupuesto en campaña / en conjunto · tROAS = ROAS objetivo de la puja en Google · EMQ = calidad de emparejamiento de eventos de Meta · CAPI = Conversions API (eventos enviados desde el servidor).</p>'
     return section("02", "Resumen de la cuenta", "Los tres números que deciden: ROAS contra el número mágico, MER y atribución", inner, "resumen")
 
 
@@ -214,10 +234,13 @@ def sec_negocio(D, N, data):
         ["Ciclo de recompra", f"{num(neg.get('ciclo_recompra_dias'))} días" if neg.get("ciclo_recompra_dias") else "—", "ventana de contaminación del retargeting"],
     ]
     be = neg.get("backend") or {}
-    rows.append(["Pedidos e ingresos reales 30 d (backend)", f"{num(be.get('pedidos_30d'))} · {money(be.get('ingresos_30d'))}" if be.get("pedidos_30d") else "pendiente", esc(be.get("nota") or "backend")])
+    t = (D.get("atribucion") or {}).get("triangulacion") or {}
+    be_txt = f"{num(t.get('pedidos_reales_30d'))} · {money(t.get('ingresos_reales_30d'))}" if t.get("origen_verdad") == "backend" else "pendiente"
+    rows.append(["Pedidos e ingresos reales 30 d (backend)", be_txt, esc(be.get("nota") or "backend")])
     ev = n.get("evento") or {}
     if ev.get("nombre"):
-        rows.append(["Fecha especial", f"{esc(ev.get('nombre'))} · {ev.get('inicio') or 'fechas por confirmar'}{(' → ' + ev['fin']) if ev.get('fin') else ''}" + (" · activo" if ev.get("activo") else ""), "excepción a la cadencia (48 h), no al tope de 35 %"])
+        fechas = (fecha_larga(ev.get("inicio")) + ((" → " + fecha_larga(ev["fin"])) if ev.get("fin") else "")) if ev.get("inicio") else "fechas por confirmar"
+        rows.append(["Fecha especial", f"{esc(ev.get('nombre'))} · {fechas}" + (" · activo" if ev.get("activo") else ""), "excepción a la cadencia (48 h), no al tope de 35 %"])
     return section("03", "Números del negocio", "Sin estos números no hay semáforo financiero", table(["Dato", "Valor", "Origen"], rows), "negocio")
 
 
@@ -228,14 +251,14 @@ def sec_meta(D, N, data):
         if not e.get("es_ventas"):
             continue
         h = e.get("historial") or {}
-        apr = e.get("aprendizaje") or "—"
+        apr = etiqueta(APRENDIZAJE, e.get("aprendizaje"))
         if e.get("conversiones_aprendizaje") is not None and apr != "—":
             apr += f" ({num(e['conversiones_aprendizaje'])})"
         ult = "—" if h.get("dias") is None else f"hace {h['dias']} d"
         if h.get("subidas_14d") is not None:
             ult += f" · {h['subidas_14d']} subidas/14 d"
         rows.append([
-            f"<strong>{esc(e['nombre'])}</strong><br><span class=mut>{esc(e.get('etapa'))} · presupuesto en {esc(e.get('nivel_presupuesto') or '—')} · {esc(e.get('attribution_setting') or '—')}<br>aprendizaje {esc(apr)} · última subida {ult}</span>",
+            f"<strong>{esc(e['nombre'])}</strong><br><span class=mut>{esc(e.get('etapa'))} · presupuesto por {esc(etiqueta(NIVEL_PPTO, e.get('nivel_presupuesto')))} · atribución {esc(e.get('attribution_setting') or '—')}<br>{esc(apr)} · última subida {ult}<br>id {esc(e.get('id') or '—')}</span>",
             money(e.get("presupuesto_diario")),
             f"<strong>{roas(e.get('roas_7d'))}</strong> <span class=mut>/ {roas(e.get('roas_30d'))}</span>",
             f"{num(e.get('compras_7d'))} <span class=mut>/ {num(e.get('compras_30d'))}</span>",
@@ -287,7 +310,7 @@ def sec_google(D, N, data):
         is_txt = f"{pct(e.get('is_7d') if e.get('is_7d') is not None else e.get('is_30d'))}<br><span class=mut>perdida ({esc(e.get('ventana_is'))}): ppto. {pct(e.get('lost_is_budget_7d') if e.get('lost_is_budget_7d') is not None else e.get('lost_is_budget_30d'))} · ranking {pct(e.get('lost_is_rank_7d') if e.get('lost_is_rank_7d') is not None else e.get('lost_is_rank_30d'))}</span>"
         gasto = f"{money(e.get('costo_30d'))}<br><span class=mut>{num(e.get('conv_30d'), 1)} conv. · {money(e.get('valor_30d'))}</span>"
         sub7 = f" · gasto 7 d {money(e.get('gasto_dia_7d'))}/día" if e.get("gasto_dia_7d") else ""
-        rows.append([f"<strong>{esc(e['nombre'])}</strong><br><span class=mut>{esc(e.get('tipo'))} · {money(e.get('presupuesto_diario'))}/día{sub7}</span>", gasto,
+        rows.append([f"<strong>{esc(e['nombre'])}</strong><br><span class=mut>{esc(etiqueta(TIPO_GOOGLE, e.get('tipo')))} · {money(e.get('presupuesto_diario'))}/día{sub7}</span>", gasto,
                      f"<strong>{roas(e.get('roas_30d'))}</strong> <span class=mut>/ {roas(e.get('roas_7d'))}</span>", is_txt, pill(e.get("estado"), e.get("etiqueta"))])
     inner = table(["Campaña", "Costo · conv. · valor 30 d", "ROAS 30 d / 7 d", "Cuota de impresiones", "Semáforo"], rows, cls="google", aligns=["l", "r", "r", "r", "l"])
     k1 = kpi("ROAS de ventas 30 d", roas(G.get("roas_ventas_30d")), "todas las campañas de venta", "ink")
@@ -334,7 +357,7 @@ def sec_atribucion(D, N, data):
     nm, eq = D["negocio"].get("numero_magico"), D["negocio"].get("roas_equilibrio")
     tiles = [
         kpi("Meta reporta", f"{num(t.get('meta_compras_30d'))} compras", f"GA4 atribuye {num(t.get('ga4_compras_paid_social_30d'))} a Paid Social ({num(t.get('ga4_compras_meta_utm_30d'))} por UTM de pauta)", "orange"),
-        kpi("Ratio Meta / GA4", f"{num(t.get('ratio_meta_vs_ga4_canal'), 1)}x", f"banda {t.get('banda_ratio_meta') or '—'} · normal ≤ {num(A['supuestos']['ratio_normal'], 1)}x · elevado ≤ {num(A['supuestos']['ratio_elevado'], 1)}x · ventana {A['supuestos']['ventana_ratio_dias']} d", "ink"),
+        kpi("Ratio Meta / GA4", xnum(t.get('ratio_meta_vs_ga4_canal')), f"banda {t.get('banda_ratio_meta') or '—'} · normal ≤ {num(A['supuestos']['ratio_normal'], 1)}x · elevado ≤ {num(A['supuestos']['ratio_elevado'], 1)}x · 30 d de la corrida, tablero en {A['supuestos']['ventana_ratio_dias']} d móviles", "ink"),
         kpi("Google Ads reporta", f"{num(t.get('google_conv_ventas_30d'), 0)} conv.", f"GA4 atribuye {num(t.get('ga4_compras_google_cpc_30d'))} a google/cpc · ratio {num(t.get('ratio_google_vs_ga4'), 2)}x ({t.get('banda_ratio_google') or '—'})", "peri"),
         kpi("Reclamado vs. real", f"{num(t.get('compras_reclamadas_plataformas'), 0)} vs {num(t.get('pedidos_reales_30d'))}", f"índice {num(t.get('indice_sobre_reclamo'), 2)} en compras · {num(t.get('indice_sobre_reclamo_valor'), 2)} en valor · verdad: {t.get('origen_verdad') or '—'} · deduplicación {num(t.get('factor_deduplicacion_global'), 2)}", "lime"),
     ]
@@ -345,7 +368,8 @@ def sec_atribucion(D, N, data):
         pos = lambda x: max(0, min(100, (x / hi) * 100))
         inner += ('<h3>Dónde está la verdad del ROAS de Meta</h3>'
                   f'<div class="band"><div class="band-bar"><span class="mark eq" style="left:{pos(eq or 0):.1f}%"></span><span class="mark nm" style="left:{pos(nm or 0):.1f}%"></span>'
-                  f'<span class="range" style="left:{pos(lo):.1f}%;width:{max(1, pos(hi) - pos(lo)):.1f}%"></span>'
+                  f'<span class="range" style="left:{pos(lo):.1f}%;width:{max(1, pos(cc if cc else hi) - pos(lo)):.1f}%"></span>'
+                  + (f'<span class="range hi" style="left:{pos(cc):.1f}%;width:{max(1, pos(hi) - pos(cc)):.1f}%"></span>' if cc else "")
                   + (f'<span class="mark cc" style="left:{pos(cc):.1f}%"></span>' if cc else "") + '</div>'
                   f'<div class="band-labels"><span>Piso: GA4 último clic <strong>{roas(lo)}</strong></span><span>Equilibrio {roas(eq)} · Número mágico {roas(nm)}' + (f' · Central {roas(cc)}' if cc else '') + f'</span><span>Techo: Ads Manager <strong>{roas(hi)}</strong></span></div></div>'
                   f'<p class="mut">Meta reclama el {pct(t.get("share_meta_sobre_ingresos"))} de los ingresos totales de la tienda. La verdad está entre las dos cotas; las pruebas de abajo la acotan.</p>')
@@ -356,7 +380,7 @@ def sec_atribucion(D, N, data):
             crows.append([f"<strong>{esc(x.get('nombre'))}</strong>", money(x.get("gasto_30d")), num(x.get("compras_30d")), roas(x.get("roas_reportado")), roas(x.get("piso")), f"<strong>{roas(x.get('central'))}</strong>", roas(x.get("techo")), f"{num(x.get('ia'), 1)}<br>{pill_conf(x.get('confianza'))}"])
     if crows:
         inner += "<h3>Cotas de incrementalidad por etapa (30 días)</h3>"
-        inner += table(["Etapa", "Gasto", "Compras Meta", "ROAS reportado", "Piso (GA4)", "Central", "Techo (deduplicado)", "Índice de incertidumbre"], crows, aligns=["l", "r", "r", "r", "r", "r", "r", "l"])
+        inner += table(["Etapa", "Gasto", "Compras Meta", "ROAS reportado", "Piso (GA4)", "Central", "Techo (deduplicado)", "Índice de incertidumbre"], crows, "cotas", aligns=["l", "r", "r", "r", "r", "r", "r", "l"])
         inner += nota("Piso = ingresos que GA4 atribuye por último clic a Paid Social / gasto. Techo = compras reportadas × factor de deduplicación global × ticket / gasto (lo que cabe en los pedidos reales). Central = media geométrica. Índice de incertidumbre = techo / piso: ≤ 2 confianza alta, ≤ 5 media, más de 5 baja. " + esc(C.get("nota") or ""), "muted")
     rows = []
     for e in D["meta"].get("entidades") or []:
@@ -398,8 +422,8 @@ def escalera_html(e):
 
 
 def card_entidad(e, notas, es_meta=True):
-    sub = f"{esc(e.get('etapa'))} · presupuesto en {esc(e.get('nivel_presupuesto') or '—')} · {money(e.get('presupuesto_diario'))}/día" if es_meta else f"{esc(e.get('tipo'))} · {money(e.get('presupuesto_diario'))}/día"
-    body = f'<div class="card-head"><div><h3>{esc(e["nombre"])}</h3><span class=mut>{sub}</span></div>{pill(e.get("estado"), e.get("etiqueta"))}</div>'
+    sub = f"{esc(e.get('etapa'))} · presupuesto por {esc(etiqueta(NIVEL_PPTO, e.get('nivel_presupuesto')))} · {money(e.get('presupuesto_diario'))}/día" if es_meta else f"{esc(etiqueta(TIPO_GOOGLE, e.get('tipo')))} · {money(e.get('presupuesto_diario'))}/día"
+    body = f'<div class="card-head"><div><h3>{esc(e["nombre"])}</h3><span class=mut>{sub}' + (f" · id {esc(e.get('id'))}" if e.get("id") else "") + f'</span></div>{pill(e.get("estado"), e.get("etiqueta"))}</div>'
     body += lista(e.get("motivos"), "motivos")
     if e.get("caps"):
         body += nota("<strong>Por qué no sube más:</strong> " + " · ".join(esc(c) for c in e["caps"]), "muted")
@@ -438,7 +462,7 @@ def sec_vertical_meta(D, N, data):
 def sec_vertical_google(D, N, data):
     G = D["google"]
     if not G.get("disponible"):
-        return ""
+        return section("09", "Plan de escalado vertical en Google Ads", None, nota("Sin datos de Google Ads en esta lectura: no hay plan vertical de Google. Verificación manual.", "muted"), "vertical-google")
     notas = N.get("notas_entidades") or {}
     cards = [card_entidad(e, notas, False) for e in G.get("entidades") or [] if e.get("es_ventas")]
     resumen = nota(f"<strong>Presupuesto diario en Google:</strong> {money(G.get('presupuesto_dia_hoy'))} hoy → {money(G.get('presupuesto_dia_tras_subida_1'))} tras la subida 1. Un cambio por campaña por semana, siempre lunes, y nunca presupuesto y tROAS a la vez.")
@@ -527,7 +551,7 @@ def sec_limites(D, N, data):
 # --------------------------------------------------------------------------------------
 CSS = """
 :root{--charcoal:#323232;--orange:#f2692d;--peri:#8088e6;--lime:#e0fb9b;--cream:#fcf2e3;--gray:#f5f5f5;--white:#fff;
---text:#323232;--body:#4a4a4a;--muted:#8a8a8a;--border:#ececec;--ok:#3f9d5a;--bad:#d6453c;--warn:#f2692d;--wait:#8088e6;
+--text:#323232;--body:#4a4a4a;--muted:#9a9a9a;--text-2:#6b6b6b;--border:#ececec;--ok:#3f9d5a;--bad:#d6453c;--warn:#f2692d;--wait:#8088e6;
 --r-lg:24px;--r-xl:32px;--r-md:16px;--shadow-sm:0 2px 8px rgba(50,50,50,.08)}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--cream);color:var(--body);font-family:'DM Sans',ui-sans-serif,system-ui,sans-serif;font-size:15px;line-height:1.6}
@@ -551,13 +575,13 @@ p.lead{font-size:17px;line-height:1.6;color:var(--text);margin:20px 0 8px;max-wi
 @media (min-width:900px){.kpis.six{grid-template-columns:repeat(3,1fr)}}
 .kpi{border-radius:var(--r-md);padding:18px 20px;min-height:112px;display:flex;flex-direction:column;justify-content:flex-end}
 .kpi .v{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.05}
-.kpi .l{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:8px;opacity:.85}
-.kpi .s{font-size:12px;margin-top:6px;opacity:.8;line-height:1.4}
+.kpi .l{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:8px}
+.kpi .s{font-size:13px;margin-top:6px;line-height:1.4}
 .kpi.orange{background:var(--orange);color:#fff}.kpi.peri{background:var(--peri);color:#fff}.kpi.lime{background:var(--lime);color:var(--charcoal)}.kpi.ink{background:var(--charcoal);color:#fff}
 .kpi.bad{background:var(--bad);color:#fff}.kpi.ok{background:var(--ok);color:#fff}
 .tscroll{overflow-x:auto;margin:10px 0}
 table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff}
-th{background:var(--charcoal);color:#fff;text-align:left;padding:10px 10px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;vertical-align:bottom}
+th{background:var(--charcoal);color:#fff;text-align:left;padding:10px 10px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;line-height:1.3;vertical-align:bottom}
 th:first-child{border-radius:12px 0 0 0}th:last-child{border-radius:0 12px 0 0}
 td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--body)}
 td:first-child{min-width:230px}
@@ -566,23 +590,23 @@ tr:last-child td{border-bottom:none}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 td.num{white-space:nowrap}
 table.compact td,table.compact th{padding:8px 10px;font-size:13px}
-.mut{color:var(--muted);font-size:12.5px}
+.mut{color:var(--text-2);font-size:13px}
 strong{color:var(--text);font-weight:600}
 .ok{color:var(--ok)}.bad{color:var(--bad)}
 .pill{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;background:var(--gray);color:var(--text)}
-.pill i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;flex:none}
-td .pill{white-space:normal;line-height:1.35;align-items:flex-start}td .pill i{margin-top:5px}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--text-2);display:inline-block;flex:none}
+td .pill,.card-head .pill{white-space:normal;line-height:1.35;align-items:flex-start;max-width:100%}td .pill i,.card-head .pill i{margin-top:5px}
 table.google td:last-child{min-width:210px}table.google th:last-child{min-width:210px}
 table.cotas td:last-child{min-width:150px}
 table.tablero td:first-child{min-width:120px}table.tablero td,table.tablero th{padding-left:8px;padding-right:8px}
-.pill.ok{background:#e6f4ea;color:#256b3b}.pill.ok i{background:var(--ok)}
-.pill.warn{background:#fde9de;color:#9a3d12}.pill.warn i{background:var(--warn)}
-.pill.bad{background:#fbe3e1;color:#8e2b25}.pill.bad i{background:var(--bad)}
-.pill.wait{background:#e6e8fb;color:#3d45a3}.pill.wait i{background:var(--wait)}
-.pill.muted{background:var(--gray);color:#6b6b6b}
+.pill.ok{background:color-mix(in srgb,var(--ok) 14%,white);color:var(--charcoal)}.pill.ok i{background:var(--ok)}
+.pill.warn{background:color-mix(in srgb,var(--orange) 16%,white);color:var(--charcoal)}.pill.warn i{background:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 14%,white);color:var(--charcoal)}.pill.bad i{background:var(--bad)}
+.pill.wait{background:color-mix(in srgb,var(--peri) 18%,white);color:var(--charcoal)}.pill.wait i{background:var(--wait)}
+.pill.muted{background:var(--gray);color:var(--text-2)}
 .callout{border-radius:var(--r-md);padding:14px 18px;margin:14px 0;font-size:14px;line-height:1.55}
-.callout.note{background:#e6e8fb;color:#2e3577}
-.callout.warn{background:#fde9de;color:#7a2f0c}
+.callout.note{background:color-mix(in srgb,var(--peri) 16%,white);color:var(--charcoal)}
+.callout.warn{background:color-mix(in srgb,var(--orange) 16%,white);color:var(--charcoal)}
 .callout.muted{background:var(--gray);color:var(--body)}
 .card{background:var(--gray);border-radius:var(--r-lg);padding:22px 24px;margin:14px 0}
 .card .card-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
@@ -596,19 +620,19 @@ ul.motivos{margin:10px 0 0}
 .box h3{margin:0 0 4px}.box p{margin:0 0 6px}
 .timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
 .tl{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px}
-.tl:nth-child(1){border-top:6px solid var(--orange)}.tl:nth-child(2){border-top:6px solid var(--peri)}.tl:nth-child(3){border-top:6px solid var(--lime)}.tl:nth-child(4){border-top:6px solid var(--charcoal)}
-.tl.evento{background:#fde9de}
-.tl .when{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px}
+.tl:nth-child(1) .when{color:var(--orange)}.tl:nth-child(2) .when{color:var(--peri)}
+.tl.evento{background:color-mix(in srgb,var(--orange) 16%,white)}
+.tl .when{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text);margin-bottom:6px}
 .tl ul{font-size:13.5px}
 .band{margin:8px 0 6px}.band-bar{position:relative;height:14px;border-radius:999px;background:var(--gray)}
-.band-bar .range{position:absolute;top:0;height:14px;border-radius:999px;background:linear-gradient(90deg,var(--peri),var(--orange))}
+.band-bar .range{position:absolute;top:0;height:14px;border-radius:999px 0 0 999px;background:var(--peri)}.band-bar .range.hi{border-radius:0 999px 999px 0;background:var(--orange)}
 .band-bar .mark{position:absolute;top:-6px;width:3px;height:26px;background:var(--charcoal);border-radius:2px}
 .band-bar .mark.eq{background:var(--bad)}.band-bar .mark.nm{background:var(--ok)}.band-bar .mark.cc{background:var(--charcoal);width:5px}
-.band-labels{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:10px;gap:12px;flex-wrap:wrap}
+.band-labels{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-2);margin-top:10px;gap:12px;flex-wrap:wrap}
 footer{margin-top:32px;background:var(--charcoal);color:rgba(255,255,255,.75);border-radius:var(--r-xl);padding:26px 36px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;font-size:13px}
 footer strong{color:#fff}footer img{height:24px;filter:brightness(0) invert(1)}
 @media (max-width:720px){header.hero{padding:28px 24px;flex-direction:column}header.hero h1{font-size:30px}section{padding:22px 18px}.wrap{padding:16px 16px 40px}}
-@media print{body{background:#fff}.wrap{max-width:none;padding:0}section{break-inside:avoid;box-shadow:none;border-color:#ddd;margin-bottom:16px}header.hero{border-radius:16px}.tscroll{overflow:visible}@page{size:A4;margin:14mm}}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:#fff}.wrap{max-width:none;padding:0}section{box-shadow:none;border-color:var(--border);margin-bottom:16px;padding:20px 22px}.card,.kpi,tr,.callout,.tl,.box{break-inside:avoid}header.hero{border-radius:16px}.tscroll{overflow:visible}table{font-size:11px}td:first-child,table.google td:last-child,table.google th:last-child,table.cotas td:last-child{min-width:0}@page{size:A4 landscape;margin:12mm}}
 """
 
 

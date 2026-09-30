@@ -118,4 +118,4 @@ La skill suma a esta tabla las señales de atribución (ver `umbrales-y-semaforo
 | Nivel del presupuesto | no cambiar | — | no cambiar; CBO admite presupuesto + anuncios nuevos el mismo día, ABO solo presupuesto |
 | Frecuencia | tope por fase | aviso por etapa | aviso SARAHI = un escalón menos; tope FV = no subir; fatiga (frecuencia + ROAS 7 d < 0,8 × 30 d + CTR 7 d < 0,8 × 30 d) = renovar anuncios antes de subir |
 | Fechas especiales | excepción a la cadencia | — | cadencia 48 h y **tope 35 % se mantiene**; solo lo excelente con ≥ 20 compras en 7 d; el resto congelado; reversión al cierre |
-| Atribución | — | mentalidad escéptica ante ROAS altos | semáforo de atribución de cuenta: amarillo ≤ 20 %; rojo ≤ 15 % en público nuevo y 0 % en públicos calientes hasta tener factor medido |
+| Atribución | — | mentalidad escéptica ante ROAS altos | semáforo de atribución de cuenta: amarillo ≤ 20 %; rojo ≤ 15 % en público nuevo y 0 % en públicos calientes (≤ 15 % solo si su piso GA4 supera el número mágico) hasta tener factor medido; sin GA4 ni pedidos ≤ 15 % |

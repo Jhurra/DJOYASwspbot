@@ -48,7 +48,7 @@ Las plataformas atribuyen con reglas generosas: Meta cuenta una compra si hubo u
 | Ratio Google / GA4 | ≤ 1,5 | 1,5-2,0 | > 2,0 | Google y GA4 comparten el clic; la diferencia viene de view-through y de conversiones por fecha de clic |
 | Índice de sobre-reclamo | ≤ 0,9 | 0,9-1,0 | > 1,0 | doble conteo seguro |
 
-Semáforo de atribución de cuenta: **rojo** si ratio > 4 o sobre-reclamo > 1; **amarillo** si ratio > 2 o sobre-reclamo > 0,9; **verde** en el resto. Los ratios se leen en ventana de 28 días y solo se reacciona a cambios mayores que el ruido (±2/√n del denominador). Con el primer factor medido, la banda roja del cliente se recalibra al ratio en que el factor cae bajo 0,4.
+Semáforo de atribución de cuenta: **rojo** si ratio > 4 o sobre-reclamo > 1; **amarillo** si ratio > 2 o sobre-reclamo > 0,9; **verde** en el resto. Los ratios se calculan con las ventanas de 30 días de la corrida y se siguen en el tablero en ventana móvil de 28 días (4 semanas); solo se reacciona a cambios mayores que el ruido (±2/√n del denominador). Con el primer factor medido se propone recalibrar a mano las bandas del cliente (`supuestos.atribucion.ratio_normal` / `ratio_elevado`) al ratio en que el factor cae bajo 0,4; el script no lo hace solo.
 
 ### 2.4 Cotas del ROAS incremental (piso, central, techo)
 
@@ -56,10 +56,10 @@ Sin prueba causal no hay factor: hay un **rango** que se calcula solo con datos.
 
 - **Piso** = ingresos que GA4 atribuye por último clic a Paid Social, repartidos por etapa / gasto de la etapa. Es la lectura más dura posible.
 - **Techo** = compras reportadas por la etapa × FDG × ticket de Paid Social / gasto de la etapa, acotado al ROAS reportado. Es lo máximo que cabe en los pedidos reales.
-- **Central** = √(piso × techo). **Índice de incertidumbre** = techo / piso: ≤ 2 confianza alta, ≤ 5 media, > 5 baja.
+- **Central** = √(piso × techo). **Índice de incertidumbre** = techo / piso: ≤ 2 confianza alta, ≤ 5 media, > 5 baja. Si el piso GA4 supera el techo deduplicado, la partición supuesta sobreasigna ingresos a esa etapa: el script toma el techo como estimación, marca la cota como **no verificable** (sin índice) y pide `utm_campaign` por campaña; nunca la declara "alta".
 - **Partición por etapa (supuesta):** los ingresos de compradores nuevos de Paid Social van a público nuevo (TOFU); los de recurrentes, a públicos calientes (MOFU, BOFU, evento). El share de nuevos sale de los source/medium de pauta. Se reemplaza por UTM por campaña cuando existan (`utm_campaign` con el nombre de la campaña).
 - Cada conjunto hereda los ratios piso / central / techo de su etapa aplicados a su ROAS de 7 días. El semáforo exige que el central supere el número mágico (cap de un escalón si no) y, con atribución en rojo, que el piso lo supere para que un público caliente reciba siquiera un paso corto.
-- En cuanto exista un dato medido (lift, holdout, A/B nativo), se carga en `incremental.factor_medido` del conjunto con su fuente y fecha, reemplaza las cotas y libera el cap de cuenta para ese conjunto. Un factor vale 90 días.
+- En cuanto exista un dato medido (lift, holdout, A/B nativo), se carga en `incremental.factor_medido` del conjunto con `fuente` y `fecha`, reemplaza las cotas y libera el cap de cuenta para ese conjunto. Un factor vale 90 días desde `fecha`: vencido, el script vuelve a las cotas y lo avisa.
 
 ### 2.5 Lo que se declara siempre
 
@@ -78,7 +78,7 @@ Ads Manager: Columnas → Comparar configuraciones de atribución → 1 día cli
 - `1d_view` alto con `1d_click` bajo: el conjunto vive de la vista; incrementalidad dudosa.
 - `28d_click` muy por encima de `7d_click`: compras tardías que probablemente eran recompra.
 
-Se cargan en el JSON como `ventanas` por entidad y `meta.ventanas_disponibles: true`.
+Se cargan en el JSON como `ventanas` por entidad (`{"1d_click": {"compras": n, "valor": v}, "7d_click": {…}, "1d_view": {…}, "28d_click": {…}}`) y `meta.ventanas_disponibles: true`. El script calcula la fracción 1 d clic / 7 d clic y la expone en `incremental.fraccion_1d_click`; cuando no hay GA4, esa fracción hace de piso del ROAS incremental del conjunto.
 
 ### 3.2 A/B nativo con atribución incremental de Meta
 
@@ -87,7 +87,7 @@ Meta ofrece la configuración de atribución "incremental" a nivel de conjunto p
 Diseño de la prueba:
 
 1. Elegir el conjunto caliente de mayor volumen que esté fuera de aprendizaje (idealmente ≥ 25 compras en 7 d).
-2. Duplicarlo con atribución incremental y **el mismo presupuesto por brazo** (partir el presupuesto actual o sumar; costo declarado). No tocar públicos ni anuncios.
+2. Duplicarlo con atribución incremental y **el mismo presupuesto por brazo** (partir el presupuesto actual o sumar; costo declarado). No tocar públicos ni anuncios durante la prueba: si el plan horizontal pide anuncios nuevos en ese conjunto, entran antes de duplicar (el duplicado los hereda) y el conjunto queda congelado los 14 días.
 3. Correr 14 días o hasta ≥ 50 compras por brazo (máximo 28 días). Se invalida si el gasto entre brazos se desbalancea más de 20 %.
 4. `factor = ROAS incremental del brazo B / ROAS estándar del brazo A`, corregido por gasto. Reemplaza las cotas de la etapa para todos los conjuntos calientes.
 5. Es un estimador de Meta, no una verdad; se declara así en el HTML. Puede correr durante un evento porque ambos brazos comparten calendario.
@@ -106,7 +106,7 @@ Durante el estudio no se cambian presupuestos ni públicos de las campañas incl
 
 Cuando no hay elegibilidad para lift:
 
-1. Elegir desde GA4 por región (`conversion-analytics` con filtro `region`, línea base de 4-8 semanas) 1-2 regiones que sumen 15-20 % de los pedidos y no sean atípicas. Nunca fijar regiones a priori.
+1. Elegir desde GA4 por región: `read_client_data_source(provider: "google-analytics4", asset: "traffic-analytics", groupBy: ["region"], fields: ["region", "sessions", "transactions", "purchase_revenue", "first_time_purchasers"])` con línea base de 4-8 semanas (`conversion-analytics` no se agrupa por región). Tomar 1-2 regiones que sumen 15-20 % de los pedidos y no sean atípicas. Nunca fijar regiones a priori.
 2. Excluirlas de **MOFU + BOFU juntos** (no de Google) durante 4 semanas; un solo brazo caliente no tiene potencia.
 3. Diferencia en diferencias: variación de ventas GA4 y backend en las regiones excluidas contra el resto, antes y durante. La caída relativa es la incrementalidad de esos conjuntos.
 4. Declarar el efecto mínimo detectable con la varianza semanal regional observada (`MDE ≈ 2,8 × desviación / media`); el Poisson simple (`2√n / n`) es solo cota inferior. Extender a 28 días más si efecto esperado / desviación < 2.
@@ -114,7 +114,7 @@ Cuando no hay elegibilidad para lift:
 
 ### 4.3 Apagado controlado (último recurso)
 
-Pausar un conjunto chico y "ver si baja la venta" no mide nada: el ruido semanal de una tienda es ≈ √(pedidos semanales). El script calcula `compras semanales reclamadas por los calientes / desviación semanal de la tienda` y marca la prueba como no concluyente si es < 2. Solo se usa MOFU + BOFU juntos, ≥ 14 días, fuera de eventos, con control sintético (Google + orgánico + directo) y aprobación explícita.
+Pausar un conjunto chico y "ver si baja la venta" no mide nada: el ruido semanal de una tienda es ≈ √(pedidos semanales). El script calcula la potencia con la **caída esperada**, no con lo reclamado: `compras semanales reclamadas por los calientes × fracción incremental central de la etapa / desviación semanal de la tienda` (y la misma cuenta con el piso como caso pesimista); marca la prueba como no concluyente si es < 2. Solo se usa MOFU + BOFU juntos, ≥ 14 días, fuera de eventos, con control sintético (Google + orgánico + directo) y aprobación explícita.
 
 ### 4.4 Escalón de presupuesto (ROAS y MER marginal)
 

@@ -35,6 +35,7 @@ Estados finales:
 
 | Estado | Paso | Lectura |
 |---|---|---|
+| `sin_objetivo` | 0 % | falta el número mágico o el equilibrio: ver sección de negocio |
 | `verde_excelente` | 35 % | lo excelente, con volumen y sin avisos |
 | `verde` | 20 % | verde con colchón medio |
 | `verde_corto` | 15 % | verde con un aviso, paso corto |
@@ -52,7 +53,7 @@ Estados finales:
 | Volumen para paso grande | < 25 compras en 7 d con paso ≥ 30 % | ruido Poisson ±20 %: un 35 % con 12 compras es apostar |
 | Tendencia a la baja | ROAS 7 d ≤ 0,8 × ROAS 30 d | se está degradando antes de subir |
 | Frecuencia en aviso | frecuencia 7 d ≥ aviso de la etapa (y < tope) | fatiga temprana; subir acelera la saturación |
-| Público chico | frecuencia 30 d ≥ tope de la etapa | más presupuesto sube la frecuencia antes que las ventas |
+| Público chico | frecuencia 30 d ≥ tope de 30 d de la etapa (1,5 × tope 7 d: TOFU 4,5 · MOFU 9 · BOFU/evento 15) | más presupuesto sube la frecuencia antes que las ventas |
 | Aprendizaje | `learning_stage_info.status = LEARNING` | una subida grande lo reinicia; el reloj pasa a 7 días |
 | Marginal preventivo | ROAS marginal de la cuenta bajo el equilibrio en la última semana completa | la serie histórica no es un test limpio, pero pide prudencia |
 | Incremental central | ROAS 7 d × ratio central de la etapa < número mágico | ni el punto medio de las cotas justifica el objetivo |
@@ -64,7 +65,7 @@ Estados finales:
 | verde | sin cap | sin cap |
 | amarillo | ≤ 20 % | ≤ 20 % |
 | rojo | ≤ 15 % | 0 % hasta tener factor medido; ≤ 15 % si su piso pesimista aún supera el número mágico |
-| sin datos | ≤ 15 % | ≤ 15 % |
+| sin datos (falta GA4 o pedidos) | ≤ 15 % | ≤ 15 % |
 
 Una entidad con `incremental.factor_medido` (lift, holdout, A/B nativo) usa su factor y no recibe cap de cuenta.
 
@@ -74,7 +75,7 @@ Una entidad con `incremental.factor_medido` (lift, holdout, A/B nativo) usa su f
 |---|---|
 | Frecuencia sobre el tope | frecuencia 7 d ≥ tope de la etapa |
 | Fatiga creativa | frecuencia ≥ aviso **y** ROAS 7 d < 0,8 × 30 d **y** CTR 7 d < 0,8 × CTR 30 d → renovar anuncios |
-| Aprendizaje limitado | `LEARNING_LIMITED` |
+| Aprendizaje limitado | `learning_stage_info.status = FAIL` (Meta no devuelve `LEARNING_LIMITED`) |
 | Automatización | actor "Meta" moviendo el presupuesto en el activity log |
 | Estudio de lift activo | `has_active_study = true` |
 | Evento activo | solo lo excelente con ≥ 20 compras en 7 d se mueve; el resto queda congelado |
@@ -88,9 +89,11 @@ Una entidad con `incremental.factor_medido` (lift, holdout, A/B nativo) usa su f
 | Más de 2 subidas en 14 días | congelar 7 días desde hoy (con cambios diarios el ROAS por nivel no se lee) |
 | Evento confirmado | 2 días para lo excelente con volumen; tope 35 % se mantiene; reversión al cierre |
 
-La fecha de la última subida sale de `ads_account_get_activity_logs` (fallback: `last_sig_edit_ts`). Checkpoint a las 72 h **solo para revertir** (ROAS < 0,9 × número mágico o CPA > objetivo → volver al nivel anterior); la decisión de volver a subir espera los días del reloj.
+La fecha de la última subida sale de `ads_account_get_activity_logs` (fallback: `last_sig_edit_ts`). Checkpoint a las 72 h **solo para revertir** (ROAS < 0,9 × número mágico o CPA > CPA máximo → volver al nivel anterior; el mismo umbral que el cap de entrada); la decisión de volver a subir espera los días del reloj.
 
 ### Frecuencia 7 d por etapa
+
+La frecuencia de 30 d tiene su propio tope (1,5 × el de 7 d: TOFU 4,5 · MOFU 9 · BOFU y evento 15): superarlo baja un escalón como señal de público chico, no bloquea. En retargeting a clientes la de 30 d llega a 10-12 con normalidad.
 
 | Etapa | Aviso (SARAHI, paso corto) | Tope (FV, no subir) |
 |---|---|---|
@@ -106,7 +109,7 @@ La etapa se deduce del nombre (TOFU / NUEVOS / MOFU / BOFU / RETARGETING / CYBER
 - Tres subidas, `presupuesto × (1 + paso)`, redondeadas a $100 en CLP.
 - Subida 1 = hoy si el reloj está cumplido; si no, el día en que se cumpla (o el fin del congelamiento).
 - Checkpoint a 72 h (solo revertir); decisión a los días del reloj: ROAS 7 d ≥ número mágico, no cae más de 25 % frente al nivel anterior, frecuencia 7 d bajo el tope.
-- Tope de la escalera: ×2 del presupuesto inicial en 28 días, frecuencia en el tope, ROAS 7 d bajo el número mágico o MER marginal bajo el equilibrio → pasar a horizontal.
+- Tope de la escalera: ×2 del presupuesto inicial en 28 días (el script corta el último escalón en ese múltiplo), frecuencia en el tope, ROAS 7 d bajo el número mágico o MER marginal bajo el equilibrio → pasar a horizontal.
 - Nivel: CBO sigue CBO, ABO sigue ABO. CBO admite presupuesto + anuncios nuevos el mismo día; ABO solo presupuesto.
 
 ## 3. Semáforo de una campaña de Google Ads
@@ -136,13 +139,13 @@ Ajustes: ROAS 7 d cae > 25 % frente a 30 d → paso 10 %. PMax con ROAS ≥ 2 ×
 | MER | ingresos totales / (gasto Meta + Google) | ≥ número mágico | entre equilibrio y objetivo | < equilibrio (frenar todo) |
 | aMER | ingresos de clientes nuevos / gasto total | ≥ número mágico | — | < número mágico (el crecimiento es recompra) |
 
-**Semáforo de atribución de cuenta:** rojo si ratio Meta/GA4 > 4 o sobre-reclamo > 1,0; amarillo si ratio > 2 o sobre-reclamo > 0,9; verde en el resto. Se lee en ventana de 28 días: la semana tiene ruido de ±2/√n con n compras de Paid Social.
+**Semáforo de atribución de cuenta:** rojo si ratio Meta/GA4 > 4 o sobre-reclamo > 1,0; amarillo si ratio > 2 o sobre-reclamo > 0,9; verde en el resto. Se calcula con las ventanas de 30 días de la corrida y se sigue en el tablero en ventana móvil de 28 días (4 semanas), porque la semana sola tiene ruido de ±2/√n con n compras de Paid Social.
 
 **Cotas del ROAS incremental** (por etapa y por cuenta, 30 días):
 
 - Piso = ingresos GA4 último clic asignados a la etapa / gasto de la etapa. Partición supuesta: los compradores nuevos de Paid Social van a público nuevo, los recurrentes a públicos calientes (share de nuevos desde source/medium de pauta).
 - Techo = compras reportadas × factor de deduplicación global × ticket de Paid Social / gasto, acotado al ROAS reportado. Factor de deduplicación global = pedidos reales / compras reclamadas por las plataformas.
-- Central = √(piso × techo). Índice de incertidumbre = techo / piso: ≤ 2 confianza alta, ≤ 5 media, > 5 baja.
+- Central = √(piso × techo). Índice de incertidumbre = techo / piso: ≤ 2 confianza alta, ≤ 5 media, > 5 baja; piso > techo → "no verificable" (partición inconsistente, se usa el techo).
 - Cada conjunto hereda los ratios piso / central / techo de su etapa sobre su ROAS de 7 días. Un factor medido reemplaza las cotas.
 
 ## 5. Alertas automáticas (el HTML muestra hasta 12, por severidad)

@@ -17,7 +17,7 @@ Dos ventanas: **30 días** (tendencia) y **7 días** (velocidad). Campos por cam
 
 1. **Campañas cuyo "conversión" no es una venta** (visitas a tienda, llamadas, clics a WhatsApp) se separan del ROAS: si `cost_per_conv` es ínfimo y `conversion_value` casi cero, la acción de conversión no es compra. Se reportan aparte y no entran al semáforo de ventas.
 2. **Marca vs genérica**: la campaña de marca (nombre contiene "Marca", "Brand" o CTR > 30 %) se evalúa con reglas propias (abajo). Su ROAS no se mezcla con el de adquisición.
-3. **Mínimo de datos**: no se decide sobre una campaña con < 30 clics o < 1 conversión en 30 días; no se toca la estrategia de puja con < 30 conversiones en 30 días.
+3. **Mínimo de datos**: no se decide sobre una campaña con < 30 clics en 30 días (con clics y sin conversiones el ROAS es 0 y cae en rojo por sí solo); no se toca la estrategia de puja con < 30 conversiones en 30 días.
 4. **Contaminación de PMax con marca**: si PMax tiene ROAS muy superior a Search genérica con CPC muy bajo, sospechar que está capturando búsquedas de marca. Confirmar con el informe de términos de búsqueda de PMax y aplicar exclusiones de marca a nivel cuenta antes de escalarla.
 
 ## Semáforo de escalado por campaña
@@ -62,7 +62,7 @@ No es escalado de adquisición: captura demanda que se creó en otro lado (Meta,
 
 ### Search genérica
 
-- Escalar por presupuesto cuando Lost IS (budget) > 20 % y ROAS sobre objetivo (con colchón 25 %).
+- Escalar por presupuesto cuando Lost IS (budget) ≥ 20 % y ROAS 30 d sobre el número mágico (sin colchón: la señal es la cuota perdida, no el margen).
 - Si el ROAS está bajo objetivo con Lost IS (rank) alto, el problema es la puja o la calidad: negativizar, mejorar anuncios, ajustar tROAS. Más presupuesto empeora el ROAS.
 - Horizontal: nuevos grupos de anuncios por intención (producto, uso, "al por mayor", "mayorista"), términos de búsqueda ganadores a exact match.
 

@@ -43,10 +43,10 @@ SUPUESTOS = {
     "checkpoint_dias": 3,            # 72 h: solo para revertir; la decisión de volver a subir espera los 5 días
     # Meta · frecuencia 7 d por etapa: aviso (SARAHI, paso corto) y tope (FV, no subir)
     "frecuencia": {
-        "TOFU":   {"aviso": 1.75, "tope": 3.0},
-        "MOFU":   {"aviso": 4.0, "tope": 6.0},
-        "BOFU":   {"aviso": 5.0, "tope": 10.0},
-        "EVENTO": {"aviso": 5.0, "tope": 10.0},
+        "TOFU":   {"aviso": 1.75, "tope": 3.0, "tope_30d": 4.5},
+        "MOFU":   {"aviso": 4.0, "tope": 6.0, "tope_30d": 9.0},
+        "BOFU":   {"aviso": 5.0, "tope": 10.0, "tope_30d": 15.0},
+        "EVENTO": {"aviso": 5.0, "tope": 10.0, "tope_30d": 15.0},
     },
     "caida_roas_tendencia": 0.20,    # ROAS 7 d < 0,8 × ROAS 30 d → tendencia a la baja
     "caida_roas_reversion": 0.25,    # en el nuevo nivel: cae > 25 % vs el anterior → volver
@@ -57,6 +57,7 @@ SUPUESTOS = {
         "ratio_normal": 2.0, "ratio_elevado": 4.0,       # compras Meta / compras GA4 Paid Social
         "sobre_reclamo_aviso": 0.9,                      # (compras Meta + Google) / pedidos reales
         "ia_alta": 2.0, "ia_media": 5.0,                 # índice de incertidumbre = techo / piso
+        "factor_vigencia_dias": 90,      # un factor medido (lift, holdout, A/B) vale 90 días
         "cap_amarillo": 0.20, "cap_rojo": 0.15,          # tope del paso según semáforo de atribución
         "ventana_ratio_dias": 28,                        # los ratios se leen en 28 d; la semana es ruido
     },
@@ -78,6 +79,7 @@ SUPUESTOS = {
     },
     "ga4": {"engagement_rate_max": 95.0, "session_cvr_max": 50.0, "cobertura_utm_min": 0.7, "dif_ingresos_backend_max": 0.15},
     "redondeo_presupuesto": 100,
+    "tope_multiplo_escalera": 2.0,       # la escalera no pasa de ×2 del presupuesto inicial (umbrales §2)
     "runbook_max_filas": 8,
 }
 
@@ -92,6 +94,19 @@ ETAPAS_CALIENTES = ("MOFU", "BOFU", "EVENTO")
 # Utilidades
 # --------------------------------------------------------------------------------------
 MESES_CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+
+
+def clp(v):
+    """Pesos sin decimales con punto de miles, para meter en frases sin tocar las comas del texto."""
+    try:
+        return "$" + f"{float(v):,.0f}".replace(",", ".")
+    except (TypeError, ValueError):
+        return "—"
+
+
+def fx(v, nd=2):
+    """ROAS/ratio como texto; None → '—' (nunca 'Nonex')."""
+    return "—" if v is None else f"{float(v):.{nd}f}x"
 
 
 def parse_num(v):
@@ -131,12 +146,18 @@ def parse_num(v):
         return None
 
 
-def pctval(v):
-    """Porcentajes que pueden venir 0-100 o 0-1."""
-    v = parse_num(v)
-    if v is None:
-        return None
-    return v / 100.0 if v > 1.0 else v
+def pct_trio(m):
+    """Cuota de impresiones y cuotas perdidas (presupuesto, ranking) de una ventana, como fracción 0-1.
+    El esquema las pide en 0-100 (así las entrega AgencyAnalytics). La escala se decide por ventana, no por valor:
+    solo si las tres vienen presentes y suman ≈ 1 se leen como fracciones; así 0,9 significa 0,9 % y no 90 %."""
+    vals = [parse_num(m.get(k)) for k in ("is", "lost_is_budget", "lost_is_rank")]
+    presentes = [v for v in vals if v is not None]
+    if not presentes:
+        return None, None, None
+    total = sum(presentes)
+    escala = 1.0 if (len(presentes) == 3 and 0.85 <= total <= 1.15 and max(presentes) <= 1.0) else 100.0
+    is_, lb, lr = [None if v is None else v / escala for v in vals]
+    return lb, lr, is_
 
 
 def div(a, b):
@@ -165,9 +186,16 @@ def parse_date(s):
     m = re.match(r"(\d{4})-(\d{2})-(\d{2})", s)
     if m:
         return dt.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
-    m = re.match(r"(\d{1,2})/(\d{1,2})/(\d{4})", s)  # activity logs: M/D/YYYY at H:MM
+    m = re.match(r"(\d{1,2})/(\d{1,2})/(\d{4})", s)  # activity logs de Meta: M/D/YYYY at H:MM
     if m:
-        return dt.date(int(m.group(3)), int(m.group(1)), int(m.group(2)))
+        a, b, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        try:
+            return dt.date(y, a, b)
+        except ValueError:
+            try:
+                return dt.date(y, b, a)  # venía como D/M/YYYY
+            except ValueError:
+                return None
     return None
 
 
@@ -232,8 +260,14 @@ def calc_negocio(neg, S, faltantes, hoy):
         out["numero_magico_origen"] = "calculado = equilibrio × 1,25 (colchón mínimo SARAHI)"
     else:
         out["numero_magico_origen"] = "entregado por el cliente / plan vigente"
-    if eq is None:
+    if eq is None and nm is not None:
+        eq = nm / (1 + S["colchon_minimo"])
+        out["roas_equilibrio_origen"] = "estimado = número mágico / 1,25 (falta margen bruto o ROAS de equilibrio)"
+        faltantes.append("negocio.margen_bruto o roas_equilibrio: el equilibrio se estima como número mágico / 1,25; pedir el margen real")
+    elif eq is None:
         faltantes.append("negocio.margen_bruto o roas_equilibrio: sin equilibrio no hay semáforo financiero")
+    else:
+        out["roas_equilibrio_origen"] = "1 / margen bruto" if parse_num(neg.get("roas_equilibrio")) is None else "entregado por el cliente"
     if nm is None:
         faltantes.append("negocio.numero_magico: sin ROAS objetivo no se puede escalar con criterio")
     fe = neg.get("fecha_especial") or {}
@@ -292,6 +326,10 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
     presupuesto = parse_num(ent.get("presupuesto_diario"))
     learning = ent.get("learning") or {}
     l_status = str(learning.get("status") or "").upper()
+    l_status = {"FAIL": "LEARNING_LIMITED", "LEARNING_LIMITED": "LEARNING_LIMITED", "WAIVING": "SIN_APRENDIZAJE"}.get(l_status, l_status)
+    compras_faltantes = [w for w, m in (("m7", m7), ("m30", m30)) if m.get("compras") is None and (m.get("roas") is not None or m.get("valor") is not None)]
+    compras7 = 0.0 if compras7 is None else compras7
+    compras30 = 0.0 if compras30 is None else compras30
     hist = historial_presupuesto(ent, hoy)
     fr = S["frecuencia"].get(etapa, S["frecuencia"]["MOFU"])
     notches = S["paso_notches"]
@@ -318,8 +356,19 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
 
     # ---- Cotas de incrementalidad de la entidad (heredadas de su etapa, o medidas)
     cot = (ctx.get("cotas_etapa") or {}).get("CALIENTE" if etapa in ETAPAS_CALIENTES else "TOFU") or {}
-    f_med = parse_num((ent.get("incremental") or {}).get("factor_medido"))
-    inc = {"origen": None, "piso": None, "central": None, "techo": None, "ia": None, "confianza": None}
+    inc_in = ent.get("incremental") or {}
+    f_med = parse_num(inc_in.get("factor_medido"))
+    f_fecha = parse_date(inc_in.get("fecha"))
+    if f_med is not None and f_fecha and (hoy - f_fecha).days > S["atribucion"].get("factor_vigencia_dias", 90):
+        d["avisos"].append(f"factor medido del {f_fecha.isoformat()} vencido (más de {S['atribucion'].get('factor_vigencia_dias', 90)} días): se vuelve a las cotas de la etapa hasta medir de nuevo")
+        f_med = None
+    elif f_med is not None and not f_fecha:
+        d["avisos"].append("factor medido sin fecha en el JSON: se asume vigente; cargar `incremental.fecha`")
+    vent = ent.get("ventanas") or {}
+    _c = lambda k: parse_num(((vent.get(k) or {}).get("compras")))
+    c1, c7 = _c("1d_click"), (_c("7d_click") or _c("7d_click_1d_view"))
+    fraccion_1d = (c1 / c7) if (c1 is not None and c7) else None
+    inc = {"origen": None, "piso": None, "central": None, "techo": None, "ia": None, "confianza": None, "fraccion_1d_click": r(fraccion_1d, 2)}
     if roas7 is not None:
         if f_med is not None:
             inc.update({"origen": "medido: " + str((ent.get("incremental") or {}).get("fuente") or "prueba causal"),
@@ -330,25 +379,44 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
             central = math.sqrt(max(piso, 1e-9) * max(techo, 1e-9))
             inc.update({"origen": f"cotas de la etapa ({cot.get('nombre')}): piso GA4 último clic, techo compras deduplicadas",
                         "piso": r(piso), "central": r(central), "techo": r(techo), "ia": cot.get("ia"), "confianza": cot.get("confianza")})
+        elif fraccion_1d is not None:
+            # sin GA4: la fracción 1 d clic / 7 d clic de las ventanas de atribución hace de piso alternativo
+            piso, techo = roas7 * fraccion_1d, roas7
+            central = math.sqrt(max(piso, 1e-9) * max(techo, 1e-9))
+            ia = techo / piso if piso > 0 else None
+            A_ = S["atribucion"]
+            inc.update({"origen": f"ventanas de atribución: piso = ROAS 7 d × fracción 1 d clic / 7 d clic ({fraccion_1d:.2f})",
+                        "piso": r(piso), "central": r(central), "techo": r(techo), "ia": r(ia, 1),
+                        "confianza": None if ia is None else ("alta" if ia <= A_["ia_alta"] else "media" if ia <= A_["ia_media"] else "baja")})
     d["incremental"] = inc
     d["central_cumple"] = None if inc["central"] is None else inc["central"] >= nm
     d["piso_cumple"] = None if inc["piso"] is None else inc["piso"] >= nm
 
     # ---- Lectura
-    if roas7 is None or ((compras7 or 0) < S["compras_min_7d"] and (compras30 or 0) < S["compras_min_30d"]):
+    if compras_faltantes:
+        d["avisos"].append(f"{' y '.join(compras_faltantes)} sin `compras` en el JSON: se asume 0; pedir omni_purchase en la consulta")
+    if not gasto7:
+        d.update({"estado": "sin_datos", "etiqueta": "Sin entrega en 7 d", "paso": 0.0, "escalera": []})
+        d["motivos"].append("gasto 7 d en cero: sin entrega reciente no hay lectura (¿pausado o recién lanzado?)")
+        return d
+    if roas7 is None:
         d.update({"estado": "sin_datos", "etiqueta": "Muestra insuficiente para decidir", "paso": 0.0, "escalera": []})
-        d["motivos"].append(f"{int(compras7 or 0)} compras en 7 d y {int(compras30 or 0)} en 30 d: bajo el mínimo de lectura ({S['compras_min_7d']} / {S['compras_min_30d']})")
+        d["motivos"].append("sin ROAS 7 d (falta `roas` o `valor` en m7): no se puede leer")
+        return d
+    if compras7 < S["compras_min_7d"] and compras30 < S["compras_min_30d"]:
+        d.update({"estado": "sin_datos", "etiqueta": "Muestra insuficiente para decidir", "paso": 0.0, "escalera": []})
+        d["motivos"].append(f"{int(compras7)} compras en 7 d y {int(compras30)} en 30 d: bajo el mínimo de lectura ({S['compras_min_7d']} / {S['compras_min_30d']})")
         return d
     if eq is not None and roas7 < eq:
         d.update({"estado": "rojo", "etiqueta": "Pierde plata · bajo el equilibrio", "paso": 0.0, "escalera": []})
         d["motivos"].append(f"ROAS 7 d {roas7:.2f}x bajo el equilibrio {eq:.2f}x")
         pre = d.get("presupuesto_pre_ultima_subida")
         d["presupuesto_sugerido"] = int(pre) if pre and presupuesto and pre < presupuesto else (rd_budget(presupuesto * 0.8, S["redondeo_presupuesto"]) if presupuesto else None)
-        d["motivos"].append(f"Volver al presupuesto previo a la última subida (${d['presupuesto_sugerido']:,}) o bajar 20 %; dos semanas bajo el equilibrio → pausar".replace(",", ".") if d["presupuesto_sugerido"] else "Bajar 20 %; dos semanas bajo el equilibrio → pausar")
+        d["motivos"].append(f"Volver al presupuesto previo a la última subida ({clp(d['presupuesto_sugerido'])}) o bajar 20 %; dos semanas bajo el equilibrio → pausar" if d["presupuesto_sugerido"] else "Bajar 20 %; dos semanas bajo el equilibrio → pausar")
         return d
     if roas7 < nm or (roas30 is not None and roas30 < nm):
         d.update({"estado": "amarillo", "etiqueta": "Bajo el número mágico · optimizar, no escalar", "paso": 0.0, "escalera": []})
-        d["motivos"].append(f"ROAS 7 d {roas7:.2f}x / 30 d {roas30 if roas30 is None else round(roas30, 2)}x contra un número mágico de {nm:.2f}x")
+        d["motivos"].append(f"ROAS 7 d {roas7:.2f}x / 30 d {fx(roas30)} contra un número mágico de {nm:.2f}x")
         return d
 
     colchon = roas7 / nm - 1
@@ -363,7 +431,7 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
         d["motivos"].append(f"ROAS 7 d {roas7:.2f}x, colchón de {colchon*100:.0f} % sobre el número mágico ({nm:.2f}x): verde justo, sin margen para retornos decrecientes")
     else:
         paso = notch_paso(min(S["paso_factor"] * colchon, notches[0]), notches)
-        d["motivos"].append(f"ROAS 7 d {roas7:.2f}x = {roas7/nm:.1f} veces el número mágico ({nm:.2f}x); colchón {min(colchon, 9.99)*100:.0f} % → paso base {paso*100:.0f} %")
+        d["motivos"].append(f"ROAS 7 d {roas7:.2f}x = {roas7/nm:.1f} veces el número mágico ({nm:.2f}x); colchón {colchon*100:,.0f} % → paso base {paso*100:.0f} %".replace(",", "."))
     paso_base = paso
 
     # ---- Caps (cada uno baja un escalón)
@@ -375,17 +443,17 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
 
     cpa7 = div(gasto7, compras7)
     if cpa7 is not None and neg.get("cpa_maximo") and cpa7 > neg["cpa_maximo"]:
-        cap(f"CPA 7 d ${cpa7:,.0f} sobre el CPA máximo ${neg['cpa_maximo']:,.0f}".replace(",", "."))
+        cap(f"CPA 7 d {clp(cpa7)} sobre el CPA máximo {clp(neg['cpa_maximo'])}")
     elif cpa7 is not None and neg.get("cpa_objetivo") and cpa7 > neg["cpa_objetivo"]:
-        d["avisos"].append(f"CPA 7 d ${cpa7:,.0f} sobre el CPA objetivo ${neg['cpa_objetivo']:,.0f} (bajo el máximo)".replace(",", "."))
+        d["avisos"].append(f"CPA 7 d {clp(cpa7)} sobre el CPA objetivo {clp(neg['cpa_objetivo'])} (bajo el máximo)")
     if paso >= 0.30 and (compras7 or 0) < S["compras_paso_maximo"]:
         cap(f"{int(compras7)} compras en 7 d (< {S['compras_paso_maximo']}): paso máximo 20 %")
     if tendencia is not None and tendencia <= -S["caida_roas_tendencia"]:
         cap(f"ROAS 7 d cae {abs(tendencia)*100:.0f} % frente a 30 d")
     if freq7 is not None and fr["aviso"] <= freq7 < fr["tope"]:
         cap(f"frecuencia 7 d {freq7:.2f} sobre el aviso temprano {fr['aviso']} (tope {fr['tope']})")
-    if freq30 is not None and freq30 >= fr["tope"]:
-        cap(f"frecuencia 30 d {freq30:.1f} en el tope de la etapa: público chico")
+    if freq30 is not None and freq30 >= fr.get("tope_30d", fr["tope"] * 1.5):
+        cap(f"frecuencia 30 d {freq30:.1f} sobre el tope de 30 d de la etapa ({fr.get('tope_30d', fr['tope'] * 1.5):g}): público chico")
     if l_status == "LEARNING":
         cap("conjunto en fase de aprendizaje: una subida grande la reinicia")
     if ctx.get("marginal_bajo_equilibrio"):
@@ -407,6 +475,8 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
                     d["caps"].append("atribución de cuenta en rojo y piso pesimista bajo el número mágico: sin subida vertical hasta tener un factor medido")
             elif paso > A["cap_rojo"]:
                 paso = A["cap_rojo"]; d["caps"].append("atribución de cuenta en rojo: paso máximo 15 % en público nuevo")
+        elif sem_atr is None and paso > A["cap_rojo"]:
+            paso = A["cap_rojo"]; d["caps"].append("sin semáforo de atribución (falta GA4 o pedidos reales): paso máximo 15 % hasta poder triangular")
     if d["central_cumple"] is False and paso > 0:
         cap(f"ROAS incremental central {inc['central']}x bajo el número mágico")
 
@@ -418,7 +488,7 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
         d["avisos"].append(f"{hist['subidas_14d']} subidas en 14 días: congelar 7 días para que el ROAS por nivel sea legible")
         dias_req = max(dias_req, S["dias_entre_subidas_aprendizaje"])
     if evento.get("activo"):
-        if etapa == "EVENTO" or (paso_base >= 0.35 and (compras7 or 0) >= S["evento"]["compras_min_7d"]):
+        if paso >= 0.35 and (compras7 or 0) >= S["evento"]["compras_min_7d"]:
             dias_req = S["evento"]["cadencia_dias"]
             d["avisos"].append(f"evento {evento.get('nombre')} activo: cadencia de {dias_req} días, tope 35 %, reversión al cierre")
         else:
@@ -431,10 +501,14 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
     fatiga = (freq7 is not None and freq7 >= fr["aviso"] and tendencia is not None and tendencia <= -S["caida_roas_tendencia"]
               and ctr7 is not None and ctr30 and ctr7 < 0.8 * ctr30)
     d["fatiga"] = bool(fatiga)
+    if (ctr7 is None or not ctr30) and freq7 is not None and freq7 >= fr["aviso"] and tendencia is not None and tendencia <= -S["caida_roas_tendencia"]:
+        d["fatiga"] = None
+        d["ctr_faltante"] = True
+        d["avisos"].append("fatiga creativa no verificable: frecuencia en aviso y ROAS 7 d cayendo, pero falta el CTR 7 d / 30 d (pedir `ctr` en la consulta)")
     if fatiga:
         d["bloqueos"].append(f"fatiga creativa: frecuencia {freq7:.2f}, ROAS 7 d cae {abs(tendencia)*100:.0f} % y CTR 7 d cae {(1 - ctr7/ctr30)*100:.0f} % frente a 30 d: renovar anuncios antes de subir")
     if l_status == "LEARNING_LIMITED":
-        d["bloqueos"].append("aprendizaje limitado: el conjunto no consigue volumen de conversiones; consolidar antes de escalar")
+        d["bloqueos"].append("aprendizaje limitado (status FAIL): el conjunto no consigue volumen de conversiones; consolidar antes de escalar")
     if hist.get("cambios_automaticos_meta"):
         d["bloqueos"].append("una automatización de Meta está moviendo el presupuesto: desactivarla y fijar un presupuesto manual antes de escalar")
     if ctx.get("estudio_activo"):
@@ -471,20 +545,31 @@ def semaforo_meta(ent, neg, S, hoy, ctx):
     esc = []
     if inicio and paso_efectivo > 0:
         p = presupuesto
+        p_max = rd_budget(presupuesto * S["tope_multiplo_escalera"], S["redondeo_presupuesto"])
+        chk_dias = S["checkpoint_dias"] if dias_req > S["checkpoint_dias"] else max(1, dias_req - 1)
         for i in range(3):
             fecha = inicio + dt.timedelta(days=dias_req * i)
             p_new = rd_budget(p * (1 + paso_efectivo), S["redondeo_presupuesto"])
             if p_new <= p:
                 p_new = int(p + S["redondeo_presupuesto"])
+            tope_alcanzado = p_new >= p_max
+            if tope_alcanzado:
+                p_new = int(p_max)
+                if p_new <= p:
+                    break
             esc.append({"n": i + 1, "fecha": fecha.isoformat(), "desde": int(p), "hasta": p_new, "paso": paso_efectivo,
-                        "checkpoint": (fecha + dt.timedelta(days=S["checkpoint_dias"])).isoformat(),
+                        "checkpoint": (fecha + dt.timedelta(days=chk_dias)).isoformat(),
                         "decision": (fecha + dt.timedelta(days=dias_req)).isoformat(),
                         "condicion": f"a los {dias_req} d: ROAS 7 d ≥ {nm:.2f}x, no cae más de {int(S['caida_roas_reversion']*100)} % frente al nivel anterior y frecuencia 7 d < {fr['tope']}",
-                        "reversion": f"checkpoint 72 h: si ROAS < {nm*S['checkpoint_factor_nm']:.2f}x o CPA > ${(neg.get('cpa_objetivo') or 0):,.0f}, volver a ${int(p):,}".replace(",", ".")})
+                        "tope_alcanzado": tope_alcanzado,
+                        "reversion": f"checkpoint {chk_dias * 24} h: si ROAS < {nm*S['checkpoint_factor_nm']:.2f}x" + (f" o CPA > {clp(neg['cpa_maximo'])}" if neg.get("cpa_maximo") else "") + f", volver a {clp(p)}"})
             p = p_new
+            if tope_alcanzado:
+                d["avisos"].append(f"la escalera llega al tope ×{S['tope_multiplo_escalera']:g} del presupuesto inicial en la subida {i + 1}: después, crecimiento horizontal")
+                break
     d["escalera"] = esc
     d["tope"] = (f"Tope de la escalera: ×2 del presupuesto inicial en 28 días, frecuencia 7 d ≥ {fr['tope']}, ROAS 7 d bajo {nm:.2f}x "
-                 f"o MER marginal bajo {eq:.2f}x → pasar a horizontal") if esc else None
+                 + (f"o MER marginal bajo {eq:.2f}x " if eq is not None else "") + "→ pasar a horizontal") if esc else None
     return d
 
 
@@ -538,7 +623,8 @@ def calc_meta(meta, neg, S, hoy, ctx, faltantes):
             "gasto_var": r(last["gasto"] / first["gasto"] - 1, 3),
             "roas_var": r((last["roas"] or 0) / first["roas"] - 1, 3) if first["roas"] else None,
             "roas_marginal_ultimo": last.get("roas_marginal"),
-            "semanas_marginal_negativo": sum(1 for s in completas if s.get("marginal_bajo_equilibrio")),
+            "semanas_marginal_negativo": next((i for i, s in enumerate(reversed(completas)) if not s.get("marginal_bajo_equilibrio")), len(completas)),
+            "semanas_marginal_negativo_total": sum(1 for s in completas if s.get("marginal_bajo_equilibrio")),
             "lectura": ("Retornos decrecientes: el gasto sube y el valor de cada peso adicional está bajo el equilibrio (alerta preventiva: la serie mezcla eventos y cambios diarios, no es un test de escalón limpio)"
                         if last.get("marginal_bajo_equilibrio") else
                         "El ROAS marginal de la última semana completa sigue sobre el equilibrio" if last.get("roas_marginal") is not None else
@@ -552,7 +638,8 @@ def calc_meta(meta, neg, S, hoy, ctx, faltantes):
 def tipo_google(c):
     t = str(c.get("tipo") or "").lower()
     n = str(c.get("nombre") or "").lower()
-    if c.get("es_marca") is True or re.search(r"marca|brand", n):
+    em = c.get("es_marca")
+    if em is True or (em is None and re.search(r"(?<!sin )(?<!no )\b(marca|brand)\b", n)):
         return "marca"
     if "performance" in t or "pmax" in t or "pmax" in n:
         return "pmax"
@@ -575,8 +662,8 @@ def semaforo_google(c, neg, S, hoy):
     roas30 = parse_num(m30.get("roas")) if m30.get("roas") is not None else div(valor30, costo30)
     roas7 = parse_num(m7.get("roas")) if m7.get("roas") is not None else div(m7.get("valor"), m7.get("costo"))
     clics30 = parse_num(m30.get("clics"))
-    lb30, lr30, is30 = pctval(m30.get("lost_is_budget")), pctval(m30.get("lost_is_rank")), pctval(m30.get("is"))
-    lb7, lr7, is7 = pctval(m7.get("lost_is_budget")), pctval(m7.get("lost_is_rank")), pctval(m7.get("is"))
+    lb30, lr30, is30 = pct_trio(m30)
+    lb7, lr7, is7 = pct_trio(m7)
     lb, lr, is_ = (lb7 if lb7 is not None else lb30), (lr7 if lr7 is not None else lr30), (is7 if is7 is not None else is30)
     ventana_is = "7 d" if lb7 is not None else "30 d"
     presupuesto = parse_num(c.get("presupuesto_diario"))
@@ -621,10 +708,10 @@ def semaforo_google(c, neg, S, hoy):
     if not roas_ok:
         if lr is not None and lr >= G["lost_is_rank_alto"]:
             d.update({"estado": "rojo" if (eq and roas30 < eq) else "amarillo", "etiqueta": "Bajo objetivo con cuota perdida por ranking · ajustar puja, no presupuesto", "paso": 0.0})
-            d["motivos"].append(f"ROAS 30 d {roas30:.2f}x / 7 d {roas7 if roas7 is None else round(roas7, 2)}x vs objetivo {nm:.2f}x; cuota perdida por ranking {lr*100:.0f} %. Acción de puja: bajar el tROAS 10-15 % da más volumen; subirlo, más eficiencia [verificación manual: la estrategia de puja no es visible en AgencyAnalytics]")
+            d["motivos"].append(f"ROAS 30 d {roas30:.2f}x / 7 d {fx(roas7)} vs objetivo {nm:.2f}x; cuota perdida por ranking {lr*100:.0f} %. Acción de puja: bajar el tROAS 10-15 % da más volumen; subirlo, más eficiencia [verificación manual: la estrategia de puja no es visible en AgencyAnalytics]")
         else:
             d.update({"estado": "rojo" if (eq and roas30 < eq) else "amarillo", "etiqueta": "Bajo el número mágico · optimizar antes de escalar", "paso": 0.0})
-            d["motivos"].append(f"ROAS 30 d {roas30:.2f}x / 7 d {roas7 if roas7 is None else round(roas7, 2)}x vs objetivo {nm:.2f}x")
+            d["motivos"].append(f"ROAS 30 d {roas30:.2f}x / 7 d {fx(roas7)} vs objetivo {nm:.2f}x")
         return d
     # verde: la palanca es la cuota perdida por presupuesto (7 d), no el colchón
     if lb is None:
@@ -633,7 +720,7 @@ def semaforo_google(c, neg, S, hoy):
     parcial = (lb is not None and G["lost_is_budget_min"] <= lb < G["lost_is_budget_fuerte"]) and not subgasto
     if lr is not None and lr >= G["lost_is_rank_alto"] and not limitada_presupuesto:
         d.update({"estado": "verde_puja", "etiqueta": "Sobre objetivo pero limitada por ranking · puja, no presupuesto", "paso": 0.0})
-        d["motivos"].append(f"ROAS 30 d {roas30:.2f}x sobre objetivo; cuota perdida por ranking {lr*100:.0f} % y por presupuesto {(lb or 0)*100:.0f} % ({ventana_is}){' · gasto medio ' + f'${gasto_dia_7d:,.0f}'.replace(',', '.') + '/día bajo el presupuesto' if subgasto else ''}. Más presupuesto no compra más subastas: bajar el tROAS 10-15 % (= más volumen) [verificación manual: estrategia de puja]")
+        d["motivos"].append(f"ROAS 30 d {roas30:.2f}x sobre objetivo; cuota perdida por ranking {lr*100:.0f} % y por presupuesto {(lb or 0)*100:.0f} % ({ventana_is}){' · gasto medio ' + clp(gasto_dia_7d) + '/día bajo el presupuesto' if subgasto else ''}. Más presupuesto no compra más subastas: bajar el tROAS 10-15 % (= más volumen) [verificación manual: estrategia de puja]")
         return d
     if lb is not None and lb < G["lost_is_budget_min"] or subgasto and not limitada_presupuesto:
         d.update({"estado": "verde_sin_techo", "etiqueta": "Sobre objetivo pero sin cuota que comprar · escalar horizontal o relajar tROAS", "paso": 0.0})
@@ -665,7 +752,7 @@ def escalera_google(e, S, hoy, nm):
         esc.append({"n": i + 1, "fecha": fecha.isoformat(), "desde": int(p), "hasta": p_new, "paso": e["paso"],
                     "checkpoint": (fecha + dt.timedelta(days=G["dias_entre_cambios"] - 1)).isoformat(), "decision": (fecha + dt.timedelta(days=G["dias_entre_cambios"])).isoformat(),
                     "condicion": f"ROAS 30 d ≥ {nm:.2f}x, ROAS 7 d no cae > 25 % y la cuota perdida por presupuesto sigue > 10 %",
-                    "reversion": f"si el ROAS cae > 20 % y queda bajo objetivo, volver a ${int(p):,}".replace(",", ".")})
+                    "reversion": f"si el ROAS cae > 20 % y queda bajo objetivo, volver a {clp(p)}"})
         p = p_new
     return esc
 
@@ -683,7 +770,7 @@ def calc_google(google, neg, S, hoy, faltantes):
         if e["tipo"] == "pmax" and gen and e.get("roas_30d") and e.get("cpc_30d"):
             g = max(gen, key=lambda x: x.get("costo_30d") or 0)
             if g.get("cpc_30d") and e["roas_30d"] >= G["canibalizacion_ratio"] * g["roas_30d"] and e["cpc_30d"] < G["canibalizacion_cpc"] * g["cpc_30d"]:
-                e["avisos"].append(f"PMax rinde {e['roas_30d']}x con CPC ${e['cpc_30d']:,.0f} frente a {g['roas_30d']}x y ${g['cpc_30d']:,.0f} en genérica: posible captura de búsquedas de marca. Confirmar exclusiones de marca antes de cualquier subida [verificación manual]".replace(",", "."))
+                e["avisos"].append(f"PMax rinde {e['roas_30d']}x con CPC {clp(e['cpc_30d'])} frente a {g['roas_30d']}x y {clp(g['cpc_30d'])} en genérica: posible captura de búsquedas de marca. Confirmar exclusiones de marca antes de cualquier subida [verificación manual]")
                 if (e.get("paso") or 0) > G["paso_parcial"]:
                     e["paso"] = G["paso_parcial"]; e["estado"] = "verde"; e["etiqueta"] = "Verde · paso corto hasta confirmar exclusiones de marca"
     for e in ents:
@@ -818,6 +905,8 @@ def calc_atribucion(data, d_meta_pre, d_google, d_ga4, neg, S, faltantes):
     dif_backend = None
     if backend.get("ingresos_30d") and ga4_t30.get("ingresos"):
         dif_backend = r(abs(parse_num(backend["ingresos_30d"]) - ga4_t30["ingresos"]) / parse_num(backend["ingresos_30d"]), 3)
+        if dif_backend is not None and dif_backend > S["ga4"]["dif_ingresos_backend_max"]:
+            d_ga4.setdefault("alertas_calidad", []).append(f"GA4 difiere {dif_backend*100:.0f} % de los ingresos del backend (umbral {S['ga4']['dif_ingresos_backend_max']*100:.0f} %): el sitio pierde eventos de compra; el piso GA4 es más pesimista de lo real")
 
     reclamado = (meta_c30 or 0) + (google_c30 or 0)
     t = {"meta_compras_30d": meta_c30, "meta_valor_30d": r(meta_v30, 0), "meta_gasto_30d": meta_g30,
@@ -872,18 +961,28 @@ def calc_atribucion(data, d_meta_pre, d_google, d_ga4, neg, S, faltantes):
             if not gasto or not compras:
                 return None
             roas_rep = valor / gasto
-            piso = rev_ps_parte / gasto
+            piso_ga4 = rev_ps_parte / gasto
             techo = min(roas_rep, compras * fdg * aov_ref / gasto)
-            piso = min(piso, techo) if techo else piso
+            inconsistente = bool(techo) and piso_ga4 > techo
+            piso = min(piso_ga4, techo) if techo else piso_ga4
             central = math.sqrt(max(piso, 1e-9) * max(techo, 1e-9))
-            ia = (techo / piso) if piso > 0 else None
-            conf = None if ia is None else ("alta" if ia <= A["ia_alta"] else "media" if ia <= A["ia_media"] else "baja")
+            if inconsistente:
+                # GA4 último clic asigna a esta etapa más ingresos que los que Meta reporta deduplicados: la partición
+                # supuesta sobreasigna y la cota no se puede verificar. Se usa el techo como estimación y se declara.
+                ia, conf = None, "no verificable"
+            else:
+                ia = (techo / piso) if piso > 0 else None
+                conf = None if ia is None else ("alta" if ia <= A["ia_alta"] else "media" if ia <= A["ia_media"] else "baja")
             return {"nombre": nombre, "gasto_30d": r(gasto, 0), "compras_30d": compras, "roas_reportado": r(roas_rep), "piso": r(piso), "central": r(central), "techo": r(techo),
+                    "piso_ga4_sin_recorte": r(piso_ga4), "particion_inconsistente": inconsistente,
                     "ia": r(ia, 1), "confianza": conf, "ratio_piso": r(piso / roas_rep, 4) if roas_rep else None, "ratio_techo": r(techo / roas_rep, 4) if roas_rep else None,
                     "ratio_central": r(central / roas_rep, 4) if roas_rep else None}
         cotas["TOFU"] = cota("público nuevo", gasto_tofu, comp_tofu, val_tofu, ga4_ps_rev * share_new)
         cotas["CALIENTE"] = cota("públicos activos y clientes (MOFU, BOFU, evento)", gasto_cal, comp_cal, val_cal, ga4_ps_rev * (1 - share_new))
         cotas["CUENTA"] = cota("cuenta Meta", meta_g30 or 0, meta_c30 or 0, meta_v30 or 0, ga4_ps_rev)
+        for k in ("TOFU", "CALIENTE"):
+            if cotas.get(k) and cotas[k].get("particion_inconsistente"):
+                faltantes.append(f"cotas {k}: GA4 asigna a esta etapa más ingresos ({cotas[k]['piso_ga4_sin_recorte']}x) que el techo deduplicado ({cotas[k]['techo']}x): la partición nuevos→TOFU / recurrentes→calientes sobreasigna; pedir utm_campaign por campaña de Meta")
         cotas["nota"] = ("Partición supuesta: los ingresos de compradores nuevos del canal Paid Social en GA4 se asignan a público nuevo y los de recurrentes a públicos calientes, "
                          f"con share de nuevos {share_new*100:.0f} % ({'UTM de pauta' if sm.get('share_nuevos_meta_utm') is not None else 'cuenta'}). Se reemplaza por UTM por campaña cuando existan.")
     else:
@@ -917,7 +1016,7 @@ def calc_atribucion(data, d_meta_pre, d_google, d_ga4, neg, S, faltantes):
             out["mer"]["lectura"] = "El negocio cubre la pauta con holgura"
 
     # ---- Evidencia y pruebas
-    nivel, evidencia = 1, ["Triangulación plataforma vs GA4 vs pedidos reales (28 d)"]
+    nivel, evidencia = 1, ["Triangulación plataforma vs GA4 vs pedidos reales (30 d)"]
     if (data.get("meta") or {}).get("ventanas_disponibles"):
         nivel = 2; evidencia.append("Comparación de ventanas de atribución exportada de Ads Manager")
     if any(e.get("attribution_setting") == "incrementality" for e in d_meta_pre.get("entidades", [])):
@@ -934,7 +1033,12 @@ def calc_atribucion(data, d_meta_pre, d_google, d_ga4, neg, S, faltantes):
     despues_evento = f"después del cierre de {evento.get('nombre')}" if (evento.get("activo") or evento.get("proximo")) else "semana 1"
     sd_sem = math.sqrt(pedidos / 4.3) if pedidos else None   # ruido Poisson semanal de la tienda
     comp_cal_sem = comp_cal / 4.3 if comp_cal else None
-    potencia_apagado = (comp_cal_sem / sd_sem) if (sd_sem and comp_cal_sem) else None
+    cc = cotas.get("CALIENTE") or {}
+    potencia_apagado = potencia_piso = None
+    if sd_sem and comp_cal_sem and cc.get("ratio_central") is not None:
+        # efecto esperado al pausar = compras reclamadas × fracción incremental (central); el piso da el caso pesimista
+        potencia_apagado = comp_cal_sem * cc["ratio_central"] / sd_sem
+        potencia_piso = comp_cal_sem * (cc.get("ratio_piso") or 0) / sd_sem
     pruebas = []
     if exp.get("lift_elegible"):
         pruebas.append({"orden": 1, "tipo": "Conversion Lift (Meta)", "cuando": despues_evento, "que": "estudio a nivel cuenta con holdout 10 %, 30 días; leer conversiones incrementales y ROAS incremental. Durante el estudio no se tocan presupuestos ni públicos", "fuente": "ads_experiment_lift_create_test (con confirmación de Jorge)"})
@@ -945,12 +1049,12 @@ def calc_atribucion(data, d_meta_pre, d_google, d_ga4, neg, S, faltantes):
                     "fuente": "ads_create_ad_set is_incremental_attribution_enabled (con confirmación)"})
     pruebas.append({"orden": 2, "tipo": "Comparar ventanas de atribución", "cuando": "semana 1 y luego mensual",
                     "que": "exportar 1 d clic / 7 d clic / 1 d vista / 28 d clic por conjunto; la fracción 1 d clic / 7 d clic 1 d vista es el piso alternativo del factor; vista y 28 d son la parte menos incremental", "fuente": "Ads Manager → Comparar configuraciones de atribución"})
-    pruebas.append({"orden": 3, "tipo": "Geo-holdout de públicos calientes", "cuando": despues_evento + ", tras el A/B",
-                    "que": "elegir desde GA4 por región 1-2 regiones con 15-20 % de los pedidos; excluirlas de MOFU + BOFU juntos 4 semanas; diferencia en diferencias contra el resto. Declarar el efecto mínimo detectable con la varianza semanal regional observada; extender a 28 d si efecto esperado / desviación < 2", "fuente": "GA4 conversion-analytics filtro region + exclusión geográfica"})
+    pruebas.append({"orden": 3, "tipo": "Geo-holdout de públicos calientes", "cuando": ("al cerrar el A/B nativo (14 días después de su arranque, semana 4)" if despues_evento == "semana 1" else despues_evento + " y al cerrar el A/B nativo"),
+                    "que": "elegir desde GA4 (traffic-analytics por región) 1-2 regiones con 15-20 % de los pedidos; excluirlas de MOFU + BOFU juntos 4 semanas; diferencia en diferencias contra el resto. Declarar el efecto mínimo detectable con la varianza semanal regional observada; extender a 28 d si efecto esperado / desviación < 2", "fuente": "GA4 traffic-analytics group_by region (transactions, purchase_revenue, first_time_purchasers) + exclusión geográfica"})
     pruebas.append({"orden": 4, "tipo": "Escalón de presupuesto (ROAS y MER marginal)", "cuando": "en cada subida",
                     "que": "una entidad por vez, sin otros cambios de presupuesto en la ventana (activity logs); comparar dos semanas completas antes y después: MER marginal = Δingresos reales / Δgasto total. Sobre el equilibrio se sigue; bajo el equilibrio dos semanas seguidas se revierte", "fuente": "serie semanal Meta + GA4 + backend"})
     pruebas.append({"orden": 5, "tipo": "Apagado controlado (último recurso)", "cuando": "solo si el geo-holdout no es viable",
-                    "que": (f"pausar MOFU + BOFU juntos ≥ 14 días fuera de eventos y leer la recompra total en backend y GA4 contra un control sintético (Google + orgánico). Potencia estimada hoy: {potencia_apagado:.1f} desviaciones semanales" + (" (concluyente)" if potencia_apagado >= 2 else " (no concluyente: no usar como estimador)") if potencia_apagado else "pausar MOFU + BOFU juntos ≥ 14 días y leer la recompra total en backend contra un control sintético"),
+                    "que": (f"pausar MOFU + BOFU juntos ≥ 14 días fuera de eventos y leer la recompra total en backend y GA4 contra un control sintético (Google + orgánico). Potencia estimada hoy: {potencia_apagado:.1f} desviaciones semanales con la cota central, {potencia_piso:.1f} con el piso" + (" (concluyente)" if potencia_apagado >= 2 else " (no concluyente: no usar como estimador)") if potencia_apagado else "pausar MOFU + BOFU juntos ≥ 14 días y leer la recompra total en backend contra un control sintético"),
                     "fuente": "backend + GA4 Direct / Organic / Email"})
     pruebas.sort(key=lambda p: p["orden"])
     for i, p in enumerate(pruebas, 1):
@@ -976,7 +1080,7 @@ def calc_atribucion(data, d_meta_pre, d_google, d_ga4, neg, S, faltantes):
                 "compras_meta": w.get("compras"), "roas_meta": w.get("roas"), "roas_marginal_meta": w.get("roas_marginal"),
                 "conv_google": parse_num(g.get("conv")), "roas_google": r(div(g.get("valor"), g.get("gasto"))),
                 "pedidos_ga4": ped, "ingresos_ga4": ing, "mer": r(div(ing, total)) if total else None,
-                "compras_paid_social_ga4": ps, "ratio_meta_ga4": r(div(w.get("compras"), ps)), "ruido_ratio": r(2 / math.sqrt(ps), 2) if ps else None, "mer_marginal": None}
+                "compras_paid_social_ga4": ps, "ratio_meta_ga4": r(div(w.get("compras"), ps)), "ruido_ratio": r(div(w.get("compras"), ps) * 2 / math.sqrt(ps), 1) if (ps and div(w.get("compras"), ps) is not None) else None, "mer_marginal": None}
         if prev and ing is not None and prev.get("ingresos_ga4") is not None and fila["gasto_total"] and prev.get("gasto_total") and abs(fila["gasto_total"] / prev["gasto_total"] - 1) >= 0.05:
             fila["mer_marginal"] = r((ing - prev["ingresos_ga4"]) / (fila["gasto_total"] - prev["gasto_total"]))
         filas.append(fila)
@@ -997,6 +1101,8 @@ def calc_alertas(d_meta, d_google, d_atr, neg, S):
     al = []
     t, m = d_atr.get("triangulacion", {}), d_atr.get("mer", {})
     for e in d_meta.get("entidades", []):
+        if not e.get("es_ventas"):
+            continue
         if e.get("estado") == "rojo":
             al.append({"nivel": "rojo", "senal": "Conjunto bajo el equilibrio", "donde": e["nombre"], "accion": "No escalar; optimizar creativo/público o pausar"})
         f7, fa, ft = e.get("frecuencia_7d"), e.get("frecuencia_aviso"), e.get("frecuencia_tope")
@@ -1015,10 +1121,10 @@ def calc_alertas(d_meta, d_google, d_atr, neg, S):
     if dep and (dep.get("share_compras_7d") or 0) >= 0.5:
         al.append({"nivel": "amarillo", "senal": "Toda la cuenta depende de un conjunto", "donde": f"{dep['nombre']} trae el {dep['share_compras_7d']*100:.0f} % de las compras de 7 d", "accion": "Escalar horizontal ya: graduar ganadores a una campaña de escalado y abrir públicos"})
     if d_meta.get("gasto_sin_retorno_30d"):
-        al.append({"nivel": "amarillo", "senal": "Gasto sin retorno medible", "donde": f"campañas de tráfico e interacción: ${d_meta['gasto_sin_retorno_30d']:,.0f} en 30 d ({d_meta.get('presupuesto_sin_retorno_dia')}/día)".replace(",", "."), "accion": "Primera fuente de financiamiento del escalón de adquisición sin subir el gasto total (decisión de Jorge)"})
+        al.append({"nivel": "amarillo", "senal": "Gasto sin retorno medible", "donde": f"campañas de tráfico e interacción: {clp(d_meta['gasto_sin_retorno_30d'])} en 30 d ({clp(d_meta.get('presupuesto_sin_retorno_dia'))}/día)", "accion": "Primera fuente de financiamiento del escalón de adquisición sin subir el gasto total (decisión de Jorge)"})
     sem = t.get("semaforo_atribucion")
     if sem == "rojo":
-        al.append({"nivel": "rojo", "senal": "Atribución de cuenta en rojo", "donde": f"Meta reporta {t.get('ratio_meta_vs_ga4_canal')}x las compras que GA4 atribuye a Paid Social; {t.get('compras_reclamadas_plataformas')} reclamadas vs {t.get('pedidos_reales_30d')} pedidos", "accion": "Decidir por MER; público nuevo con paso máximo 15 %; públicos calientes sin subida vertical hasta medir (A/B nativo, geo-holdout)"})
+        al.append({"nivel": "rojo", "senal": "Atribución de cuenta en rojo", "donde": f"Meta reporta {fx(t.get('ratio_meta_vs_ga4_canal'), 1)} las compras que GA4 atribuye a Paid Social; {int(round(t.get('compras_reclamadas_plataformas') or 0))} reclamadas vs {int(round(t.get('pedidos_reales_30d') or 0))} pedidos", "accion": "Decidir por MER; público nuevo con paso máximo 15 %; públicos calientes sin subida vertical hasta medir (A/B nativo, geo-holdout)"})
     elif sem == "amarillo":
         al.append({"nivel": "amarillo", "senal": "Atribución de cuenta elevada", "donde": f"ratio Meta/GA4 {t.get('ratio_meta_vs_ga4_canal')}x · sobre-reclamo {t.get('indice_sobre_reclamo')}", "accion": "Paso máximo 20 %; vigilar el ratio en ventana de 28 días"})
     if t.get("banda_ratio_google") == "alto":
@@ -1034,7 +1140,7 @@ def calc_alertas(d_meta, d_google, d_atr, neg, S):
         al.append({"nivel": "amarillo", "senal": "aMER (clientes nuevos) bajo el número mágico", "donde": f"aMER {m['amer_30d']}x", "accion": "El crecimiento viene de recompra: priorizar público nuevo y adquisición en Google"})
     for e in d_google.get("entidades", []):
         if e.get("estado") == "cubrir":
-            al.append({"nivel": "amarillo", "senal": "Marca pierde cuota por presupuesto", "donde": e["nombre"], "accion": f"Subir a ${e.get('nuevo_presupuesto'):,}/día (cobertura, no escalado)".replace(",", ".")})
+            al.append({"nivel": "amarillo", "senal": "Marca pierde cuota por presupuesto", "donde": e["nombre"], "accion": f"Subir a {clp(e.get('nuevo_presupuesto'))}/día (cobertura, no escalado)"})
         if e.get("estado") in ("rojo", "amarillo", "verde_puja") and (e.get("lost_is_rank_7d") or e.get("lost_is_rank_30d") or 0) >= S["google"]["lost_is_rank_alto"]:
             al.append({"nivel": "amarillo", "senal": "Campaña limitada por ranking", "donde": e["nombre"], "accion": "Ajustar puja (bajar tROAS 10-15 % = más volumen) o calidad; no subir presupuesto [verificación manual: estrategia de puja]"})
         for a in e.get("avisos", []):
@@ -1047,6 +1153,21 @@ def calc_alertas(d_meta, d_google, d_atr, neg, S):
     return al
 
 
+def _correcciones(e):
+    """Acciones que el lunes hay que ejecutar aunque no haya subida: son las que el semáforo señala como bloqueo o alerta roja."""
+    out = []
+    f7, ft = e.get("frecuencia_7d"), e.get("frecuencia_tope")
+    if f7 is not None and ft and f7 >= ft:
+        out.append(f"frecuencia 7 d {f7:.1f} sobre el tope {ft:g}: ampliar público o bajar presupuesto")
+    if (e.get("historial") or {}).get("cambios_automaticos_meta"):
+        out.append("una automatización de Meta mueve el presupuesto: desactivarla y fijar presupuesto manual")
+    if e.get("fatiga"):
+        out.append("fatiga creativa: renovar anuncios antes de subir")
+    if e.get("aprendizaje") == "LEARNING_LIMITED":
+        out.append("aprendizaje limitado: consolidar antes de escalar")
+    return out
+
+
 def calc_runbook(d_meta, d_google, neg, S, hoy):
     filas = []
     for e in d_meta.get("entidades", []):
@@ -1057,9 +1178,19 @@ def calc_runbook(d_meta, d_google, neg, S, hoy):
             s = esc[0]
             filas.append({"plataforma": "Meta", "entidad": e["nombre"], "hoy": e.get("presupuesto_diario"), "nuevo": s["hasta"], "fecha": s["fecha"], "orden": s["fecha"],
                           "condicion": s["condicion"], "reversion": s["reversion"], "accion": f"subir {s['paso']*100:.0f} %"})
+        elif e.get("estado") == "rojo" and e.get("presupuesto_sugerido") and e.get("presupuesto_diario") and e["presupuesto_sugerido"] < e["presupuesto_diario"]:
+            filas.append({"plataforma": "Meta", "entidad": e["nombre"], "hoy": e.get("presupuesto_diario"), "nuevo": e["presupuesto_sugerido"], "fecha": hoy.isoformat(), "orden": hoy.isoformat(),
+                          "condicion": (e.get("motivos") or ["bajo el equilibrio"])[-1], "reversion": "si sigue bajo el equilibrio dos semanas: pausar", "accion": "bajar"})
+        elif _correcciones(e):
+            filas.append({"plataforma": "Meta", "entidad": e["nombre"], "hoy": e.get("presupuesto_diario"), "nuevo": e.get("presupuesto_diario"), "fecha": hoy.isoformat(), "orden": hoy.isoformat(),
+                          "condicion": " · ".join(_correcciones(e)), "reversion": "—", "accion": "corregir"})
         elif e.get("estado") in ("bloqueado", "verde_justo", "verde_mantener", "amarillo", "rojo"):
             filas.append({"plataforma": "Meta", "entidad": e["nombre"], "hoy": e.get("presupuesto_diario"), "nuevo": e.get("presupuesto_diario"), "fecha": hoy.isoformat(), "orden": "9999",
                           "condicion": e.get("etiqueta"), "reversion": "—", "accion": "mantener"})
+    sin_retorno = [e for e in d_meta.get("entidades", []) if not e.get("es_ventas") and (e.get("presupuesto_diario") or 0) > 0]
+    if sin_retorno:
+        filas.append({"plataforma": "Meta", "entidad": f"{len(sin_retorno)} campañas de tráfico e interacción", "hoy": d_meta.get("presupuesto_sin_retorno_dia"), "nuevo": None, "fecha": hoy.isoformat(), "orden": hoy.isoformat(),
+                      "condicion": f"gasto sin retorno medible ({clp(d_meta.get('gasto_sin_retorno_30d'))} en 30 d): decidir si financian el escalón de adquisición", "reversion": "—", "accion": "decidir"})
     for e in d_google.get("entidades", []):
         if not e.get("es_ventas"):
             continue
@@ -1082,7 +1213,9 @@ def calc_runbook(d_meta, d_google, neg, S, hoy):
     def fcorta(iso):
         d = parse_date(iso)
         return f"{d.day} {MESES_CORTOS[d.month - 1]}" if d else str(iso)
-    meta_txt = "sin subidas" if not activas or not any(f["plataforma"] == "Meta" for f in activas) else "primera subida el " + fcorta(min(f["fecha"] for f in activas if f["plataforma"] == "Meta"))
+    subidas_meta = [f for f in activas if f["plataforma"] == "Meta" and f["accion"].startswith("subir")]
+    corr_meta = [f for f in activas if f["plataforma"] == "Meta" and f["accion"] in ("corregir", "bajar")]
+    meta_txt = ("sin subidas" if not subidas_meta else "primera subida el " + fcorta(min(f["fecha"] for f in subidas_meta))) + (f", {len(corr_meta)} corrección(es) el lunes" if corr_meta else "")
     g_act = [f for f in activas if f["plataforma"] == "Google"]
     google_txt = "sin cambios" if not g_act else "; ".join(f"{f['entidad'].split(' x ')[0]} {f['accion']} el {fcorta(f['fecha'])}" for f in g_act[:2])
     out["linea_meta"] = meta_txt
@@ -1115,14 +1248,14 @@ def calc_calendario(d_meta, d_google, d_atr, neg, hoy):
             for s in e.get("escalera") or []:
                 f = parse_date(s["fecha"])
                 if f and ini <= f <= fin:
-                    acciones.append(f"Meta · {e['nombre']}: subida {s['n']} a ${s['hasta']:,}/día el {_fcorta(s['fecha'])}; checkpoint {_fcorta(s['checkpoint'])}, decisión {_fcorta(s['decision'])}".replace(",", "."))
+                    acciones.append(f"Meta · {e['nombre']}: subida {s['n']} a {clp(s['hasta'])}/día el {_fcorta(s['fecha'])}; checkpoint {_fcorta(s['checkpoint'])}, decisión {_fcorta(s['decision'])}")
         for e in d_google.get("entidades", []):
             if e.get("estado") == "cubrir" and i == 0 and e.get("nuevo_presupuesto"):
-                acciones.append(f"Google · {e['nombre']}: cubrir cuota de marca, presupuesto a ${e['nuevo_presupuesto']:,}/día el lunes".replace(",", "."))
+                acciones.append(f"Google · {e['nombre']}: cubrir cuota de marca, presupuesto a {clp(e['nuevo_presupuesto'])}/día el lunes")
             for s in e.get("escalera") or []:
                 f = parse_date(s["fecha"])
                 if f and ini <= f <= fin:
-                    acciones.append(f"Google · {e['nombre']}: subida {s['n']} a ${s['hasta']:,}/día el lunes {_fcorta(s['fecha'])}".replace(",", "."))
+                    acciones.append(f"Google · {e['nombre']}: subida {s['n']} a {clp(s['hasta'])}/día el lunes {_fcorta(s['fecha'])}")
         for p in d_atr.get("pruebas", []):
             c = (p.get("cuando") or "").lower()
             if p.get("pendiente_requisitos"):
@@ -1131,8 +1264,8 @@ def calc_calendario(d_meta, d_google, d_atr, neg, hoy):
                 acciones.append(f"Medición · {p['tipo']}: {_breve(p['que'])}")
             elif i == 1 and "después del cierre" in c and "a/b" in p["tipo"].lower():
                 acciones.append(f"Medición · {p['tipo']} (si el evento ya cerró): {_breve(p['que'])}")
-            elif i == 2 and "geo" in p["tipo"].lower():
-                acciones.append(f"Medición · {p['tipo']}: {_breve(p['que'])}")
+            elif i == 3 and "geo" in p["tipo"].lower() and "semana 4" in c:
+                acciones.append(f"Medición · {p['tipo']} (arranca al cerrar el A/B): {_breve(p['que'])}")
         acciones.append("Medición · actualizar el tablero semanal: gasto, compras, pedidos, MER, ratio Meta/GA4 (28 d), impresiones de marca en Google")
         semanas.append({"n": i + 1, "inicio": ini.isoformat(), "fin": fin.isoformat(), "evento": en_evento, "acciones": acciones})
     return semanas
@@ -1168,7 +1301,7 @@ def calcular(data, hoy=None):
         "mer_30d": d_atr["mer"].get("mer_30d"), "amer_30d": d_atr["mer"].get("amer_30d"),
         "ratio_meta_ga4": t.get("ratio_meta_vs_ga4_canal"), "indice_sobre_reclamo": t.get("indice_sobre_reclamo"), "semaforo_atribucion": t.get("semaforo_atribucion"),
         "entidades_meta_por_estado": {}, "alertas_rojas": sum(1 for a in alertas if a["nivel"] == "rojo"),
-        "linea": f"Meta: {runbook['linea_meta']} · Google: {runbook['linea_google']} · Atribución: {t.get('semaforo_atribucion') or 'sin datos'} (ratio {t.get('ratio_meta_vs_ga4_canal')}x, sobre-reclamo {t.get('indice_sobre_reclamo')}) · MER {d_atr['mer'].get('mer_30d')}x",
+        "linea": f"Meta: {runbook['linea_meta']} · Google: {runbook['linea_google']} · Atribución: {t.get('semaforo_atribucion') or 'sin datos'}" + (f" (ratio {fx(t.get('ratio_meta_vs_ga4_canal'))}, sobre-reclamo {t.get('indice_sobre_reclamo')})" if t.get('ratio_meta_vs_ga4_canal') is not None else "") + (f" · MER {fx(d_atr['mer'].get('mer_30d'))}" if d_atr['mer'].get('mer_30d') is not None else " · MER sin datos"),
     }
     for e in d_meta.get("entidades", []):
         resumen["entidades_meta_por_estado"][e.get("estado")] = resumen["entidades_meta_por_estado"].get(e.get("estado"), 0) + 1
@@ -1189,6 +1322,9 @@ def main():
         sys.exit(1)
     with open(args[0], encoding="utf-8") as f:
         data = json.load(f)
+    if hoy and parse_date(hoy) is None:
+        print(f"--hoy '{hoy}' no es una fecha válida: usar AAAA-MM-DD")
+        sys.exit(2)
     out = calcular(data, hoy)
     with open(args[1], "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
