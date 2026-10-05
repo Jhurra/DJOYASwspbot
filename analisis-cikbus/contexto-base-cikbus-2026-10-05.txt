@@ -1,0 +1,127 @@
+CONTEXTO BASE DE CIKBUS ELITÉ x SARAHI
+Levantado: 05/10/2026
+Sitio: cikbus.cl
+Nota: cikbus.cl tiene verificación anti-bot y no se pudo leer desde esta sesión. Lo que se sabe del sitio sale de buscadores, de Recorrido.cl y de Google Play. Los campos marcados (verificar) requieren abrir el sitio o la red a mano.
+
+═══════════════════════════════════════════
+1. MARCA Y SITIO WEB
+═══════════════════════════════════════════
+País: Chile (Ovalle, Región de Coquimbo; operación Santiago - Norte Grande) ✓
+Link Sitio web: https://cikbus.cl ✓ (título indexado: "CIKBUS - Pasajes en bus baratos")
+Página "Nosotros" / About: https://cikbus.cl/nuestra-historia/ (verificar; también indexado https://cikbus.cl/historia.html)
+Página de categorías principal: https://www.recorrido.cl/cikbus/es ✓ (motor de venta online, procesado por Recorrido.cl)
+Envíos y devoluciones: anulación de pasajes en el motor de Recorrido.cl (https://www.recorrido.cl/cikbus/es, menú "Anular pasajes") ✓ · política propia en cikbus.cl (verificar)
+Preguntas frecuentes: (verificar) no indexada en buscadores
+Blog / contenidos: [NO EXISTE] no indexado; solo la landing https://cikbus.cl/express/ ("beneficios al comprar por internet en CIKTUR.CL y CIKBUS.CL") ✓
+sitemap.xml: https://cikbus.cl/sitemap.xml (verificar; bloqueado por anti-bot)
+
+═══════════════════════════════════════════
+2. REDES SOCIALES
+═══════════════════════════════════════════
+Instagram: https://www.instagram.com/cikbuselite/ ✓ (bio: "Viaja por todo el Norte de Chile en buses con alto nivel en Seguridad, Bioseguridad y Entretenimiento a bordo")
+Facebook: https://www.facebook.com/CikbusElite ✓ ("Buses Cikbus Elité")
+Tik Tok: [NO EXISTE] no se encontró cuenta oficial (verificar)
+LinkedIn: [NO EXISTE] no se encontró página de empresa (verificar)
+Youtube: [NO EXISTE] no se encontró canal oficial; hay un "video institucional" citado por busesdechile.com (verificar)
+Pinterest: [NO EXISTE]
+Otra red social: X/Twitter citado en las fichas de oficinas de busesdechile.com (verificar handle)
+
+═══════════════════════════════════════════
+3. CLIENTE
+═══════════════════════════════════════════
+Perfil de Google Business: https://www.google.com/maps/search/Cikbus+Elite+Terminal+San+Borja+Santiago (acceso) · fichas detectadas: "Buses Cikbus Elité" Av. Balmaceda 1932, Calama ✓ · "CIKBUS Elite" Ariztía Pte 769, Ovalle ✓ · "Buses Cikbus Elité" Ariztía Ote 739, Ovalle ✓ (una ficha por oficina: 14 oficinas listadas en busesdechile.com)
+Trustpilot / otro sitio de reseñas: Reclamos.cl sin ficha propia detectada; los reclamos aparecen bajo Kupos.cl (ago 2024) y bajo Ciktur (2019, 2020) ✓ · https://www.checkmybus.com/coach-providers/cikbus-elite/reviews ✓ (1,8 de 5, 10 reseñas)
+Marketplaces donde venden: https://www.recorrido.cl/es/bus/cikbus-pasajes ✓ (3,9 de 5, 1.609 opiniones últimos 6 meses) · https://kupos.cl/es/pasajes/bus/cikbus ✓ · https://www.busbud.com/es-419/empresa-de-autobuses/cikbus-elite ✓ (3,6 de 5, 158 reseñas) · https://chilepasajes.cl/es/buses/buses-cikbus ✓ · https://www.pasajebus.com/en/bus/tickets/cikbus-elite ✓
+Otra fuente de reseñas: Google Play app "Cikbus" https://play.google.com/store/apps/details?id=cl.chilepasajes.cikbus ✓ (1K+ descargas, desarrollador ChilePasajes.cl) · Grupo Facebook Mochileros Chile "Precaución al viajar con Cikbus - Ciktur" https://www.facebook.com/groups/chilemochileros/posts/8324395884237194/ ✓ · Post oficial sobre devoluciones de compras por internet https://www.facebook.com/CikbusElite/posts/2490370501084246 ✓
+
+═══════════════════════════════════════════
+4. PUBLICIDAD
+═══════════════════════════════════════════
+Biblioteca de anuncios de Meta: https://www.facebook.com/ads/library/?q=cikbus ✓ (05/10/2026: 0 anuncios encontrados por búsqueda de texto "Cikbus" y "Cikbus Elité" en Chile, activos e inactivos; confirmar por página)
+Google Ads Transparency: https://adstransparency.google.com/?domain=cikbus.cl (verificar; carga con JavaScript, no legible desde esta sesión)
+
+═══════════════════════════════════════════
+5. COMPETENCIA
+═══════════════════════════════════════════
+
+--- COMPETENCIA PRINCIPAL ---
+Nombre: Pullman Bus ✓
+Sitio web: https://www.pullmanbus.cl ✓
+Biblioteca de anuncios de Meta: https://www.facebook.com/ads/library/?q=pullman%20bus ✓ (05/10/2026: solo 1 anuncio activo de Pullman Bus Costa Central, 01/10/2026)
+Google Ads Transparency: https://adstransparency.google.com/?domain=pullmanbus.cl (verificar)
+Instagram: https://www.instagram.com/pullmanbus/ (verificar)
+Facebook: https://www.facebook.com/pullmanbus (verificar)
+Tik Tok: (verificar)
+Otra fuente de información: https://es.wikipedia.org/wiki/Pullman_Bus ✓ (454 buses 2S 2024, crisis financiera) · https://www.latercera.com/pulso/noticia/pullman-bus-otra-vez-en-panne-financiera/GTMMWHLXOZEGLD7GV6R23ACWXY/ ✓ · SERNAC 2024: 1.555 reclamos, 45% acogida ✓
+
+--- COMPETIDOR SECUNDARIO ---
+Nombre: Turbus ✓
+Sitio web: https://www.turbus.cl ✓
+Biblioteca de anuncios de Meta: https://www.facebook.com/ads/library/?q=turbus ✓ (05/10/2026: 18 anuncios activos de la página Turbus, campaña Cyber Bus desde 03/10/2026)
+Google Ads Transparency: https://adstransparency.google.com/?domain=turbus.cl (verificar)
+Instagram: https://www.instagram.com/turbus/ (verificar)
+Facebook: https://www.facebook.com/Turbus ✓ (page id 137847054448 en Ad Library)
+Tik Tok: (verificar)
+Otra fuente de información: https://es.wikipedia.org/wiki/Tur_Bus ✓ · SERNAC 2024: 2.786 reclamos (incluye Tas Choapa e Inter Sur), 81% acogida ✓ · https://www.reclamos.cl/empresa/turbus ✓
+
+--- COMPETIDOR SECUNDARIO ---
+Nombre: FlixBus Chile (integra la operación de Andimar desde agosto 2025) ✓
+Sitio web: https://www.flixbus.cl ✓ · https://www.flixbus.cl/andimar ✓
+Biblioteca de anuncios de Meta: https://www.facebook.com/ads/library/?q=flixbus ✓ (05/10/2026: anuncios de catálogo dinámico activos desde 09/03/2026, anuncio de app desde 23/06/2026)
+Google Ads Transparency: https://adstransparency.google.com/?domain=flixbus.cl (verificar)
+Instagram: https://www.instagram.com/flixbus_chile/ (verificar)
+Facebook: https://www.facebook.com/FlixBus ✓ (page id 232244643787404 en Ad Library)
+Tik Tok: (verificar)
+Otra fuente de información: https://chocale.cl/2025/08/mas-buses-mas-rutas-flixbus-se-expande-con-la-integracion-de-andimar/ ✓ · https://espaciot.cl/flixbus-integra-la-operacion-de-andimar-y-expande-su-red-nacional/ ✓ · https://www.busbud.com/es-419/empresa-de-autobuses/andimar ✓ (3,8 de 5, 74 reseñas) · SERNAC 2024: Flixbus 355 reclamos, 25% acogida ✓
+
+--- COMPETIDOR SECUNDARIO ---
+Nombre: Expreso Norte ✓
+Sitio web: https://www.expresonorte.cl ✓ (carga con JavaScript, texto no legible desde esta sesión)
+Biblioteca de anuncios de Meta: https://www.facebook.com/ads/library/?q=expreso%20norte ✓ (05/10/2026: 0 anuncios propios encontrados)
+Google Ads Transparency: https://adstransparency.google.com/?domain=expresonorte.cl (verificar)
+Instagram: (verificar)
+Facebook: https://www.facebook.com/expresonorte (verificar; enlazado desde Recorrido.cl)
+Tik Tok: (verificar)
+Otra fuente de información: https://www.recorrido.cl/es/bus/expreso-norte-pasajes ✓ (fundada años 70, flota 90, 33 oficinas de Arica a Santiago) · https://www.reclamos.cl/empresa/expreso-norte ✓
+
+--- OTROS COMPETIDORES ---
+Nombre + Sitio web: Pluss Chile https://www.plusschile.cl ✓ (marca hermana: Gaspar Cikutovic Madariaga E.I.R.L.; Premio Recorrido 2024 mejor línea zona norte)
+Nombre + Sitio web: Buses Ciktur https://www.recorrido.cl/es/bus/ciktur (marca hermana, Ovalle, 1980) ✓
+Nombre + Sitio web: Cóndor Bus (grupo Turbus) https://www.condorbus.cl (verificar) · Cormar Bus, Covalle Bus, Cruz del Norte, Pullman San Andrés: presentes en comparadores, sin perfilar
+Nota: Buses Romani figura con "servicios suspendidos momentáneamente" en busesromani.cl al 05/10/2026 ✓, por eso no se perfila.
+
+--- PLATAFORMAS QUE COMPITEN POR LA VENTA ---
+Nombre + Sitio web: Recorrido.cl https://www.recorrido.cl ✓ (de Busbud desde 2022; procesa la venta online de cikbus.cl)
+Nombre + Sitio web: Kupos.cl https://kupos.cl ✓ (ex PasajeBus; anuncios activos "hasta 40% dscto" desde 04/10/2026)
+Nombre + Sitio web: Chilepasajes.cl https://www.chilepasajes.cl ✓ (Bipay SpA; desarrolla la app Cikbus y el motor de pasajes.narbus.cl)
+Nombre + Sitio web: Busbud https://www.busbud.com ✓ · CheckMyBus https://www.checkmybus.com ✓
+
+--- REFERENTE FUERA DEL MERCADO LOCAL ---
+Nombre: FlixBus (global) ✓
+Sitio web: https://www.flixbus.com ✓
+Biblioteca de anuncios de Meta: https://www.facebook.com/ads/library/?q=flixbus ✓
+Google Ads Transparency: https://adstransparency.google.com/?domain=flixbus.com (verificar)
+Instagram: https://www.instagram.com/flixbus/ (verificar)
+Tik Tok: https://www.tiktok.com/@flixbus (verificar)
+Otra fuente de información: https://corporate.flix.com/press_releases/flix-launches-bus-operations-in-chile-its-42nd-country-worldwide/ ✓ (modelo: plataforma tecnológica + operadores locales, app con ticket digital y seguimiento en vivo)
+
+═══════════════════════════════════════════
+6. PLATAFORMAS Y ACCESOS
+═══════════════════════════════════════════
+Google Analytics 4 (ID propiedad): (acceso) pedir G-XXXXXXXXXX; el head no se pudo leer
+Google Ads (ID de cuenta): (acceso) https://ads.google.com
+Meta Business Manager (ID de cuenta): (acceso) https://business.facebook.com/
+Search Console (propiedad): https://search.google.com/search-console?resource_id=sc-domain:cikbus.cl (acceso)
+Merchant Center (ID): (acceso) https://merchants.google.com/ (no aplica a pasajes, salvo feed de rutas para anuncios dinámicos)
+Google Tag Manager (Contenedor): (acceso) pedir GTM-XXXXXXX
+Plataforma de Ecommerce: venta online procesada por Recorrido.cl (marca blanca en https://www.recorrido.cl/cikbus/es) ✓ · app móvil desarrollada por ChilePasajes.cl (Bipay SpA) ✓ · sitio informativo cikbus.cl con protección anti-bot (CMS por verificar)
+Plataforma de Email Marketing: (verificar) no detectable sin leer el head
+Mapas de Calor: (verificar) no detectable sin leer el head
+
+A revisar:
+- https://www.recorrido.cl/cikbus/es : la compra sale del dominio de la marca; el pixel, GA4 y el remarketing dependen de lo que Recorrido permita instalar.
+- https://play.google.com/store/apps/details?id=cl.chilepasajes.cikbus : app con otro proveedor (Chilepasajes) y programa de puntos; conviene saber si convive con la venta de Recorrido.
+- https://www.sernac.cl/portal/604/w3-article-83871.html : ranking SERNAC 2024 de buses; Cikbus no aparece entre las 10 más reclamadas, Pluss Chile sí (291 reclamos).
+- https://espaciot.cl/entrevistas/vinko-cikutovic-cikbus-elite-la-calidad-de-servicio-marca-la-diferencia/ : entrevista al gerente general con la tesis de marca ("La gente ya no se casa con una marca; busca comodidad, seguridad y un servicio de calidad").
+- https://www.blog.recorrido.cl/destinos/cikbus-elite-nuevo-modasa-zeus-4-a-la-serena/ : salida desde Las Condes (Omnium Apoquindo, Escuela Militar) los viernes a La Serena; activo poco comunicado.
+- https://www.diarioeldia.cl/noticias/2023/12/14/117448-empresa-ovallina-a-la-vanguardia-cikbus-elite-lanza-flota-de-buses-amigables-con-medio-ambiente : flota Euro 6 2024 y sistema "viaje seguro".
