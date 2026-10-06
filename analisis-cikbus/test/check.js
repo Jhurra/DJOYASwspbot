@@ -25,7 +25,7 @@ const path = require('path');
         const ourH2 = document.querySelector('.sarcik .ck-title');
         r.ourH2Font = ourH2 ? getComputedStyle(ourH2).fontFamily : null;
         r.ourH2Color = ourH2 ? getComputedStyle(ourH2).color : null;
-        r.metricOverflow = Array.from(document.querySelectorAll('.sarcik .ck-kpi-num, .sarcik .ck-stat-num')).some(el => el.scrollWidth > el.clientWidth + 1);
+        r.metricOverflow = Array.from(document.querySelectorAll('.sarcik .ck-metric-value')).some(el => el.scrollWidth > el.clientWidth + 1);
         r.listaFlag = document.querySelector('.sarcik').getAttribute('data-ck-lista');
         r.printBtn = !!document.getElementById('ck-print');
         return r;
