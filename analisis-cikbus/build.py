@@ -13,7 +13,7 @@ html = html_cms
 (out/'SARAHI-analisis-cikbus-2-CSS.css').write_text(css+'\n', encoding='utf-8')
 (out/'SARAHI-analisis-cikbus-3-JAVASCRIPT.js').write_text(js+'\n', encoding='utf-8')
 # single piece deliverable
-(out/'analisis-marca-cikbus-elite-2026-10-05.html').write_text(src, encoding='utf-8')
+(out/'analisis-marca-cikbus-2026-10-05.html').write_text(src, encoding='utf-8')
 # hostile test page: CMS mangling + theme + script before markup
 mangle = lambda t: t.replace('&', '&#038;')
 tema = ('body{margin:0;background:#fff;color:#444;font-family:"DM Sans",sans-serif}'

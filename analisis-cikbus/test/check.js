@@ -3,7 +3,7 @@ const path = require('path');
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium/chrome-linux/chrome' }).catch(async () => chromium.launch());
   const results = {};
-  for (const [name, file] of [['single', '../analisis-marca-cikbus-elite-2026-10-05.html'], ['cms', 'test-cms.html'], ['duro', 'test-cms-duro.html']]) {
+  for (const [name, file] of [['single', '../analisis-marca-cikbus-2026-10-05.html'], ['cms', 'test-cms.html'], ['duro', 'test-cms-duro.html']]) {
     for (const width of [1280, 390]) {
       const page = await browser.newPage({ viewport: { width, height: 900 } });
       const errors = [];
