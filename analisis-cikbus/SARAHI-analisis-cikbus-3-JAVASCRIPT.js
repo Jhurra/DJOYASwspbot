@@ -71,6 +71,42 @@ function pieza(ROOT){
     });
   });
 
+  /* Comparativa por canal: pestañas y barras */
+  var cmp = ROOT.querySelector('#ck-cmp');
+  if(cmp){
+    cada(cmp.querySelectorAll('.ck-bars'), function(grupo){
+      var filas = grupo.querySelectorAll('.ck-bar');
+      var tope = 0;
+      cada(filas, function(f){
+        var v = parseFloat(f.getAttribute('data-ck-v'));
+        if(isFinite(v)){ tope = Math.max(tope, v); }
+      });
+      cada(filas, function(f){
+        var v = parseFloat(f.getAttribute('data-ck-v'));
+        var relleno = f.querySelector('.ck-bar-fill');
+        if(!relleno) return;
+        if(!isFinite(v)){ f.classList.add('ck-bar-pend'); relleno.style.width = '0'; return; }
+        var pct = tope ? (v / tope) * 100 : 0;
+        if(v){ pct = Math.max(pct, 1.5); }
+        relleno.style.width = pct.toFixed(1) + '%';
+      });
+    });
+
+    var botones = cmp.querySelectorAll('[data-ck-tab]');
+    var paneles = cmp.querySelectorAll('[data-ck-panel]');
+    function muestra(clave){
+      cada(botones, function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-ck-tab') === clave ? 'true' : 'false'); });
+      cada(paneles, function(p){
+        if(p.getAttribute('data-ck-panel') === clave){ p.classList.remove('ck-off'); }
+        else { p.classList.add('ck-off'); }
+      });
+    }
+    cada(botones, function(b){
+      b.addEventListener('click', function(){ muestra(b.getAttribute('data-ck-tab')); });
+    });
+    muestra('ig');
+  }
+
   var btn = ROOT.querySelector('#ck-print');
   if(btn){
     btn.addEventListener('click', function(){

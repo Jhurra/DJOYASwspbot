@@ -280,6 +280,44 @@
 @media print{
   .sarcik .ck-summary,.sarcik .ck-num{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+/* Comparativa por canal */
+.sarcik .ck-cmp{background:var(--surface-warm);border-radius:var(--r-xl);padding:32px;margin:20px 0 8px}
+.sarcik .ck-cmp-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-bottom:22px}
+.sarcik .ck-cmp-head .ck-eyebrow{margin:0}
+.sarcik .ck-panel{background:#ffffff;border:1px solid var(--border);border-radius:var(--r-lg);padding:26px}
+.sarcik .ck-panel.ck-off{display:none}
+.sarcik .ck-cmp-frase{font-size:clamp(19px,2.2vw,23px);line-height:1.35;font-weight:600;color:var(--ink-strong);letter-spacing:-.015em;max-width:40ch;margin-bottom:16px;text-wrap:balance}
+.sarcik .ck-cmp-frase em{font-style:normal;color:var(--sar-orange);font-weight:700}
+.sarcik .ck-bars{display:flex;flex-direction:column;gap:12px;margin:14px 0 4px}
+.sarcik .ck-bar{display:grid;grid-template-columns:132px minmax(0,1fr) 104px;align-items:center;gap:14px}
+.sarcik .ck-bar-n{font-size:15px;font-weight:500;color:var(--ink-strong);line-height:1.3}
+.sarcik .ck-bar-own .ck-bar-n{font-weight:700}
+.sarcik .ck-bar-track{display:block;height:26px;background:var(--cell-bg);border-radius:var(--r-sm);overflow:hidden;position:relative}
+.sarcik .ck-bar-fill{display:block;height:100%;width:0;background:var(--sar-peri);border-radius:var(--r-sm);transition:width .5s ease}
+.sarcik .ck-bar-own .ck-bar-fill{background:var(--sar-orange)}
+.sarcik .ck-bar-v{font-size:15px;font-weight:700;color:var(--ink-strong);white-space:nowrap;text-align:right}
+.sarcik .ck-bar-own .ck-bar-v{color:var(--orange-700)}
+.sarcik .ck-bar-pend .ck-bar-track{background:transparent;border:1.5px dashed var(--border-strong)}
+.sarcik .ck-bar-pend .ck-bar-v{font-weight:500;color:var(--ink-muted);font-size:14px}
+.sarcik .ck-cmp-src{font-size:13.5px;line-height:1.55;color:var(--ink-muted);margin-top:16px}
+.sarcik .ck-cmp-src a{color:var(--peri-600);text-decoration:underline}
+.sarcik .ck-panel .ck-legend{margin-bottom:2px}
+@media (max-width:900px){
+  .sarcik .ck-cmp{padding:22px 16px}
+  .sarcik .ck-panel{padding:20px 16px}
+}
+@media (max-width:480px){
+  .sarcik .ck-bar{grid-template-columns:96px minmax(0,1fr) 78px;gap:8px}
+  .sarcik .ck-bar-n,.sarcik .ck-bar-v{font-size:13.5px}
+  .sarcik .ck-bar-pend .ck-bar-v{font-size:12px}
+  .sarcik .ck-seg button{padding:8px 12px;font-size:13px}
+  .sarcik .ck-panel .ck-verdict{flex-direction:column;gap:8px}
+}
+@media print{
+  .sarcik .ck-panel.ck-off{display:block}
+  .sarcik .ck-panel{margin-bottom:14px;break-inside:avoid}
+  .sarcik .ck-cmp,.sarcik .ck-bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 /* ==/CSS== */
 </style>
 </head>
@@ -524,6 +562,42 @@
     <p class="ck-num">03</p>
     <h2 class="ck-title">Panorama publicitario</h2>
     <p>Foto del 05/10/2026 en la Biblioteca de Anuncios de Meta para Chile, buscando por nombre de marca. Google Ads Transparency no se pudo leer desde esta sesión y queda marcado para verificar a mano. Los anuncios cambian a diario.</p>
+
+        <h3 class="ck-sub">Cikbus frente a su competencia, en cifras</h3>
+    <div class="ck-cmp" id="ck-cmp">
+      <div class="ck-cmp-head">
+        <p class="ck-eyebrow">Compara por canal</p>
+        <div class="ck-seg" role="group" aria-label="Elige el canal">
+          <button type="button" data-ck-tab="ig" aria-pressed="true"><span class="ck-dot"></span>Seguidores en Instagram</button>
+          <button type="button" data-ck-tab="meta" aria-pressed="false"><span class="ck-dot"></span>Anuncios en Meta</button>
+          <button type="button" data-ck-tab="google" aria-pressed="false"><span class="ck-dot"></span>Google Ads</button>
+        </div>
+      </div>
+
+      <div class="ck-panel" data-ck-panel="ig">
+        <p class="ck-cmp-frase">FlixBus tiene <em>unas 18 veces</em> los seguidores de Cikbus. Turbus, 12 veces. Pullman Bus, 6 veces.</p>
+        <div class="ck-legend"><span><i style="background:#f2692d"></i>Cikbus</span><span><i style="background:#8088e6"></i>Competencia</span></div>
+        <div class="ck-bars"><div class="ck-bar ck-bar-own" data-ck-v="5096"><span class="ck-bar-n">Cikbus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">5.096</span></div><div class="ck-bar" data-ck-v="91000"><span class="ck-bar-n">FlixBus Chile</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">91 mil</span></div><div class="ck-bar" data-ck-v="63000"><span class="ck-bar-n">Turbus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">63 mil</span></div><div class="ck-bar" data-ck-v="32000"><span class="ck-bar-n">Pullman Bus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">32 mil</span></div><div class="ck-bar" data-ck-v="2468"><span class="ck-bar-n">Expreso Norte</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">2.468</span></div></div>
+        <p class="ck-verdict"><span class="ck-tag ck-tag-bad">Brecha</span>Cikbus solo supera a Expreso Norte y queda cuarta de cinco en seguidores. Las tres marcas de arriba hablan a una comunidad entre 6 y 18 veces más grande.</p>
+        <p class="ck-cmp-src">Fuente: perfil público de cada cuenta oficial (@cikbuselite, @flixbus_chile, @turbuscl, @pullmanbus, @expreso_norte), consultado el 06/10/2026. Instagram muestra las cuentas grandes redondeadas en miles.</p>
+      </div>
+
+      <div class="ck-panel" data-ck-panel="meta">
+        <p class="ck-cmp-frase">Cikbus tiene <em>0 anuncios</em> activos. FlixBus y Turbus suman unos 109.</p>
+        <div class="ck-legend"><span><i style="background:#f2692d"></i>Cikbus</span><span><i style="background:#8088e6"></i>Competencia</span></div>
+        <div class="ck-bars"><div class="ck-bar ck-bar-own" data-ck-v="0"><span class="ck-bar-n">Cikbus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">0</span></div><div class="ck-bar" data-ck-v="88"><span class="ck-bar-n">FlixBus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">88 aprox.</span></div><div class="ck-bar" data-ck-v="21"><span class="ck-bar-n">Turbus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">21</span></div><div class="ck-bar" data-ck-v="0"><span class="ck-bar-n">Pullman Bus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">0</span></div><div class="ck-bar" data-ck-v="0"><span class="ck-bar-n">Expreso Norte</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">0</span></div></div>
+        <p class="ck-verdict"><span class="ck-tag ck-tag-peri">Espacio libre</span>Pullman Bus y Expreso Norte tampoco pautan en Meta. Solo dos marcas compran atención en el corredor, y ninguna con el norte como destino.</p>
+        <p class="ck-cmp-src">Fuente: Biblioteca de Anuncios de Meta, Chile, anuncios activos por página oficial, consulta del 06/10/2026. FlixBus es una cifra estimada por la propia biblioteca. La tabla de más abajo es la foto del 05/10 por nombre de marca: la pauta cambia a diario.</p>
+      </div>
+
+      <div class="ck-panel" data-ck-panel="google">
+        <p class="ck-cmp-frase">Google Ads Transparency <em>no se pudo leer</em> desde esta sesión.</p>
+        <div class="ck-legend"><span><i style="background:#f2692d"></i>Cikbus</span><span><i style="background:#8088e6"></i>Competencia</span></div>
+        <div class="ck-bars"><div class="ck-bar ck-bar-own ck-bar-pend" data-ck-v=""><span class="ck-bar-n">Cikbus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">Por verificar</span></div><div class="ck-bar ck-bar-pend" data-ck-v=""><span class="ck-bar-n">FlixBus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">Por verificar</span></div><div class="ck-bar ck-bar-pend" data-ck-v=""><span class="ck-bar-n">Turbus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">Por verificar</span></div><div class="ck-bar ck-bar-pend" data-ck-v=""><span class="ck-bar-n">Pullman Bus</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">Por verificar</span></div><div class="ck-bar ck-bar-pend" data-ck-v=""><span class="ck-bar-n">Expreso Norte</span><span class="ck-bar-track"><span class="ck-bar-fill"></span></span><span class="ck-bar-v">Por verificar</span></div></div>
+        <p class="ck-verdict"><span class="ck-tag ck-tag-peri">Verificar</span>Queda por revisar a mano qué marcas compran búsquedas en Google. Es el canal donde se decide la compra del pasaje.</p>
+        <p class="ck-cmp-src">Revisar en Google Ads Transparency: <a href="https://adstransparency.google.com/?domain=cikbus.cl" target="_blank" rel="noopener">cikbus.cl</a> · <a href="https://adstransparency.google.com/?domain=flixbus.cl" target="_blank" rel="noopener">flixbus.cl</a> · <a href="https://adstransparency.google.com/?domain=turbus.cl" target="_blank" rel="noopener">turbus.cl</a> · <a href="https://adstransparency.google.com/?domain=pullmanbus.cl" target="_blank" rel="noopener">pullmanbus.cl</a> · <a href="https://adstransparency.google.com/?domain=expresonorte.cl" target="_blank" rel="noopener">expresonorte.cl</a></p>
+      </div>
+    </div>
 
     <h3 class="ck-sub">Qué dice Cikbus hoy</h3>
     <div class="ck-dark">
@@ -915,6 +989,42 @@ function pieza(ROOT){
       marca(it.sec);
     });
   });
+
+  /* Comparativa por canal: pestañas y barras */
+  var cmp = ROOT.querySelector('#ck-cmp');
+  if(cmp){
+    cada(cmp.querySelectorAll('.ck-bars'), function(grupo){
+      var filas = grupo.querySelectorAll('.ck-bar');
+      var tope = 0;
+      cada(filas, function(f){
+        var v = parseFloat(f.getAttribute('data-ck-v'));
+        if(isFinite(v)){ tope = Math.max(tope, v); }
+      });
+      cada(filas, function(f){
+        var v = parseFloat(f.getAttribute('data-ck-v'));
+        var relleno = f.querySelector('.ck-bar-fill');
+        if(!relleno) return;
+        if(!isFinite(v)){ f.classList.add('ck-bar-pend'); relleno.style.width = '0'; return; }
+        var pct = tope ? (v / tope) * 100 : 0;
+        if(v){ pct = Math.max(pct, 1.5); }
+        relleno.style.width = pct.toFixed(1) + '%';
+      });
+    });
+
+    var botones = cmp.querySelectorAll('[data-ck-tab]');
+    var paneles = cmp.querySelectorAll('[data-ck-panel]');
+    function muestra(clave){
+      cada(botones, function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-ck-tab') === clave ? 'true' : 'false'); });
+      cada(paneles, function(p){
+        if(p.getAttribute('data-ck-panel') === clave){ p.classList.remove('ck-off'); }
+        else { p.classList.add('ck-off'); }
+      });
+    }
+    cada(botones, function(b){
+      b.addEventListener('click', function(){ muestra(b.getAttribute('data-ck-tab')); });
+    });
+    muestra('ig');
+  }
 
   var btn = ROOT.querySelector('#ck-print');
   if(btn){

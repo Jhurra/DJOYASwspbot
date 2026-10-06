@@ -30,6 +30,26 @@ const path = require('path');
         r.printBtn = !!document.getElementById('ck-print');
         return r;
       });
+      data.cmp = await page.evaluate(() => {
+        const c = document.querySelector('.sarcik #ck-cmp'); if (!c) return null;
+        const vis = Array.from(c.querySelectorAll('.ck-panel')).filter(p => getComputedStyle(p).display !== 'none').map(p => p.getAttribute('data-ck-panel'));
+        const widths = Array.from(c.querySelectorAll('[data-ck-panel="ig"] .ck-bar-fill')).map(f => f.style.width);
+        const pend = c.querySelectorAll('.ck-bar-pend').length;
+        const over = Array.from(c.querySelectorAll('.ck-bar-v,.ck-bar-n')).some(e => e.scrollWidth > e.clientWidth + 1);
+        return { vis, widths, pend, over };
+      });
+      await page.click('.sarcik #ck-cmp [data-ck-tab="meta"]');
+      data.cmpMeta = await page.evaluate(() => {
+        const c = document.querySelector('.sarcik #ck-cmp');
+        const vis = Array.from(c.querySelectorAll('.ck-panel')).filter(p => getComputedStyle(p).display !== 'none').map(p => p.getAttribute('data-ck-panel'));
+        const widths = Array.from(c.querySelectorAll('[data-ck-panel="meta"] .ck-bar-fill')).map(f => f.style.width);
+        return { vis, widths, pressed: c.querySelector('[aria-pressed="true"]').getAttribute('data-ck-tab') };
+      });
+      if (name === 'single' || name === 'duro') {
+        await page.click('.sarcik #ck-cmp [data-ck-tab="ig"]');
+        const el = await page.$('.sarcik #ck-cmp');
+        await el.screenshot({ path: path.resolve(__dirname, 'shot-cmp-' + name + '-' + width + '.png') });
+      }
       // click a toc link and check active class
       await page.click('.sarcik .ck-toc a[href="#ck-s3"]');
       await page.waitForTimeout(900);
