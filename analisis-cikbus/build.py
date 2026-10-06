@@ -4,7 +4,12 @@ css = re.search(r'/\* ==CSS== \*/\n(.*?)\n/\* ==/CSS== \*/', src, re.S).group(1)
 html = re.search(r'<!-- ==HTML== -->\n(.*?)\n<!-- ==/HTML== -->', src, re.S).group(1)
 js  = re.search(r'/\* ==JS== \*/\n(.*?)\n/\* ==/JS== \*/', src, re.S).group(1)
 out = pathlib.Path('.')
-(out/'SARAHI-analisis-cikbus-1-HTML.html').write_text(html+'\n', encoding='utf-8')
+# HTML en una sola linea: el CMS (wpautop) mete <p> y <br> donde hay saltos y rompe tablas
+html_cms = re.sub(r'<!--.*?-->', '', html, flags=re.S)
+html_cms = re.sub(r'>\s+<', '><', html_cms)
+html_cms = re.sub(r'\s*\n\s*', ' ', html_cms).strip()
+(out/'SARAHI-analisis-cikbus-1-HTML.html').write_text(html_cms+'\n', encoding='utf-8')
+html = html_cms
 (out/'SARAHI-analisis-cikbus-2-CSS.css').write_text(css+'\n', encoding='utf-8')
 (out/'SARAHI-analisis-cikbus-3-JAVASCRIPT.js').write_text(js+'\n', encoding='utf-8')
 # single piece deliverable

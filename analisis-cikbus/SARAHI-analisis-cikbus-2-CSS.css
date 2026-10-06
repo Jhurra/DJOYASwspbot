@@ -125,7 +125,7 @@
 .sarcik summary{cursor:pointer;padding:16px 20px;font-weight:600;color:var(--ink-strong);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .sarcik summary::-webkit-details-marker{display:none}
 .sarcik summary::after{content:"+";font-size:22px;line-height:1;color:var(--sar-orange);font-weight:400}
-.sarcik details[open] summary::after{content:"\2013"}
+.sarcik details[open] summary::after{content:"–"}
 .sarcik details .ck-dbody{padding:0 20px 20px}
 
 .sarcik .ck-dafo{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}

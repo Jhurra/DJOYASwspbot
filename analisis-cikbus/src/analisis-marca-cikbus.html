@@ -134,7 +134,7 @@
 .sarcik summary{cursor:pointer;padding:16px 20px;font-weight:600;color:var(--ink-strong);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .sarcik summary::-webkit-details-marker{display:none}
 .sarcik summary::after{content:"+";font-size:22px;line-height:1;color:var(--sar-orange);font-weight:400}
-.sarcik details[open] summary::after{content:"\2013"}
+.sarcik details[open] summary::after{content:"–"}
 .sarcik details .ck-dbody{padding:0 20px 20px}
 
 .sarcik .ck-dafo{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}
@@ -736,11 +736,18 @@
 (function(){
 "use strict";
 
+/* Sin los caracteres ampersand, menor que ni mayor que: el CMS los reescribe. */
+function cada(lista, fn){
+  var i = 0;
+  var n = lista ? lista.length : 0;
+  while(i !== n){ fn(lista[i], i); i = i + 1; }
+}
+
 function arranca(){
   var ROOT = document.querySelector('.sarcik');
   if(!ROOT){
     arranca.intentos = (arranca.intentos || 0) + 1;
-    if(arranca.intentos < 100) setTimeout(arranca, 100);
+    if(arranca.intentos !== 100){ setTimeout(arranca, 100); }
     return;
   }
   if(ROOT.getAttribute('data-ck-lista') === '1') return;
@@ -754,57 +761,55 @@ if(document.readyState === 'loading'){
 }
 
 function pieza(ROOT){
-  var links = ROOT.querySelectorAll('.ck-toc a[href^="#"]');
+  var links = ROOT.querySelectorAll('.ck-toc a');
   var secciones = [];
-  var i;
-  for(i = 0; i < links.length; i++){
-    var id = links[i].getAttribute('href').slice(1);
-    var sec = document.getElementById(id);
-    if(sec){ secciones.push({ link: links[i], sec: sec }); }
-  }
+  cada(links, function(a){
+    var href = a.getAttribute('href') || '';
+    if(href.charAt(0) !== '#') return;
+    var sec = document.getElementById(href.slice(1));
+    if(sec){ secciones.push({ link: a, sec: sec }); }
+  });
 
   function marca(activa){
-    for(var k = 0; k < secciones.length; k++){
-      if(secciones[k].sec === activa){
-        secciones[k].link.classList.add('ck-on');
-      } else {
-        secciones[k].link.classList.remove('ck-on');
-      }
-    }
+    cada(secciones, function(it){
+      if(it.sec === activa){ it.link.classList.add('ck-on'); }
+      else { it.link.classList.remove('ck-on'); }
+    });
   }
 
   if('IntersectionObserver' in window){
     var visibles = {};
     var obs = new IntersectionObserver(function(entries){
-      for(var e = 0; e < entries.length; e++){
-        visibles[entries[e].target.id] = entries[e].isIntersecting;
-      }
-      for(var s = 0; s < secciones.length; s++){
-        if(visibles[secciones[s].sec.id]){ marca(secciones[s].sec); return; }
-      }
+      cada(entries, function(en){ visibles[en.target.id] = en.isIntersecting; });
+      var hecho = false;
+      cada(secciones, function(it){
+        if(hecho) return;
+        if(visibles[it.sec.id]){ marca(it.sec); hecho = true; }
+      });
     }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
-    for(i = 0; i < secciones.length; i++){ obs.observe(secciones[i].sec); }
+    cada(secciones, function(it){ obs.observe(it.sec); });
   }
 
-  for(i = 0; i < links.length; i++){
-    links[i].addEventListener('click', function(ev){
-      var destino = document.getElementById(this.getAttribute('href').slice(1));
-      if(!destino) return;
+  cada(secciones, function(it){
+    it.link.addEventListener('click', function(ev){
       ev.preventDefault();
       var suave = true;
       if(window.matchMedia){
         if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ suave = false; }
       }
-      destino.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
-      if(history.replaceState){ history.replaceState(null, '', '#' + destino.id); }
+      try {
+        it.sec.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+      } catch(e){
+        it.sec.scrollIntoView(true);
+      }
+      marca(it.sec);
     });
-  }
+  });
 
   var btn = ROOT.querySelector('#ck-print');
   if(btn){
     btn.addEventListener('click', function(){
-      var det = ROOT.querySelectorAll('details');
-      for(var d = 0; d < det.length; d++){ det[d].setAttribute('open', ''); }
+      cada(ROOT.querySelectorAll('details'), function(d){ d.setAttribute('open', ''); });
       window.print();
     });
   }
