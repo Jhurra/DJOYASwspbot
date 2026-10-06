@@ -27,7 +27,7 @@ pagina = ('<!doctype html><html lang="es"><head><meta charset="utf-8">'
           '<meta name="viewport" content="width=device-width,initial-scale=1">'
           '<style>'+tema+'</style><style>'+mangle(css)+'</style></head><body>'
           '<header><h1>Sitio</h1><button>Boton tema</button></header>'
-          '<div style="max-width:1170px;margin:0 auto">'
+          '<div style="max-width:1170px;margin:0 auto;padding:0 16px">'
           '<script>'+mangle(js)+'</script>'+mangle(html)+'</div>'
           '<footer><div class="card">.card del tema, debe seguir negra</div></footer>'
           '</body></html>')
@@ -35,3 +35,12 @@ pagina = ('<!doctype html><html lang="es"><head><meta charset="utf-8">'
 (out/'test/test-cms.html').write_text(pagina, encoding='utf-8')
 for f in ['SARAHI-analisis-cikbus-1-HTML.html','SARAHI-analisis-cikbus-2-CSS.css','SARAHI-analisis-cikbus-3-JAVASCRIPT.js']:
     t=(out/f).read_text(encoding='utf-8'); print(f, len(t), 'chars, ampersands:', t.count('&'))
+# CMS duro: además del ampersand, codifica < y > dentro del script y aplica autoformato a los saltos
+def wpautop(t):
+    t = re.sub(r'\n\s*\n', '</p><p>', t)
+    return t.replace('\n', '<br>\n')
+duro = ('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        '<style>'+tema+'</style><style>'+mangle(css)+'</style></head><body><header style="height:80px;background:#eee">Header del sitio</header>'
+        '<div style="max-width:1170px;margin:0 auto;padding:0 16px"><script>'+mangle(js).replace('<','&lt;').replace('>','&gt;')+'</script>'
+        + wpautop(mangle(html)) + '</div><footer><div class="card">.card del tema, debe seguir negra</div></footer></body></html>')
+(out/'test/test-cms-duro.html').write_text(duro, encoding='utf-8')
