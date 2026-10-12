@@ -7,7 +7,7 @@
   --ink:#2f2d2b; --body:#4a4744; --soft:#8a8580; --line:#e7e3de; --line-strong:#d6d0c9;
   --orange:#f2692d; --orange-ink:#c4501c; --peri:#7b84e3; --peri-ink:#525bd0; --third:#6f6a64;
   --band:#2f2d2b; --band-ink:#ffffff; --band-soft:rgba(255,255,255,.72); --lime:#e0fb9b;
-  --good:#2f7f49; --bad:#c23a31; --focus:rgba(123,132,227,.38);
+  --good:#2f7f49; --bad:#c23a31; --focus:rgba(123,132,227,.38); --conv:#9fcf3f; --base:#d9d3cc;
   --font:'DM Sans',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 }
@@ -16,13 +16,13 @@
   --ink:#f3f1ee; --body:#d6d2cd; --soft:#9a948e; --line:#3a3734; --line-strong:#4a4643;
   --orange:#f57a43; --orange-ink:#ff9a6b; --peri:#8f97ec; --peri-ink:#aab0f3; --third:#a8a29b;
   --band:#121110; --band-ink:#ffffff; --band-soft:rgba(255,255,255,.72); --lime:#e0fb9b;
-  --good:#5cc27e; --bad:#ef6a60; --focus:rgba(143,151,236,.45); color-scheme:dark}}
+  --good:#5cc27e; --bad:#ef6a60; --focus:rgba(143,151,236,.45); --conv:#c6ec78; --base:#4a4643; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#1c1b1a; --surface:#252322; --muted:#2d2b29; --warm:#2e2822;
   --ink:#f3f1ee; --body:#d6d2cd; --soft:#9a948e; --line:#3a3734; --line-strong:#4a4643;
   --orange:#f57a43; --orange-ink:#ff9a6b; --peri:#8f97ec; --peri-ink:#aab0f3; --third:#a8a29b;
   --band:#121110; --band-ink:#ffffff; --band-soft:rgba(255,255,255,.72); --lime:#e0fb9b;
-  --good:#5cc27e; --bad:#ef6a60; --focus:rgba(143,151,236,.45); color-scheme:dark}
+  --good:#5cc27e; --bad:#ef6a60; --focus:rgba(143,151,236,.45); --conv:#c6ec78; --base:#4a4643; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--body);font-family:var(--font);font-size:16px;line-height:1.6;font-variant-numeric:tabular-nums}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:36px 64px;display:flex;flex-direction:column;gap:28px}
@@ -100,6 +100,11 @@ select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);bo
 .btn:hover{background:var(--muted)}
 
 .comp{min-width:560px}
+.venta-tot{display:flex;flex-wrap:wrap;gap:10px 28px;margin:4px 0 14px}
+.venta-tot div{display:flex;flex-direction:column}
+.venta-tot b{font-size:clamp(22px,2.6vw,28px);color:var(--ink);letter-spacing:-.02em;line-height:1.15;white-space:nowrap}
+.venta-tot b.or{color:var(--orange-ink)}
+.venta-tot span{font-size:13px;color:var(--soft)}
 .comp td:first-child{white-space:normal}
 .comp .dif{color:var(--orange-ink);font-weight:700}
 .comp-frase{font-size:16.5px;color:var(--ink);max-width:72ch;margin-bottom:14px}
@@ -138,12 +143,26 @@ select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);bo
     <div class="kpis">
       <div class="kpi"><div class="kpi-n" id="k-inv"></div><div class="kpi-l">Inversión en Google y Meta</div></div>
       <div class="kpi"><div class="kpi-n" id="k-rep"></div><div class="kpi-l">ROAS que van a mostrar las plataformas</div></div>
-      <div class="kpi"><div class="kpi-n or" id="k-real"></div><div class="kpi-l">ROAS real: venta nueva que trae la publicidad por peso invertido</div></div>
-      <div class="kpi"><div class="kpi-n" id="k-nueva"></div><div class="kpi-l">Venta nueva para Cikbus, por publicidad y por mejor conversión, sin contar lo que solo cambia de canal</div></div>
+      <div class="kpi"><div class="kpi-n or" id="k-real"></div><div class="kpi-l">ROAS incremental: venta extra en cikbus.cl por peso invertido</div></div>
+      <div class="kpi"><div class="kpi-n or" id="k-nueva"></div><div class="kpi-l">Venta incremental en cikbus.cl: lo que vende el sitio por sobre lo que vendería sin hacer nada</div></div>
       <div class="kpi"><div class="kpi-n" id="k-cl"></div><div class="kpi-l" id="k-cl-l">Venta promedio mensual en cikbus.cl</div></div>
-      <div class="kpi"><div class="kpi-n or" id="k-neto"></div><div class="kpi-l">Resultado neto: margen de la venta nueva más comisión ahorrada, menos publicidad y agencia</div></div>
+      <div class="kpi"><div class="kpi-n" id="k-neto"></div><div class="kpi-l">Resultado neto conservador: solo cuenta como ganancia la venta que Cikbus no habría hecho por otro canal</div></div>
     </div>
     <p class="band-pie" id="pie"></p>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div><p class="eyebrow">Venta proyectada en cikbus.cl</p><h2 style="margin-top:6px">Cuánto más vende el sitio, mes a mes</h2></div>
+      <div class="seg" role="group" aria-label="Plan" id="planTabs">
+        <button type="button" data-plan="pro" aria-pressed="false">Plan Pro</button>
+        <button type="button" data-plan="partner" aria-pressed="true">Plan Partner</button>
+      </div>
+    </div>
+    <div class="venta-tot" id="venta-tot"></div>
+    <div class="legend" id="leyenda-venta"></div>
+    <div class="chart" id="grafico-venta"></div>
+    <p class="note" id="nota-venta"></p>
   </section>
 
   <section class="card">
@@ -162,7 +181,6 @@ select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);bo
       <div><h2>Mes a mes</h2></div>
       <div class="seg" role="group" aria-label="Gráfico" id="tabs">
         <button type="button" data-tab="inv" aria-pressed="true">Inversión por mes</button>
-        <button type="button" data-tab="cl" aria-pressed="false">Venta en cikbus.cl</button>
         <button type="button" data-tab="cr" aria-pressed="false">Conversión web</button>
       </div>
     </div>
@@ -175,13 +193,13 @@ select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);bo
     <table>
       <thead><tr>
         <th>Mes</th><th>Marca</th><th>Genéricas</th><th>Meta</th><th>Inversión</th>
-        <th>Venta reportada</th><th>ROAS reportado</th><th>Venta nueva</th><th>ROAS real</th><th>cikbus.cl</th><th>Resultado neto</th>
+        <th>Venta reportada</th><th>ROAS reportado</th><th>Incremental web</th><th>ROAS incremental</th><th>cikbus.cl</th><th>Resultado neto</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
       <tfoot id="tfoot"></tfoot>
     </table>
   </div>
-  <p class="note">Millones de pesos al mes, sin IVA. La venta reportada es la suma de lo que Google y Meta se atribuyen. La venta nueva descuenta lo que se habría vendido igual y lo que solo pasa de una plataforma a cikbus.cl.</p>
+  <p class="note">Millones de pesos al mes, sin IVA. La venta reportada es la suma de lo que Google y Meta se atribuyen. El incremental web es lo que cikbus.cl vende por sobre su base sin publicidad: venta recuperada de plataformas, venta de los anuncios y venta por mejor conversión. El resultado neto es más estricto y solo cuenta como ganancia la parte que Cikbus no habría hecho por otro canal.</p>
 
   <section class="grid2">
     <div class="card group" id="col1"></div>
@@ -305,7 +323,8 @@ function simular(e,plan,usarTope){
     var nueva=nuevaAds+nuevaConv;
     var ahorro=p.comisionDif*platLoss+ahorroConv;
     var ventaCl=baseCl+extraConv+captCl+p.incrGen*rGen+p.incrMeta*rMeta;
-    filas.push({mes:MESES[t],cr:cr,gMarca:gMarca,gGen:gGen,gMeta:gMeta,inv:inv,rep:rep,nueva:nueva,nuevaAds:nuevaAds,nuevaConv:nuevaConv,
+    var adsWeb=p.incrGen*rGen+p.incrMeta*rMeta;
+    filas.push({mes:MESES[t],cr:cr,extraConv:extraConv,captCl:captCl,adsWeb:adsWeb,incWeb:extraConv+captCl+adsWeb,gMarca:gMarca,gGen:gGen,gMeta:gMeta,inv:inv,rep:rep,nueva:nueva,nuevaAds:nuevaAds,nuevaConv:nuevaConv,
       ventaCl:ventaCl,base:baseCl,ahorro:ahorro,fee:fee,neto:p.margen*nueva+ahorro-inv-fee});
   }
   return filas;
@@ -316,7 +335,8 @@ function el(tag,attrs,padre,txt){var e=document.createElementNS('http://www.w3.o
 function niceMax(v){var p=Math.pow(10,Math.floor(Math.log10(v)));var m=v/p;var n=m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10;return n*p;}
 function nTicks(max){return (max%4===0)?4:5;}
 function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
-function ejes(svg,max,x0,x1,y0,y1,suf){var nt=nTicks(max);for(var i=0;i<=nt;i++){var v=max*i/nt,y=y0-(y0-y1)*i/nt;el('line',{x1:x0,x2:x1,y1:y,y2:y,stroke:css('--line'),'stroke-width':1},svg);el('text',{x:x0-8,y:y+4,'text-anchor':'end','font-size':11,fill:css('--soft'),'font-family':'DM Mono, monospace'},svg,suf==='%'?cl(v,v%1?1:0)+'%':'$'+cl(v,v%1?1:0));}}
+function escala(v){var e=Math.pow(10,Math.floor(Math.log10(v/5)));var st=[1,2,2.5,5,10].map(function(m){return m*e;}).filter(function(s){return v/s<=6;})[0];return {max:Math.ceil(v/st)*st,n:Math.ceil(v/st)};}
+function ejes(svg,max,x0,x1,y0,y1,suf,ntFijo){var nt=ntFijo||nTicks(max);for(var i=0;i<=nt;i++){var v=max*i/nt,y=y0-(y0-y1)*i/nt;el('line',{x1:x0,x2:x1,y1:y,y2:y,stroke:css('--line'),'stroke-width':1},svg);el('text',{x:x0-8,y:y+4,'text-anchor':'end','font-size':11,fill:css('--soft'),'font-family':'DM Mono, monospace'},svg,suf==='%'?cl(v,v%1?1:0)+'%':'$'+cl(v,v%1?1:0));}}
 
 function grafInv(f){
   var W=760,H=300,x0=48,x1=W-12,y0=H-34,y1=16;
@@ -345,56 +365,75 @@ function lineas(f,series,max,suf,label){
   return svg;
 }
 
+function grafVenta(f,otro){
+  var W=760,H=320,x0=52,x1=W-12,y0=H-34,y1=22;
+  var sc=escala(Math.max.apply(null,f.concat(otro).map(function(r){return r.ventaCl;}))*1.08),max=sc.max;
+  var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Venta proyectada en cikbus.cl por mes'});
+  ejes(svg,max,x0,x1,y0,y1,'$',sc.n);
+  var bw=(x1-x0)/12;function Y(v){return y0-(y0-y1)*v/max;}
+  f.forEach(function(r,i){
+    var x=x0+i*bw+bw*0.18,w=bw*0.64,y=y0;
+    [['base','--base'],['captCl','--orange'],['adsWeb','--peri'],['extraConv','--conv']].forEach(function(s){var h=(y0-y1)*r[s[0]]/max;if(h>0.2){y-=h;el('rect',{x:x,y:y,width:w,height:h,fill:css(s[1])},svg);}});
+    var o=otro[i].ventaCl;el('line',{x1:x-3,x2:x+w+3,y1:Y(o),y2:Y(o),stroke:css('--ink'),'stroke-width':1.5,'stroke-dasharray':'4 3'},svg);
+    el('text',{x:x+w/2,y:Math.min(y,Y(o))-7,'text-anchor':'middle','font-size':11,'font-weight':600,fill:css('--orange-ink'),'font-family':'DM Mono, monospace'},svg,'+'+cl(r.incWeb,0));
+    el('text',{x:x+w/2,y:H-12,'text-anchor':'middle','font-size':12,fill:css('--soft')},svg,r.mes);
+  });
+  return svg;
+}
 function render(){
   var usarTope=document.getElementById('usarTope').checked;
   var plan=document.getElementById('plan').value;
+  document.querySelectorAll('#planTabs button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-plan')===plan?'true':'false');});
   var f=simular(estado,plan,usarTope);
   var otro=simular(estado,plan==='partner'?'pro':'partner',usarTope);
   var fPro=plan==='pro'?f:otro, fPar=plan==='partner'?f:otro;
-  var T={inv:sumar(f,'inv'),rep:sumar(f,'rep'),nueva:sumar(f,'nueva'),ads:sumar(f,'nuevaAds'),neto:sumar(f,'neto'),cl:sumar(f,'ventaCl'),base:sumar(f,'base'),ahorro:sumar(f,'ahorro')};
+  var T={inv:sumar(f,'inv'),rep:sumar(f,'rep'),nueva:sumar(f,'nueva'),ads:sumar(f,'nuevaAds'),inc:sumar(f,'incWeb'),neto:sumar(f,'neto'),cl:sumar(f,'ventaCl'),base:sumar(f,'base'),ahorro:sumar(f,'ahorro')};
   var clProm=T.cl/12,baseProm=T.base/12,alza=(clProm/baseProm-1)*100;
   document.getElementById('k-inv').textContent=mm(T.inv);
   document.getElementById('k-rep').textContent=xx(T.rep/T.inv);
-  document.getElementById('k-real').textContent=xx(T.ads/T.inv);
-  document.getElementById('k-nueva').textContent=mm(T.nueva);
+  document.getElementById('k-real').textContent=xx(T.inc/T.inv);
+  document.getElementById('k-nueva').textContent=mm(T.inc);
   document.getElementById('k-cl').textContent=mm(clProm);
   document.getElementById('k-cl-l').textContent='Venta promedio mensual en cikbus.cl, '+cl(alza,0)+'% más que sin publicidad';
   document.getElementById('k-neto').textContent=mm(T.neto);
   var nombre=plan==='partner'?'Plan Partner':'Plan Pro';
-  document.getElementById('frase').innerHTML='Con el '+nombre+', partir con <b>'+mm(f[0].inv)+'</b> y llegar a <b>'+mm(f[2].inv)+'</b> en enero. La web pasa de convertir <b>'+pc(f[0].cr)+'</b> a <b>'+pc(f[11].cr)+'</b>. Las plataformas van a mostrar cerca de <b>'+xx(T.rep/T.inv)+'</b>; la venta nueva que trae la publicidad es <b>'+xx(T.ads/T.inv)+'</b> lo invertido.';
-  document.getElementById('pie').textContent='Con un margen de '+cl(estado.margen,0)+'%, cada peso de publicidad se paga desde un ROAS real de '+cl(100/estado.margen,1)+'x. La comisión ahorrada suma '+mm(T.ahorro)+' en el año. Agencia: '+FEE[plan]+' UF al mes, incluida en el resultado neto.';
+  document.getElementById('frase').innerHTML='Con el '+nombre+', partir con <b>'+mm(f[0].inv)+'</b> y llegar a <b>'+mm(f[2].inv)+'</b> en enero. '+(f[11].cr-f[0].cr>0.05?'La web pasa de convertir <b>'+pc(f[0].cr)+'</b> a <b>'+pc(f[11].cr)+'</b>.':'La web se mantiene en <b>'+pc(f[0].cr)+'</b> de conversión.')+' Las plataformas van a mostrar cerca de <b>'+xx(T.rep/T.inv)+'</b>; cikbus.cl vende <b>'+mm(T.inc)+'</b> más en el año, <b>'+xx(T.inc/T.inv)+'</b> lo invertido.';
+  document.getElementById('pie').textContent='Visto con exigencia, la venta que Cikbus no habría hecho por ningún canal suma '+mm(T.nueva)+' y la comisión ahorrada '+mm(T.ahorro)+'. Con un margen de '+cl(estado.margen,0)+'%, eso deja el resultado neto conservador después de publicidad y '+FEE[plan]+' UF al mes de agencia.';
 
   /* Comparación Pro y Partner */
-  var A={},B={};['inv','nueva','neto','ventaCl','fee','nuevaConv','nuevaAds'].forEach(function(k){A[k]=sumar(fPro,k);B[k]=sumar(fPar,k);});
+  var A={},B={};['inv','nueva','neto','ventaCl','fee','nuevaConv','nuevaAds','incWeb','extraConv'].forEach(function(k){A[k]=sumar(fPro,k);B[k]=sumar(fPar,k);});
   var filasComp=[
     ['Conversión de cikbus.cl al mes 12',pc(fPro[11].cr),pc(fPar[11].cr),'+'+cl(fPar[11].cr-fPro[11].cr,1)+' pts'],
     ['Costo de la agencia en 12 meses',mm(A.fee),mm(B.fee),'+'+mm(B.fee-A.fee)],
     ['Inversión en Google y Meta',mm(A.inv),mm(B.inv),(B.inv>=A.inv?'+':'−')+mm(Math.abs(B.inv-A.inv))],
-    ['Venta nueva para Cikbus',mm(A.nueva),mm(B.nueva),'+'+mm(B.nueva-A.nueva)],
-    ['   de eso, por convertir mejor el tráfico que ya llega',mm(A.nuevaConv),mm(B.nuevaConv),'+'+mm(B.nuevaConv-A.nuevaConv)],
-    ['ROAS real de la publicidad',xx(A.nuevaAds/A.inv),xx(B.nuevaAds/B.inv),(B.nuevaAds/B.inv-A.nuevaAds/A.inv>=0?'+':'−')+cl(Math.abs(B.nuevaAds/B.inv-A.nuevaAds/A.inv),1)+'x'],
+    ['Venta incremental en cikbus.cl',mm(A.incWeb),mm(B.incWeb),'+'+mm(B.incWeb-A.incWeb)],
+    ['   de eso, por convertir mejor el tráfico que ya llega',mm(A.extraConv),mm(B.extraConv),'+'+mm(B.extraConv-A.extraConv)],
+    ['ROAS incremental web',xx(A.incWeb/A.inv),xx(B.incWeb/B.inv),(B.incWeb/B.inv-A.incWeb/A.inv>=0?'+':'−')+cl(Math.abs(B.incWeb/B.inv-A.incWeb/A.inv),1)+'x'],
     ['Venta promedio mensual en cikbus.cl',mm(A.ventaCl/12),mm(B.ventaCl/12),'+'+mm((B.ventaCl-A.ventaCl)/12)],
-    ['Resultado neto en 12 meses',mm(A.neto),mm(B.neto),(B.neto-A.neto>=0?'+':'−')+mm(Math.abs(B.neto-A.neto))]
+    ['Resultado neto conservador',mm(A.neto),mm(B.neto),(B.neto-A.neto>=0?'+':'−')+mm(Math.abs(B.neto-A.neto))]
   ];
   var cb=document.getElementById('comp-body');cb.innerHTML='';
   filasComp.forEach(function(r,i){var tr=document.createElement('tr');tr.innerHTML='<td'+(r[0].indexOf('   ')===0?' style="padding-left:28px;color:var(--soft)"':'')+'>'+r[0].trim()+'</td><td class="num">'+r[1]+'</td><td class="num">'+r[2]+'</td><td class="num dif">'+r[3]+'</td>';if(i===filasComp.length-1)tr.style.fontWeight='700';cb.appendChild(tr);});
   var gana=B.neto-A.neto;
-  document.getElementById('comp-frase').innerHTML='El Plan Partner cuesta <b>'+mm(B.fee-A.fee)+'</b> más en el año. Al llevar la conversión de cikbus.cl de '+pc(fPro[0].cr)+' a '+pc(fPar[11].cr)+', '+(gana>=0?'deja <b>'+mm(gana)+'</b> más de resultado neto':'deja <b>'+mm(-gana)+'</b> menos de resultado neto')+'. Mejor conversión hace rendir cada peso de publicidad y además vende más con el tráfico que hoy ya llega gratis.';
+  document.getElementById('comp-frase').innerHTML='El Plan Partner cuesta <b>'+mm(B.fee-A.fee)+'</b> más en el año. Al llevar la conversión de cikbus.cl de '+pc(fPro[0].cr)+' a '+pc(fPar[11].cr)+', '+(gana>=0?'deja <b>'+mm(gana)+'</b> más de resultado neto':'deja <b>'+mm(-gana)+'</b> menos de resultado neto')+', y cikbus.cl vende <b>'+mm(B.incWeb-A.incWeb)+'</b> más en el año. Mejor conversión hace rendir cada peso de publicidad y además vende más con el tráfico que hoy ya llega gratis.';
+
+  var gv=document.getElementById('grafico-venta');gv.innerHTML='';gv.appendChild(grafVenta(f,otro));
+  var nomOtro=plan==='partner'?'Plan Pro':'Plan Partner';
+  var sCap=sumar(f,'captCl'),sAds=sumar(f,'adsWeb'),sConv=sumar(f,'extraConv');
+  document.getElementById('venta-tot').innerHTML='<div><b>'+mm(T.cl)+'</b><span>venta en cikbus.cl en 12 meses</span></div><div><b class="or">+'+mm(T.inc)+'</b><span>incremental sobre '+mm(T.base)+' sin publicidad (+'+cl(T.inc/T.base*100,0)+'%)</span></div><div><b>'+(T.cl-sumar(otro,'ventaCl')>=0?'+':'−')+mm(Math.abs(T.cl-sumar(otro,'ventaCl')))+'</b><span>frente al '+nomOtro+'</span></div>';
+  document.getElementById('leyenda-venta').innerHTML='<span><i style="background:var(--base)"></i>Base sin publicidad</span><span><i style="background:var(--orange)"></i>Recuperada de plataformas · '+mm(sCap)+'</span><span><i style="background:var(--peri)"></i>Anuncios genéricos y Meta · '+mm(sAds)+'</span><span><i style="background:var(--conv)"></i>Mejor conversión · '+mm(sConv)+'</span><span><i style="background:transparent;border:1.5px dashed var(--ink)"></i>Total con el '+nomOtro+'</span>';
+  document.getElementById('nota-venta').textContent='Millones de pesos al mes. El número sobre cada barra es la venta incremental del sitio. La línea punteada marca cuánto vendería cikbus.cl con el '+nomOtro+', para ver la diferencia de un vistazo.';
 
   var tb=document.getElementById('tbody');tb.innerHTML='';
   f.forEach(function(r){var tr=document.createElement('tr');
-    tr.innerHTML='<td>'+r.mes+'<span class="sub">conv. '+pc(r.cr)+'</span></td><td class="num">'+cl(r.gMarca,1)+'</td><td class="num">'+cl(r.gGen,1)+'</td><td class="num">'+cl(r.gMeta,1)+'</td><td class="num"><b>'+cl(r.inv,1)+'</b></td><td class="num">'+cl(r.rep,0)+'</td><td class="num">'+xx(r.inv?r.rep/r.inv:0)+'</td><td class="num">'+cl(r.nueva,1)+'</td><td class="num">'+xx(r.inv?r.nuevaAds/r.inv:0)+'</td><td class="num">'+cl(r.ventaCl,0)+'<span class="sub">base '+cl(r.base,0)+'</span></td><td class="num '+(r.neto<0?'neg':'pos')+'">'+(r.neto<0?'−':'+')+cl(Math.abs(r.neto),1)+'</td>';
+    tr.innerHTML='<td>'+r.mes+'<span class="sub">conv. '+pc(r.cr)+'</span></td><td class="num">'+cl(r.gMarca,1)+'</td><td class="num">'+cl(r.gGen,1)+'</td><td class="num">'+cl(r.gMeta,1)+'</td><td class="num"><b>'+cl(r.inv,1)+'</b></td><td class="num">'+cl(r.rep,0)+'</td><td class="num">'+xx(r.inv?r.rep/r.inv:0)+'</td><td class="num">'+cl(r.incWeb,1)+'</td><td class="num">'+xx(r.inv?r.incWeb/r.inv:0)+'</td><td class="num">'+cl(r.ventaCl,0)+'<span class="sub">base '+cl(r.base,0)+'</span></td><td class="num '+(r.neto<0?'neg':'pos')+'">'+(r.neto<0?'−':'+')+cl(Math.abs(r.neto),1)+'</td>';
     tb.appendChild(tr);});
-  document.getElementById('tfoot').innerHTML='<tr><td>12 meses</td><td class="num">'+cl(sumar(f,'gMarca'),0)+'</td><td class="num">'+cl(sumar(f,'gGen'),0)+'</td><td class="num">'+cl(sumar(f,'gMeta'),0)+'</td><td class="num">'+cl(T.inv,0)+'</td><td class="num">'+cl(T.rep,0)+'</td><td class="num">'+xx(T.rep/T.inv)+'</td><td class="num">'+cl(T.nueva,0)+'</td><td class="num">'+xx(T.ads/T.inv)+'</td><td class="num">'+cl(T.cl,0)+'</td><td class="num '+(T.neto<0?'neg':'pos')+'">'+(T.neto<0?'−':'+')+cl(Math.abs(T.neto),0)+'</td></tr>';
+  document.getElementById('tfoot').innerHTML='<tr><td>12 meses</td><td class="num">'+cl(sumar(f,'gMarca'),0)+'</td><td class="num">'+cl(sumar(f,'gGen'),0)+'</td><td class="num">'+cl(sumar(f,'gMeta'),0)+'</td><td class="num">'+cl(T.inv,0)+'</td><td class="num">'+cl(T.rep,0)+'</td><td class="num">'+xx(T.rep/T.inv)+'</td><td class="num">'+cl(T.inc,0)+'</td><td class="num">'+xx(T.inc/T.inv)+'</td><td class="num">'+cl(T.cl,0)+'</td><td class="num '+(T.neto<0?'neg':'pos')+'">'+(T.neto<0?'−':'+')+cl(Math.abs(T.neto),0)+'</td></tr>';
 
   var g=document.getElementById('grafico');g.innerHTML='';
   var ley=document.getElementById('leyenda'),nota=document.getElementById('nota-graf');
   if(tab==='inv'){g.appendChild(grafInv(f));ley.innerHTML='<span><i style="background:var(--orange)"></i>Marca</span><span><i style="background:var(--peri)"></i>Genéricas y Performance Max</span><span><i style="background:var(--third)"></i>Meta</span>';
     nota.textContent='Millones de pesos. Parte en '+mm(estado.topeInicial)+' y puede subir '+mm(estado.topeSuma)+' por mes; desde ahí sigue a la temporada y nunca pasa de lo que conviene invertir.';}
-  else if(tab==='cl'){var max=niceMax(Math.max.apply(null,f.map(function(r){return r.ventaCl;}))*1.08);
-    g.appendChild(lineas(f,[{data:f.map(function(r){return r.base;}),color:'--soft',w:2,dash:'5 4',fin:mm,finAbajo:true},{data:f.map(function(r){return r.ventaCl;}),color:'--orange',puntos:true,fin:mm}],max,'$','Venta mensual en cikbus.cl con y sin publicidad'));
-    ley.innerHTML='<span><i style="background:var(--orange)"></i>Con publicidad, '+nombre+'</span><span><i style="background:var(--soft)"></i>Sin publicidad</span>';
-    nota.textContent='Millones de pesos. Incluye la venta que vuelve desde las plataformas, así que crece más que la venta total de Cikbus.';}
   else{var maxc=Math.ceil(Math.max(NB.cr,fPar[11].cr)*1.15/2)*2;
     g.appendChild(lineas(f,[{data:f.map(function(){return NB.cr;}),color:'--third',w:1.5,dash:'3 4',inicio:function(v){return 'Narbus hoy '+pc(v);}},{data:fPro.map(function(r){return r.cr;}),color:'--peri',puntos:true,fin:function(v){return 'Pro '+pc(v);},finAbajo:true},{data:fPar.map(function(r){return r.cr;}),color:'--orange',puntos:true,fin:function(v){return 'Partner '+pc(v);}}],maxc,'%','Tasa de conversión de cikbus.cl por plan'));
     ley.innerHTML='<span><i style="background:var(--orange)"></i>Plan Partner</span><span><i style="background:var(--peri)"></i>Plan Pro</span><span><i style="background:var(--third)"></i>Narbus hoy</span>';
@@ -429,6 +468,7 @@ document.querySelectorAll('#escenarios button').forEach(function(b){b.addEventLi
 document.querySelectorAll('#tabs button').forEach(function(b){b.addEventListener('click',function(){tab=b.getAttribute('data-tab');document.querySelectorAll('#tabs button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});render();});});
 document.getElementById('usarTope').addEventListener('change',render);
 document.getElementById('plan').addEventListener('change',render);
+document.querySelectorAll('#planTabs button').forEach(function(b){b.addEventListener('click',function(){document.getElementById('plan').value=b.getAttribute('data-plan');render();});});
 document.getElementById('reset').addEventListener('click',function(){cargar(escActual||'base');});
 if(window.matchMedia){var mq=window.matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',render);}
 cargar('base');
