@@ -1,0 +1,79 @@
+<style>
+  .gc-footer {
+    --c1: #076951; --c2: #16876b; --c3: #365951; --c4: #192c27;
+    --c5: #e7f4f1; --c6: #f2f7f6; --c8: #ffffff; --line: #deebe8;
+    background: var(--c6); color: var(--c3);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px; line-height: 1.65; text-align: left;
+  }
+  .gc-footer *, .gc-footer *::before, .gc-footer *::after { box-sizing: border-box; }
+  .gc-footer .gc-wrap { width: 100%; max-width: 1290px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .gc-footer h2 { margin: 0; color: var(--c4); font-size: clamp(26px, 1.5rem + 0.9vw, 35px); line-height: 1.3; font-weight: 700; }
+  .gc-footer h4 { margin: 0 0 14px; color: var(--c4); font-size: 16px; line-height: 1.4; font-weight: 700; }
+  .gc-footer p { margin: 0; }
+  .gc-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .gc-footer a { color: var(--c3); text-decoration: none; }
+  .gc-footer a:hover { color: var(--c1); }
+
+  .gc-footer .gc-top .gc-wrap { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; padding-top: 60px; padding-bottom: 60px; border-bottom: 1px solid var(--line); }
+  .gc-footer .gc-mid .gc-wrap { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 50px; padding-top: 60px; padding-bottom: 60px; }
+  .gc-footer .gc-mid .gc-wrap > * { min-width: 0; }
+  .gc-footer .gc-stack { display: grid; gap: 14px; align-content: start; }
+  .gc-footer .gc-links { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .gc-footer .gc-bottom .gc-wrap { padding-top: 25px; padding-bottom: 25px; text-align: center; font-size: 14px; border-top: 1px solid var(--line); }
+  .gc-footer .gc-brand { font-size: 25px; font-weight: 700; color: var(--c4); line-height: 1.2; }
+  .gc-footer .gc-brand span { color: var(--c1); }
+  .gc-footer .gc-socials { display: flex; gap: 10px; }
+  .gc-footer .gc-socials a { width: 38px; height: 38px; border-radius: 50%; background: var(--c8); display: grid; place-items: center; color: var(--c4); font-size: 13px; font-weight: 700; }
+  .gc-footer .gc-socials a:hover { background: var(--c1); color: #ffffff; }
+  .gc-footer .gc-crisis { font-size: 13px; margin-top: 12px; }
+
+  .gc-footer .gc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 10px 28px; border-radius: 8px; border: 2px solid #25d366; background: #25d366; color: #0b3d22; font-size: 15px; font-weight: 600; text-decoration: none; transition: background-color .2s, border-color .2s, color .2s; }
+  .gc-footer .gc-btn:hover { background: #1fb457; border-color: #1fb457; color: #ffffff; }
+  .gc-wa-ico { width: 20px; height: 20px; flex: none; }
+
+  .gc-wa-float {
+    position: fixed; z-index: 9999;
+    right: calc(20px + env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    width: 58px; height: 58px; border-radius: 50%; background: #25d366; color: #ffffff;
+    display: grid; place-items: center; box-shadow: 0 10px 24px rgba(7, 105, 81, 0.3); transition: transform .2s;
+  }
+  .gc-wa-float:hover { transform: scale(1.06); color: #ffffff; }
+  .gc-wa-float .gc-wa-ico { width: 30px; height: 30px; }
+
+  @media (max-width: 999px) {
+    .gc-footer .gc-top .gc-wrap, .gc-footer .gc-mid .gc-wrap { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+    .gc-footer .gc-links { text-align: center; }
+    .gc-footer .gc-socials { justify-content: center; }
+  }
+</style>
+
+<footer class="gc-footer">
+  <div class="gc-top">
+    <div class="gc-wrap">
+      <h2>¿Quieres dar el primer paso?</h2>
+      <div><a class="gc-btn" href="https://wa.me/34652202828?text=Hola%20Georgia%2C%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20terapia%20en%20l%C3%ADnea" target="_blank" rel="noopener"><svg class="gc-wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .2-1.2c-.1-.2-.3-.2-.6-.4Z"/></svg>Escríbeme por WhatsApp</a></div>
+    </div>
+  </div>
+  <div class="gc-mid">
+    <div class="gc-wrap">
+      <div class="gc-stack">
+        <a class="gc-brand" href="/">Terapia con <span>Gi</span></a>
+        <p>Terapia en línea y en español para personas que viven fuera de su país.</p>
+        <div class="gc-socials"><a href="https://www.instagram.com/terapia.congi/" target="_blank" rel="noopener" aria-label="Instagram">IG</a><a href="#" aria-label="Facebook">FB</a><a href="#" aria-label="TikTok">TT</a></div>
+      </div>
+      <div class="gc-links">
+        <div><h4>Sitio</h4><ul><li><a href="/">Inicio</a></li><li><a href="/conoceme/">Conóceme</a></li><li><a href="/servicios/">Servicios</a></li><li><a href="/contacto/">Contacto</a></li></ul></div>
+        <div><h4>Servicios</h4><ul><li><a href="/servicios/">Ansiedad y estrés</a></li><li><a href="/servicios/">Duelo migratorio</a></li><li><a href="/servicios/">Duelos y pérdidas</a></li><li><a href="/servicios/">Cambios de vida</a></li></ul></div>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul><li><a href="https://wa.me/34652202828" target="_blank" rel="noopener">WhatsApp +34 652 20 28 28</a></li><li><a href="mailto:camarenageorgia@gmail.com">camarenageorgia@gmail.com</a></li><li>Sesiones en línea en todo el mundo</li></ul>
+        <p class="gc-crisis">Si estás en una crisis, llama al número de emergencias de tu país. La terapia en línea no es un servicio de urgencias.</p>
+      </div>
+    </div>
+  </div>
+  <div class="gc-bottom"><div class="gc-wrap">Copyright © 2026 georgiacamarena.com. Aviso de privacidad.</div></div>
+</footer>
+
+<a class="gc-wa-float" href="https://wa.me/34652202828?text=Hola%20Georgia%2C%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre%20la%20terapia%20en%20l%C3%ADnea" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg class="gc-wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .2-1.2c-.1-.2-.3-.2-.6-.4Z"/></svg></a>
