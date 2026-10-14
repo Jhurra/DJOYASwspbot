@@ -3,133 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Servicios · Terapia con Gi</title>
+<title>Servicios | Terapia con Gi</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Terapia psicológica en línea, en español, para personas que viven fuera de su país. Georgia Camarena, psicóloga y también migrante.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap">
+<meta name="description" content="Terapia psicológica en línea y en español para personas que viven fuera de su país. Georgia Camarena, psicóloga.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="draftbar"><div class="wrap"><span>Borrador v1 · Propuesta de rediseño para georgiacamarena.com</span><a href="estructura.html">Ver estructura y notas →</a></div></div>
+<div class="draftbar"><div class="wrap"><span>Borrador v2 del nuevo sitio de Georgia Camarena</span><a href="estructura.html">Ver estructura y notas</a></div></div>
 
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="index.html">Terapia con <b>Gi</b></a>
-    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>
+    <a class="brand" href="index.html">Terapia con <span>Gi</span></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menú <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></button>
     <nav class="nav" id="nav" aria-label="Principal">
       <a href="index.html">Inicio</a>
       <a href="conoceme.html">Conóceme</a>
       <a href="servicios.html" aria-current="page">Servicios</a>
-      <a href="index.html#preguntas">Preguntas</a>
-      <a class="btn" href="agenda.html">Agenda tu sesión</a>
+      <a href="agenda.html">Contacto</a>
+      <a class="btn ghost" href="agenda.html#reserva">Agenda tu sesión</a>
     </nav>
   </div>
 </header>
-
 <main>
-  <!-- 1. CABECERA -->
-  <section class="page-hero">
+  <section class="page-head">
     <div class="wrap">
-      <span class="eyebrow">Servicios</span>
-      <h1>Terapia individual en línea, <em>en español y en tu horario</em></h1>
-      <p class="lead measure">Sesiones por videollamada para personas que viven fuera de su país. Trabajamos lo que te trae hoy, a tu ritmo.</p>
-      <div class="facts">
-        <div><span class="k">Formato</span><span class="v">Videollamada</span></div>
-        <div><span class="k">Idioma</span><span class="v">Español</span></div>
-        <div><span class="k">Duración</span><span class="v">Por definir <span class="todo">Pendiente</span></span></div>
-        <div><span class="k">Inversión</span><span class="v">Por definir <span class="todo">Pendiente</span></span></div>
+      <div class="crumbs"><a href="index.html">Inicio</a><span>/</span><span>Servicios</span></div>
+      <h1>Servicios</h1>
+    </div>
+  </section>
+
+  <!-- Intro + lista de servicios -->
+  <section class="section white">
+    <div class="wrap split">
+      <div class="stack">
+        <div class="photo ratio-square" role="img" aria-label="Espacio para foto de Georgia"><span>Foto de Georgia</span></div>
+        <p>Terapia individual por videollamada para personas que viven fuera de su país. Trabajamos lo que te trae hoy, a tu ritmo.</p>
+      </div>
+      <div class="svc-list">
+        <div class="svc-item"><span class="ico">01</span><div class="stack" style="gap:6px"><h3>Ansiedad y estrés</h3><p>Para cuando sobrepiensas, te cuesta descansar o vives con una inquietud constante.</p></div></div>
+        <div class="svc-item"><span class="ico">02</span><div class="stack" style="gap:6px"><h3>Duelo migratorio y adaptación</h3><p>Para cuando extrañas tu casa, te sientes entre dos lugares o no terminas de encajar.</p></div></div>
+        <div class="svc-item"><span class="ico">03</span><div class="stack" style="gap:6px"><h3>Duelos y pérdidas</h3><p>Para atravesar la pérdida de una persona, una relación o una etapa.</p></div></div>
+        <div class="svc-item"><span class="ico">04</span><div class="stack" style="gap:6px"><h3>Cambios y decisiones de vida</h3><p>Para cuando te sientes estancada o te cuesta decidir, incluso en cosas pequeñas.</p></div></div>
+        <p class="hint">Servicios propuestos a partir del sitio actual y de su perfil profesional. <span class="todo">Validar con Georgia</span></p>
       </div>
     </div>
   </section>
 
-  <!-- 2. SERVICIOS EN DETALLE -->
-  <section class="section" style="padding-top:24px">
-    <div class="wrap">
-      <article class="service" id="ansiedad">
-        <div class="stack">
-          <span class="eyebrow">Individual</span>
-          <h2>Ansiedad y estrés</h2>
-          <p class="muted">Para cuando la mente no para, el cuerpo está en alerta y no sabes bien por qué.</p>
-        </div>
-        <dl>
-          <div><dt>Es para ti si</dt><dd>Sobrepiensas, te cuesta dormir o descansar, sientes inquietud constante o tienes momentos de mucha angustia.</dd></div>
-          <div><dt>Qué trabajamos</dt><dd>Entender qué dispara tu ansiedad, reconocer tus patrones y aprender herramientas para regularte en el día a día.</dd></div>
-          <div><dt>Qué te llevas</dt><dd>Desde la primera sesión, herramientas prácticas para los momentos difíciles.</dd></div>
-        </dl>
-      </article>
-      <article class="service" id="migracion">
-        <div class="stack">
-          <span class="eyebrow">Individual</span>
-          <h2>Duelo migratorio y adaptación</h2>
-          <p class="muted">Extrañar, sentirte entre dos lugares, empezar de nuevo.</p>
-        </div>
-        <dl>
-          <div><dt>Es para ti si</dt><dd>Te duele estar lejos de tu gente, sientes que no terminas de encajar o que perdiste una parte de ti al mudarte.</dd></div>
-          <div><dt>Qué trabajamos</dt><dd>Darle lugar a lo que dejaste, sostener la distancia con tus vínculos y construir un sentido de hogar donde estás hoy.</dd></div>
-          <div><dt>Qué te llevas</dt><dd>Un espacio en tu idioma con alguien que entiende la experiencia de migrar desde dentro.</dd></div>
-        </dl>
-      </article>
-      <article class="service" id="cambios">
-        <div class="stack">
-          <span class="eyebrow">Individual</span>
-          <h2>Cambios y decisiones de vida</h2>
-          <p class="muted">Rupturas, pérdidas, trabajo nuevo o sentirte estancada.</p>
-        </div>
-        <dl>
-          <div><dt>Es para ti si</dt><dd>Te cuesta tomar decisiones, incluso las pequeñas, o atraviesas una etapa de mucha incertidumbre.</dd></div>
-          <div><dt>Qué trabajamos</dt><dd>Aclarar qué quieres y qué necesitas, y hacerte cargo de lo que sientes en lugar de solo reaccionar.</dd></div>
-          <div><dt>Qué te llevas</dt><dd>Más claridad y confianza para avanzar.</dd></div>
-        </dl>
-      </article>
-    </div>
-  </section>
-
-  <!-- 3. CÓMO EMPEZAR -->
-  <section class="section band-sage">
+  <!-- Tres pasos (How it works) -->
+  <section class="section">
     <div class="wrap">
       <div class="stack center">
-        <span class="eyebrow">Cómo empezar</span>
-        <h2>Tres pasos para tu primera sesión</h2>
+        <span class="label">Cómo funciona</span>
+        <h2>Así es el proceso de terapia</h2>
       </div>
       <div class="steps">
-        <article class="step"><span class="num">1</span><h3>Escríbeme</h3><p class="muted">Llena el formulario o mándame un mensaje. Me cuentas brevemente qué te trae y desde dónde me escribes.</p></article>
-        <article class="step"><span class="num">2</span><h3>Elegimos horario</h3><p class="muted">Te propongo opciones que funcionen con tu zona horaria y te envío el enlace de la videollamada.</p></article>
-        <article class="step"><span class="num">3</span><h3>Primera sesión</h3><p class="muted">Nos conocemos, hablamos de lo que estás viviendo y definimos juntas cómo seguir.</p></article>
+        <div class="step"><span class="n">1</span><h3>¿Qué va a pasar en la sesión?</h3><p>Tendrás un espacio privado para hablar de lo que te pasa, a tu ritmo. Desde la primera sesión te llevas herramientas para los momentos de ansiedad.</p></div>
+        <div class="step"><span class="n">2</span><h3>¿Cómo te va a ayudar?</h3><p>Vas a ir entendiendo qué hay detrás de lo que sientes y a reconocer patrones en tu vida, en un espacio donde te sientes escuchada.</p></div>
+        <div class="step"><span class="n">3</span><h3>¿Qué va a cambiar?</h3><p>Dejarás de sentir que todo es caótico y vas a aprender a hacerte cargo de lo que sientes, en lugar de solo reaccionar.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 4. CTA -->
-  <section class="cta-final">
+  <!-- Precios -->
+  <section class="section white">
     <div class="wrap">
-      <h2>Da el primer paso <em>para sentirte mejor</em></h2>
-      <ul class="pills"><li>Terapia en línea</li><li>En español</li><li>En cualquier parte del mundo</li></ul>
-      <a class="btn" href="agenda.html">Agenda tu primera sesión <span class="arrow" aria-hidden="true">→</span></a>
+      <div class="stack center">
+        <span class="label">Inversión</span>
+        <h2>Sesiones y paquetes</h2>
+      </div>
+      <div class="prices">
+        <div class="price">
+          <h3>Sesión individual</h3>
+          <div class="amount">Precio <small>por sesión</small> <span class="todo">Pendiente</span></div>
+          <ul class="checks"><li>Videollamada en español</li><li>Horario según tu zona</li><li>Herramientas desde la primera sesión</li></ul>
+          <a class="btn ghost" href="agenda.html#reserva">Agendar</a>
+        </div>
+        <div class="price featured">
+          <h3>Paquete de 4 sesiones</h3>
+          <div class="amount">Precio <small>por paquete</small> <span class="todo">Pendiente</span></div>
+          <ul class="checks"><li>Cuatro sesiones, una por semana</li><li>El mismo horario cada semana</li><li>Para empezar un proceso con constancia</li></ul>
+          <a class="btn" href="agenda.html#reserva">Agendar</a>
+        </div>
+      </div>
+      <p class="hint" style="text-align:center;margin-top:18px">El paquete es una propuesta. Hay que confirmar si Georgia lo quiere ofrecer.</p>
+    </div>
+  </section>
+
+  <!-- Banda final (Together we can do more) -->
+  <section class="section">
+    <div class="wrap">
+      <div class="cta-band">
+        <div class="txt">
+          <h2>Empieza a sentirte mejor</h2>
+          <p>Escríbeme hoy por WhatsApp</p>
+          <p class="phone">+00 000 000 0000</p>
+          <div><span class="todo">Número pendiente</span></div>
+        </div>
+        <div class="photo" role="img" aria-label="Espacio para foto"><span>Foto de Georgia</span></div>
+      </div>
     </div>
   </section>
 </main>
 
-
 <footer class="site-footer">
-  <div class="wrap">
-    <div>
-      <a class="brand" href="index.html">Terapia con <b>Gi</b></a>
-      <p class="muted" style="margin-top:10px">Georgia Camarena · Psicóloga. Terapia en línea, en español, para personas que viven fuera de su país.</p>
-      <p class="crisis">Si estás en una crisis o en peligro, llama al número de emergencias de tu país. La terapia en línea no sustituye la atención de urgencia.</p>
+  <div class="foot-top">
+    <div class="wrap">
+      <h2>¿Quieres dar el primer paso?</h2>
+      <div class="actions"><a class="btn" href="agenda.html#reserva">Agenda tu primera sesión</a></div>
     </div>
-    <div>
-      <h4>Sitio</h4>
-      <ul><li><a href="conoceme.html">Conóceme</a></li><li><a href="servicios.html">Servicios</a></li><li><a href="index.html#preguntas">Preguntas</a></li><li><a href="agenda.html">Agenda tu sesión</a></li></ul>
-    </div>
-    <div>
-      <h4>Sígueme</h4>
-      <ul><li><a href="https://www.instagram.com/terapia.congi/">Instagram · @terapia.congi</a></li><li><a href="#">Facebook</a></li><li><a href="#">TikTok</a></li></ul>
-    </div>
-    <div class="legal"><span>© 2026 georgiacamarena.com</span><span>Aviso de privacidad · Política de cookies</span></div>
   </div>
+  <div class="foot-mid">
+    <div class="wrap">
+      <div class="stack">
+        <a class="brand" href="index.html">Terapia con <span>Gi</span></a>
+        <p>Terapia en línea y en español para personas que viven fuera de su país.</p>
+        <div class="socials"><a href="https://www.instagram.com/terapia.congi/" aria-label="Instagram">IG</a><a href="#" aria-label="Facebook">FB</a><a href="#" aria-label="TikTok">TT</a></div>
+      </div>
+      <div class="foot-links">
+        <div><h4>Sitio</h4><ul><li><a href="index.html">Inicio</a></li><li><a href="conoceme.html">Conóceme</a></li><li><a href="servicios.html">Servicios</a></li><li><a href="agenda.html">Contacto</a></li></ul></div>
+        <div><h4>Servicios</h4><ul><li><a href="servicios.html">Ansiedad y estrés</a></li><li><a href="servicios.html">Duelo migratorio</a></li><li><a href="servicios.html">Duelos y pérdidas</a></li><li><a href="servicios.html">Cambios de vida</a></li></ul></div>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul><li>WhatsApp <span class="todo">Pendiente</span></li><li>hola@georgiacamarena.com <span class="todo">Confirmar</span></li><li>Sesiones en línea en todo el mundo</li></ul>
+        <p class="crisis">Si estás en una crisis, llama al número de emergencias de tu país. La terapia en línea no es un servicio de urgencias.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot-bottom"><div class="wrap">Copyright © 2026 georgiacamarena.com. Aviso de privacidad.</div></div>
 </footer>
 
 <script src="main.js"></script>
