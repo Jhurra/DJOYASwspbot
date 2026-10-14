@@ -16,25 +16,21 @@
     try { zoneField.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
   }
 
-  // Número de WhatsApp: escríbelo aquí con código de país y sin signos, por ejemplo "5215512345678".
-  // Se aplica a todos los botones de WhatsApp del sitio.
-  var WHATSAPP = "";
-  if (WHATSAPP) {
-    document.querySelectorAll('a[href^="https://wa.me/"]').forEach(function (a) {
-      a.href = a.href.replace("https://wa.me/", "https://wa.me/" + WHATSAPP);
-    });
-  }
-
-  // Formulario de contacto (borrador: no envía datos)
+  // Formulario de contacto: abre el correo de quien visita con el mensaje listo
   var form = document.getElementById("contacto-form");
   var done = document.getElementById("contacto-ok");
   if (form && done) {
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
       if (!form.reportValidity()) return;
-      var name = (document.getElementById("nombre").value || "").trim().split(" ")[0];
-      done.querySelector("[data-name]").textContent = name;
+      var val = function (id) { return (document.getElementById(id).value || "").trim(); };
+      var body = "Nombre: " + val("nombre") + "\nCorreo: " + val("correo") + "\nPaís: " + val("pais") +
+        "\nZona horaria: " + val("zona") + "\n\n" + val("mensaje");
+      var href = "mailto:camarenageorgia@gmail.com?subject=" + encodeURIComponent("Consulta desde la web") +
+        "&body=" + encodeURIComponent(body);
+      done.querySelector("[data-name]").textContent = val("nombre").split(" ")[0];
       form.hidden = true; done.hidden = false;
+      window.location.href = href;
     });
     document.getElementById("contacto-again").addEventListener("click", function () { done.hidden = true; form.hidden = false; });
   }
