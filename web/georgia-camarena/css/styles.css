@@ -118,7 +118,32 @@ p { margin: 0; }
 .nav .btn:hover { color: #ffffff; }
 .actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 
-/* Espacio para fotos */
+/* Fotos */
+.photo-img { width: 100%; max-width: 100%; height: auto; object-fit: cover; border-radius: var(--radius-card); display: block; background: var(--c5); }
+.photo-img.ratio-hero { aspect-ratio: 5 / 6; object-position: center top; }
+.photo-img.ratio-square { aspect-ratio: 1 / 1; object-position: center top; }
+.photo-img.ratio-wide { aspect-ratio: 16 / 10; }
+.photo-img.ratio-card { aspect-ratio: 4 / 3; }
+.photo-img.band-img { border-radius: 0; height: 100%; min-height: 280px; }
+
+/* Botón de WhatsApp */
+.wa-ico { width: 20px; height: 20px; flex: none; }
+.btn.wa { background: #25d366; border-color: #25d366; color: #0b3d22; font-weight: 600; }
+.btn.wa:hover { background: #1fb457; border-color: #1fb457; color: #ffffff; }
+.btn.light .wa-ico { color: #1fb457; }
+.nav .btn.wa { color: #0b3d22; }
+.nav .btn.wa:hover { color: #ffffff; }
+.btn.wa-ghost .wa-ico { color: #1fb457; }
+.wa-float {
+  position: fixed; z-index: 40;
+  right: calc(20px + env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  width: 58px; height: 58px; border-radius: 50%; background: #25d366; color: #ffffff;
+  display: grid; place-items: center; box-shadow: 0 10px 24px rgba(7, 105, 81, 0.3); transition: transform .2s;
+}
+.wa-float:hover { transform: scale(1.06); color: #ffffff; }
+.wa-float .wa-ico { width: 30px; height: 30px; }
+
+/* Espacio para fotos sin imagen */
 .photo {
   position: relative; width: 100%; max-width: 100%;
   border-radius: var(--radius-card); overflow: hidden;
@@ -188,32 +213,11 @@ p { margin: 0; }
 .service-card .more { font-weight: 600; text-decoration: none; }
 @media (max-width: 999px) { .services { grid-template-columns: 1fr; max-width: 560px; } }
 
-/* Módulo de reserva, como el "Book a Consultation" de la referencia */
-.booking { display: grid; grid-template-columns: 0.9fr 1.1fr; background: var(--c8); border-radius: var(--radius-card); box-shadow: var(--shadow-float); overflow: hidden; margin-top: 44px; text-align: left; }
-.booking > * { min-width: 0; }
-.booking-info { padding: clamp(24px, 4vw, 40px); border-right: 1px solid var(--c5); display: grid; gap: 14px; align-content: start; }
-.booking-info .meta { display: grid; gap: 8px; font-size: 15px; }
-.booking-info .meta div { display: flex; gap: 10px; align-items: center; }
-.booking-info .meta i { width: 8px; height: 8px; border-radius: 50%; background: var(--c1); flex: none; }
-.cal { padding: clamp(24px, 4vw, 40px); display: grid; gap: 16px; }
-.cal-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.cal-head h3 { font-size: 18px; }
-.cal-nav { display: flex; gap: 6px; }
-.cal-nav button { width: 34px; height: 34px; border-radius: var(--radius-btn); border: 1px solid var(--c5); background: var(--c8); color: var(--c4); cursor: pointer; font: inherit; font-weight: 700; }
-.cal-nav button:hover { border-color: var(--c1); color: var(--c1); }
-.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; text-align: center; }
-.cal-grid .dow { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--c3); padding-bottom: 4px; }
-.cal-grid button { aspect-ratio: 1; max-width: 100%; border: 0; border-radius: var(--radius-btn); background: transparent; color: #9aaba6; font: inherit; font-size: 14px; cursor: default; }
-.cal-grid button.open { background: var(--c5); color: var(--c1); font-weight: 700; cursor: pointer; }
-.cal-grid button.open:hover { background: #d4ebe4; }
-.cal-grid button.sel { background: var(--c1); color: #ffffff; }
-.slots { display: flex; flex-wrap: wrap; gap: 8px; }
-.slots button { border: 1px solid var(--c1); background: var(--c8); color: var(--c1); border-radius: var(--radius-btn); padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums; }
-.slots button:hover, .slots button.sel { background: var(--c1); color: #ffffff; }
-.tz-line { font-size: 14px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.tz-line b { color: var(--c4); }
-.booking-ok { background: var(--c5); border-radius: var(--radius-field); padding: 14px 16px; font-size: 15px; color: var(--c4); }
-@media (max-width: 860px) { .booking { grid-template-columns: 1fr; } .booking-info { border-right: 0; border-bottom: 1px solid var(--c5); } }
+/* Bloque de WhatsApp */
+.wa-card { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(24px, 5vw, 60px); align-items: center; background: var(--c8); border-radius: var(--radius-card); box-shadow: var(--shadow-float); padding: clamp(20px, 4vw, 40px); margin-top: 44px; text-align: left; }
+.wa-card > * { min-width: 0; }
+.wa-photo { width: 100%; max-width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-card); }
+@media (max-width: 860px) { .wa-card { grid-template-columns: 1fr; } .wa-photo { max-width: 360px; } }
 
 /* Pasos 1 2 3 */
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 50px; }
@@ -242,9 +246,6 @@ p { margin: 0; }
 .cta-band > * { min-width: 0; }
 .cta-band .txt { padding: clamp(28px, 5vw, 60px); display: grid; gap: 16px; }
 .cta-band h2 { color: #ffffff; }
-.cta-band .phone { font-size: 24px; font-weight: 700; user-select: all; }
-.cta-band .photo { border-radius: 0; height: 100%; min-height: 260px; background: linear-gradient(160deg, #16876b, #0b5a46); color: #ffffff; }
-.cta-band .photo span { background: rgba(0, 0, 0, 0.18); }
 @media (max-width: 860px) { .cta-band { grid-template-columns: 1fr; } }
 
 /* Preguntas frecuentes */
