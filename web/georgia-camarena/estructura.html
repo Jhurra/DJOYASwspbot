@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estructura del sitio · Terapia con Gi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Terapia psicológica en línea, en español, para personas que viven fuera de su país. Georgia Camarena, psicóloga y también migrante.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="draftbar"><div class="wrap"><span>Borrador v1 · Propuesta de rediseño para georgiacamarena.com</span><a href="estructura.html">Ver estructura y notas →</a></div></div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html">Terapia con <b>Gi</b></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <a href="index.html">Inicio</a>
+      <a href="conoceme.html">Conóceme</a>
+      <a href="servicios.html">Servicios</a>
+      <a href="index.html#preguntas">Preguntas</a>
+      <a class="btn" href="agenda.html">Agenda tu sesión</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">Documento de trabajo · Borrador v1</span>
+      <h1>Estructura del nuevo sitio <em>Terapia con Gi</em></h1>
+      <p class="lead measure">Diagnóstico del sitio actual, mapa del sitio y estructura de cada landing, con el estilo cálido y cercano del sitio de referencia (Blocksy Consultant).</p>
+      <ul class="toc">
+        <li><a href="#fuentes">Fuentes</a></li>
+        <li><a href="#diagnostico">Diagnóstico</a></li>
+        <li><a href="#mapa">Mapa del sitio</a></li>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#conoceme">Conóceme</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#agenda">Agenda</a></li>
+        <li><a href="#uxui">Guía UX/UI</a></li>
+        <li><a href="#pendientes">Pendientes</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="fuentes" style="padding-top:12px">
+    <div class="wrap stack">
+      <h2>Fuentes revisadas</h2>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Fuente</th><th>Estado</th><th>Qué se usó</th></tr></thead>
+        <tbody>
+          <tr><td>georgiacamarena.com</td><td><span class="status ok">Leído</span></td><td>Todo el texto de Inicio. Conóceme y Servicios están “en construcción”.</td></tr>
+          <tr><td>Perfil en Doctoralia</td><td><span class="status ok">Leído</span></td><td>Formación (Ibero, Complutense de Madrid), enfoque Gestalt, especialidad en ansiedad y estrés, cédula 14656046.</td></tr>
+          <tr><td>Referencia Blocksy Consultant</td><td><span class="status no">Sin acceso</span></td><td>La red bloqueó startersites.io. La estructura se basa en la descripción oficial de la plantilla (página de servicios y módulo para agendar citas) y en el patrón habitual de sitios de consultoría personal. Hay que compararla visualmente.</td></tr>
+          <tr><td>Boceto en Canva</td><td><span class="status no">Sin acceso</span></td><td>Canva respondió 403. Hace falta exportarlo a PDF o PNG para alinear textos, colores y orden de secciones.</td></tr>
+          <tr><td>Instagram @terapia.congi</td><td><span class="status no">Sin acceso</span></td><td>Instagram bloqueó la lectura (429). Hacen falta capturas o la paleta y tipografías de la marca.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="section band" id="diagnostico">
+    <div class="wrap stack">
+      <h2>Diagnóstico del sitio actual</h2>
+      <div class="cards" style="margin-top:12px">
+        <div class="card"><span class="tag">Conservar</span><ul>
+          <li>El mensaje del hero: “¿Vives fuera de tu país y sientes una incomodidad constante…?” Es claro y conecta.</li>
+          <li>La lista “Esto también te puede estar pasando”.</li>
+          <li>Las tres preguntas del proceso: qué pasa, cómo ayuda, qué cambia.</li>
+          <li>El cierre: “Terapia en línea · En español · En cualquier parte del mundo”.</li>
+        </ul></div>
+        <div class="card"><span class="tag">Corregir</span><ul>
+          <li>Conóceme y Servicios están en construcción. Son las dos páginas que más generan confianza.</li>
+          <li>Un solo CTA al final de la página; el hero no tiene botón.</li>
+          <li>No hay fotos de Georgia, credenciales, precios, duración ni preguntas frecuentes.</li>
+          <li>Los íconos sociales se repiten 6 veces en el pie.</li>
+          <li>El nombre “Terapia con Gi” aparece solo en una página.</li>
+        </ul></div>
+        <div class="card"><span class="tag">Agregar</span><ul>
+          <li>CTA en el hero y botón fijo “Agenda tu sesión” en el menú.</li>
+          <li>Credenciales visibles: formación y cédula.</li>
+          <li>Horarios por zona horaria (la audiencia vive en otros países).</li>
+          <li>Testimonios reales, preguntas frecuentes y aviso de privacidad.</li>
+          <li>Página de agenda con formulario y WhatsApp.</li>
+        </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="mapa">
+    <div class="wrap stack">
+      <h2>Mapa del sitio</h2>
+      <p class="muted measure">Cuatro landings. Todas llevan a una sola acción: agendar la primera sesión.</p>
+      <ol class="toc" aria-label="Recorrido">
+        <li><a href="index.html">Inicio</a></li>
+        <li><span class="muted">→</span></li>
+        <li><a href="conoceme.html">Conóceme</a></li>
+        <li><span class="muted">o</span></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><span class="muted">→</span></li>
+        <li><a class="btn" href="agenda.html" style="padding:6px 16px">Agenda</a></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section band" id="inicio">
+    <div class="wrap stack">
+      <h2>Landing 1 · Inicio</h2>
+      <p class="muted">Objetivo: que la visitante se sienta comprendida en 5 segundos y llegue a Agenda.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Sección</th><th>Objetivo</th><th>Contenido</th><th>CTA</th></tr></thead>
+        <tbody>
+          <tr><td>1. Hero</td><td>Identificación inmediata</td><td>Pregunta del sitio actual + “Soy Georgia, psicóloga y también migrante”. Retrato en arco. Credenciales en una línea.</td><td>Quiero dar el primer paso / Conóceme</td></tr>
+          <tr><td>2. Zonas horarias</td><td>Quitar la objeción “estoy lejos”</td><td>Hora local de la visitante y de 5 ciudades con mucha migración hispana.</td><td>—</td></tr>
+          <tr><td>3. ¿Te pasa esto?</td><td>Validar lo que siente</td><td>Las 7 situaciones del sitio actual + frase de cierre.</td><td>—</td></tr>
+          <tr><td>4. Proceso</td><td>Reducir la incertidumbre</td><td>Qué pasa en la sesión / cómo te ayuda / qué cambia.</td><td>—</td></tr>
+          <tr><td>5. Sobre mí</td><td>Generar confianza</td><td>Foto, frase de presentación, formación resumida.</td><td>Conoce mi historia</td></tr>
+          <tr><td>6. Servicios</td><td>Mostrar en qué ayuda</td><td>3 tarjetas: ansiedad y estrés, duelo migratorio, cambios de vida.</td><td>Ver más</td></tr>
+          <tr><td>7. Testimonios</td><td>Prueba social</td><td>3 testimonios reales con iniciales y país.</td><td>—</td></tr>
+          <tr><td>8. Preguntas</td><td>Resolver objeciones</td><td>Modalidad, países, duración y precio, número de sesiones, confidencialidad.</td><td>—</td></tr>
+          <tr><td>9. CTA final</td><td>Conversión</td><td>“Da el primer paso para sentirte mejor” + las tres etiquetas.</td><td>Quiero dar el primer paso</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="section" id="conoceme">
+    <div class="wrap stack">
+      <h2>Landing 2 · Conóceme</h2>
+      <p class="muted">Objetivo: que la visitante sienta que Georgia la entiende porque vivió lo mismo.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Sección</th><th>Objetivo</th><th>Contenido</th><th>CTA</th></tr></thead>
+        <tbody>
+          <tr><td>1. Hero personal</td><td>Cercanía</td><td>“Hola, soy Georgia. Sé lo que es empezar lejos de casa.” Retrato.</td><td>Agenda tu primera sesión</td></tr>
+          <tr><td>2. Mi historia</td><td>Conexión emocional</td><td>Su experiencia migrante y por qué eligió esta especialidad. <span class="todo">Texto real pendiente</span></td><td>—</td></tr>
+          <tr><td>3. Formación</td><td>Autoridad</td><td>Ibero, Complutense de Madrid (Gestalt; ansiedad y estrés), cédula.</td><td>—</td></tr>
+          <tr><td>4. Cómo trabajo</td><td>Explicar el enfoque</td><td>Gestalt en lenguaje simple + 3 valores: cercana, práctica, sin juicio.</td><td>—</td></tr>
+          <tr><td>5. Frase</td><td>Respiro emocional</td><td>Cita de Georgia.</td><td>—</td></tr>
+          <tr><td>6. CTA</td><td>Conversión</td><td>“¿Hablamos? Empieza a tu ritmo.”</td><td>Agenda tu primera sesión</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="section band" id="servicios">
+    <div class="wrap stack">
+      <h2>Landing 3 · Servicios</h2>
+      <p class="muted">Objetivo: que la visitante sepa si esto es para ella, cuánto dura y cuánto cuesta. Los tres servicios son una propuesta basada en el sitio actual y en Doctoralia; Georgia debe validarlos.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Sección</th><th>Objetivo</th><th>Contenido</th><th>CTA</th></tr></thead>
+        <tbody>
+          <tr><td>1. Cabecera + datos</td><td>Información rápida</td><td>Formato, idioma, duración, inversión. <span class="todo">Duración y precio pendientes</span></td><td>—</td></tr>
+          <tr><td>2. Servicios</td><td>Autoidentificación</td><td>Cada servicio con: es para ti si / qué trabajamos / qué te llevas.</td><td>—</td></tr>
+          <tr><td>3. Cómo empezar</td><td>Bajar la fricción</td><td>Escríbeme → elegimos horario → primera sesión.</td><td>—</td></tr>
+          <tr><td>4. CTA</td><td>Conversión</td><td>Cierre con las tres etiquetas.</td><td>Agenda tu primera sesión</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="section" id="agenda">
+    <div class="wrap stack">
+      <h2>Landing 4 · Agenda</h2>
+      <p class="muted">Objetivo: convertir. Equivale al módulo de reservas de la plantilla Consultant.</p>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Bloque</th><th>Objetivo</th><th>Contenido</th></tr></thead>
+        <tbody>
+          <tr><td>Formulario</td><td>Captar la solicitud</td><td>Nombre, correo, país, zona horaria automática, horario preferido, motivo (opcional), consentimiento.</td></tr>
+          <tr><td>Contacto directo</td><td>Alternativa sin fricción</td><td>WhatsApp y correo con botón de copiar. <span class="todo">Datos pendientes</span></td></tr>
+          <tr><td>Qué pasa después</td><td>Dar certeza</td><td>Los 3 pasos y el tiempo de respuesta.</td></tr>
+          <tr><td>Aviso de crisis</td><td>Responsabilidad profesional</td><td>Indicar que no es un canal de urgencias.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted measure">Opción recomendada para producción: conectar un calendario real (Calendly, Cal.com o el módulo de citas de Blocksy) para que la paciente elija su horario sin esperar respuesta.</p>
+    </div>
+  </section>
+
+  <section class="section band-sage" id="uxui">
+    <div class="wrap stack">
+      <h2>Guía UX/UI (estilo cercano y cálido)</h2>
+      <div class="values" style="margin-top:8px">
+        <div><h3>Color</h3><p class="muted">Arena rosada de fondo, eucalipto para botones y enlaces, un toque durazno en detalles. Paleta tranquila, sin blancos fríos. Ajustar a la paleta del Canva cuando llegue.</p></div>
+        <div><h3>Tipografía</h3><p class="muted">Serif editorial (Newsreader) para títulos, con cursiva en la parte emocional del mensaje. Sans humanista (Figtree) para leer cómodo.</p></div>
+        <div><h3>Formas</h3><p class="muted">Retratos en arco (evocan puerta y hogar), botones redondeados, tarjetas suaves. Bandas de color alternas para marcar el ritmo de lectura.</p></div>
+        <div><h3>Tono</h3><p class="muted">Tuteo, frases cortas, validación antes de solución. El texto está en femenino, como el sitio actual (“estancada”); confirmar si se quiere lenguaje neutro.</p></div>
+        <div><h3>Conversión</h3><p class="muted">Un solo objetivo por página. CTA en el hero, en el menú y al cierre. Preguntas frecuentes antes del CTA final.</p></div>
+        <div><h3>Plataforma sugerida</h3><p class="muted">WordPress + tema Blocksy con la plantilla Consultant (incluye página de servicios y reservas). Este prototipo sirve como guía de contenido y diseño.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pendientes">
+    <div class="wrap stack">
+      <h2>Pendientes para la versión 2</h2>
+      <ol class="measure">
+        <li>Exportar el boceto de Canva a PDF o PNG para alinear textos, orden y paleta.</li>
+        <li>Capturas del Instagram @terapia.congi o el manual de marca (logo, colores, tipografías).</li>
+        <li>Fotos de Georgia: un retrato principal y 2 o 3 fotos de su espacio de trabajo.</li>
+        <li>Su historia migrante en 4 o 5 líneas: de dónde es, dónde vive y cuándo migró.</li>
+        <li>Duración, precio, moneda y medios de pago de la sesión.</li>
+        <li>Número de WhatsApp y correo de contacto.</li>
+        <li>3 testimonios reales con autorización.</li>
+        <li>Validar los 3 servicios propuestos.</li>
+        <li>Definir la plataforma: WordPress + Blocksy, GoDaddy (actual) u otra.</li>
+      </ol>
+      <div class="actions"><a class="btn" href="index.html">Ver el prototipo <span class="arrow" aria-hidden="true">→</span></a></div>
+    </div>
+  </section>
+</main>
+
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <a class="brand" href="index.html">Terapia con <b>Gi</b></a>
+      <p class="muted" style="margin-top:10px">Georgia Camarena · Psicóloga. Terapia en línea, en español, para personas que viven fuera de su país.</p>
+      <p class="crisis">Si estás en una crisis o en peligro, llama al número de emergencias de tu país. La terapia en línea no sustituye la atención de urgencia.</p>
+    </div>
+    <div>
+      <h4>Sitio</h4>
+      <ul><li><a href="conoceme.html">Conóceme</a></li><li><a href="servicios.html">Servicios</a></li><li><a href="index.html#preguntas">Preguntas</a></li><li><a href="agenda.html">Agenda tu sesión</a></li></ul>
+    </div>
+    <div>
+      <h4>Sígueme</h4>
+      <ul><li><a href="https://www.instagram.com/terapia.congi/">Instagram · @terapia.congi</a></li><li><a href="#">Facebook</a></li><li><a href="#">TikTok</a></li></ul>
+    </div>
+    <div class="legal"><span>© 2026 georgiacamarena.com</span><span>Aviso de privacidad · Política de cookies</span></div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
