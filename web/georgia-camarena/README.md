@@ -33,3 +33,7 @@ El sitio actual está hecho con el constructor de GoDaddy, que no permite subir 
 - Un testimonio real con permiso.
 - Validar los 4 servicios y el texto de "Mi historia".
 - Enlaces de Facebook y TikTok.
+
+## Solo el contenido
+
+La carpeta `contenido/` tiene las mismas 4 páginas sin cabecera ni pie, solo el bloque `<main>`. Sirve para pegarlas dentro de otro sitio o constructor que ya tenga su propio menú y pie. Necesitan `css/styles.css` y `js/main.js`, y las rutas `img/...` deben apuntar a donde se suban las fotos.
