@@ -1,0 +1,36 @@
+/* Terapia con Gi, estilos del pie y del botón flotante de WhatsApp */
+/* Logo de texto */
+.brand { font-size: 25px; font-weight: 700; color: var(--c4); text-decoration: none; line-height: 1.2; }
+.brand span { color: var(--c1); }
+
+/* Pie, fondo menta como en la referencia */
+.site-footer { background: var(--c6); font-size: 15px; }
+.foot-top .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding-block: 60px; border-bottom: 1px solid var(--line); }
+.foot-top .actions { justify-content: flex-end; }
+.foot-mid .wrap { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 50px; padding-block: 60px; }
+.foot-mid .wrap > * { min-width: 0; }
+.foot-mid h4 { margin-bottom: 14px; }
+.foot-mid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot-mid a { color: var(--c3); text-decoration: none; }
+.foot-mid a:hover { color: var(--c1); }
+.foot-links { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.foot-bottom .wrap { padding-block: 25px; text-align: center; font-size: 14px; border-top: 1px solid var(--line); }
+.socials { display: flex; gap: 10px; }
+.socials a { width: 38px; height: 38px; border-radius: 50%; background: var(--c8); display: grid; place-items: center; color: var(--c4); font-size: 13px; font-weight: 700; text-decoration: none; }
+.socials a:hover { background: var(--c1); color: #ffffff; }
+.crisis { font-size: 13px; margin-top: 12px; }
+@media (max-width: 999px) {
+  .foot-top .wrap, .foot-mid .wrap { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .foot-top .actions { justify-content: center; }
+  .foot-links { text-align: center; }
+}
+
+/* Botón flotante de WhatsApp */
+.wa-float {
+  position: fixed; z-index: 40;
+  right: calc(20px + env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  width: 58px; height: 58px; border-radius: 50%; background: #25d366; color: #ffffff;
+  display: grid; place-items: center; box-shadow: 0 10px 24px rgba(7, 105, 81, 0.3); transition: transform .2s;
+}
+.wa-float:hover { transform: scale(1.06); color: #ffffff; }
+.wa-float .wa-ico { width: 30px; height: 30px; }
