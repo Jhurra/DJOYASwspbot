@@ -152,7 +152,7 @@ select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);bo
   <header class="head">
     <p class="eyebrow">SARAHI · Modelo de inversión · Cikbus</p>
     <h1>¿Cuánto invertir en Cikbus y cuánto vuelve?</h1>
-    <p class="lead">Proyección de 12 meses, de noviembre 2026 a octubre 2027, para una cuenta que hoy no hace publicidad. Parte de $150 millones en cikbus.cl en septiembre y sigue la curva anual de referencia del transporte interurbano. Combina los datos que entregó Cikbus con el rendimiento de referencia de cada tipo de campaña en la industria.</p>
+    <p class="lead">Proyección de 12 meses, de noviembre 2026 a octubre 2027, para una cuenta que hoy no hace publicidad. Parte de $120 millones en cikbus.cl en septiembre y sigue la curva anual de referencia del transporte interurbano. Combina los datos que entregó Cikbus con el rendimiento de referencia de cada tipo de campaña en la industria.</p>
     <span class="flag"><i></i>Proyección referencial: cifras estimadas con supuestos que se pueden ajustar.</span>
   </header>
 
@@ -329,7 +329,7 @@ var IVA=0.19;
 var REF={genRmax:34.2,genK:5.62,metaRmax:45,metaK:1.0,cr:9.0};
 
 var CAMPOS=[
- {grupo:1,id:'ventaCl',label:'Venta de cikbus.cl en septiembre',min:60,max:300,step:5,fmt:'m',src:'$150 millones en septiembre, sin contar plataformas. Los demás meses siguen la curva anual de referencia de la industria.'},
+ {grupo:1,id:'ventaCl',label:'Venta de cikbus.cl en septiembre',min:60,max:300,step:5,fmt:'m',src:'$120 millones en septiembre, sin contar plataformas. Los demás meses siguen la curva anual de referencia de la industria.'},
  {grupo:1,id:'ventaPlat',label:'Venta en plataformas en septiembre',min:100,max:600,step:10,fmt:'m',src:'Derivado: cikbus.cl es cerca del 30% de la venta online, según Cikbus.'},
  {grupo:1,id:'comisionDif',label:'Comisión que se ahorra si vende cikbus.cl en vez de una plataforma',min:0,max:7,step:0.5,fmt:'p',src:'Dato de Cikbus: la diferencia es cerca de 2 puntos.'},
  {grupo:1,id:'margen',label:'Margen de un pasaje adicional',min:30,max:90,step:5,fmt:'p',src:'Supuesto. Un asiento vacío cuesta casi nada; confirmarlo con Cikbus.'},
@@ -351,9 +351,9 @@ var CAMPOS=[
  {grupo:4,id:'topeSuma',label:'Cuánto puede subir la inversión cada mes',min:0.5,max:5,step:0.5,fmt:'m',src:'De 2 en 2 millones. El modelo nunca invierte más de lo que conviene, aunque el tope lo permita.'}
 ];
 var ESC={
- base:{roasPiso:14,ventaCl:150,ventaPlat:350,comisionDif:2,margen:60,degr:25,crPartner:9,mesesPartner:5,mejoraPro:0,nuevaCR:35,costoMarca:4.4,escala:1.2,incrGen:75,incrMeta:15,shareGoogleCl:50,shareGooglePlat:25,captura:40,fuga:17,topeInicial:2,topeSuma:2},
- cons:{roasPiso:14,ventaCl:150,ventaPlat:350,comisionDif:2,margen:50,degr:30,crPartner:8,mesesPartner:6,mejoraPro:0,nuevaCR:25,costoMarca:5,escala:0.9,incrGen:60,incrMeta:10,shareGoogleCl:50,shareGooglePlat:20,captura:30,fuga:12,topeInicial:2,topeSuma:2},
- opt:{roasPiso:14,ventaCl:150,ventaPlat:350,comisionDif:2,margen:65,degr:20,crPartner:9.5,mesesPartner:4,mejoraPro:5,nuevaCR:45,costoMarca:4,escala:1.5,incrGen:85,incrMeta:20,shareGoogleCl:50,shareGooglePlat:30,captura:50,fuga:20,topeInicial:2,topeSuma:2}
+ base:{roasPiso:14,ventaCl:120,ventaPlat:280,comisionDif:2,margen:60,degr:25,crPartner:9,mesesPartner:5,mejoraPro:0,nuevaCR:35,costoMarca:4.4,escala:1.2,incrGen:75,incrMeta:15,shareGoogleCl:50,shareGooglePlat:25,captura:40,fuga:17,topeInicial:2,topeSuma:2},
+ cons:{roasPiso:14,ventaCl:120,ventaPlat:280,comisionDif:2,margen:50,degr:30,crPartner:8,mesesPartner:6,mejoraPro:0,nuevaCR:25,costoMarca:5,escala:0.9,incrGen:60,incrMeta:10,shareGoogleCl:50,shareGooglePlat:20,captura:30,fuga:12,topeInicial:2,topeSuma:2},
+ opt:{roasPiso:14,ventaCl:120,ventaPlat:280,comisionDif:2,margen:65,degr:20,crPartner:9.5,mesesPartner:4,mejoraPro:5,nuevaCR:45,costoMarca:4,escala:1.5,incrGen:85,incrMeta:20,shareGoogleCl:50,shareGooglePlat:30,captura:50,fuga:20,topeInicial:2,topeSuma:2}
 };
 var estado={}; var escActual='base'; var tab='inv';
 
