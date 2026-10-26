@@ -14,15 +14,15 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Obtener DATABASE_URL sin modificarla
-DATABASE_URL = os.getenv('DATABASE_URL')
-config.set_main_option('sqlalchemy.url', DATABASE_URL)
-
 # Importar Base y modelos
-from app.database import Base
+from app.database import Base, get_database_url
 from app import models  # Importar tus modelos para que Alembic los detecte
 
 target_metadata = Base.metadata
+
+# Alembic corre con el driver síncrono (psycopg2)
+DATABASE_URL = get_database_url(async_driver=False)
+config.set_main_option('sqlalchemy.url', DATABASE_URL.replace('%', '%%'))
 
 def run_migrations_offline():
     """Ejecuta migraciones en modo 'offline'."""

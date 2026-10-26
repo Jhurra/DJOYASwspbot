@@ -1,110 +1,102 @@
 import asyncio
-from dotenv import load_dotenv
-from openai import OpenAI
-import os
-import time
+import datetime
 import logging
+import os
+from collections import defaultdict
 
-thread_lock = asyncio.Lock()
+from dotenv import load_dotenv
+from openai import AsyncOpenAI
+from sqlalchemy import select
+
+from app.database import async_session
+from app.models import Conversation
 
 load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_ASSISTANT_ID = os.getenv('OPENAI_ASSISTANT_ID')
-client = OpenAI(api_key=OPENAI_API_KEY)
-client.timeout = 10
 
-async def check_if_thread_exists(user_id, expiration_time=3600*10):
-    from ..models import Thread
-    from ..database import async_session
-    import datetime
-    from sqlalchemy.future import select
+# La Assistants API se apagó el 26/08/2026. El bot usa ahora Responses API + Conversations.
+# Configuración recomendada: crear un "Prompt" en el dashboard de OpenAI (modelo, instrucciones
+# y herramientas como file_search) y poner su ID en OPENAI_PROMPT_ID.
+# Alternativa sin Prompt: OPENAI_MODEL + OPENAI_INSTRUCTIONS (+ OPENAI_VECTOR_STORE_ID).
+OPENAI_PROMPT_ID = os.getenv('OPENAI_PROMPT_ID')
+OPENAI_PROMPT_VERSION = os.getenv('OPENAI_PROMPT_VERSION')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini')
+OPENAI_INSTRUCTIONS = os.getenv('OPENAI_INSTRUCTIONS')
+OPENAI_VECTOR_STORE_ID = os.getenv('OPENAI_VECTOR_STORE_ID')
+# Horas sin mensajes tras las cuales se empieza una conversación nueva
+CONVERSATION_TTL_HOURS = float(os.getenv('CONVERSATION_TTL_HOURS', '10'))
 
+client = AsyncOpenAI(api_key=os.getenv('OPENAI_API_KEY'), timeout=60, max_retries=2)
+
+FAILED_MESSAGE = "Lo sentimos, ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo en unos minutos."
+
+# Un lock por usuario: los mensajes de una misma persona se procesan en orden,
+# pero distintos usuarios no se bloquean entre sí.
+_user_locks = defaultdict(asyncio.Lock)
+
+
+def _now():
+    return datetime.datetime.now(datetime.timezone.utc)
+
+
+async def get_conversation_id(user_id):
     async with async_session() as session:
-        result = await session.execute(select(Thread).where(Thread.user_id == user_id))
-        thread = result.scalars().first()
-        if thread:
-            time_difference = datetime.datetime.now() - thread.timestamp
-            if time_difference <= datetime.timedelta(seconds=expiration_time):
-                return thread.thread_id
+        result = await session.execute(select(Conversation).where(Conversation.user_id == user_id))
+        conversation = result.scalars().first()
+        if conversation:
+            updated_at = conversation.updated_at
+            if updated_at.tzinfo is None:
+                updated_at = updated_at.replace(tzinfo=datetime.timezone.utc)
+            if _now() - updated_at <= datetime.timedelta(hours=CONVERSATION_TTL_HOURS):
+                return conversation.conversation_id
     return None
 
-async def store_thread(user_id, thread_id):
-    from ..models import Thread
-    from ..database import async_session
-    import datetime
-    from sqlalchemy.future import select
 
-    current_time = datetime.datetime.now()
-
+async def store_conversation(user_id, conversation_id):
     async with async_session() as session:
-        result = await session.execute(select(Thread).where(Thread.user_id == user_id))
-        thread = result.scalars().first()
-        if thread:
-            thread.thread_id = thread_id
-            thread.timestamp = current_time
+        conversation = await session.get(Conversation, user_id)
+        if conversation:
+            conversation.conversation_id = conversation_id
+            conversation.updated_at = _now()
         else:
-            new_thread = Thread(user_id=user_id, thread_id=thread_id, timestamp=current_time)
-            session.add(new_thread)
+            session.add(Conversation(user_id=user_id, conversation_id=conversation_id, updated_at=_now()))
         await session.commit()
 
-async def run_assistant(thread, name):
-    import asyncio
 
-    try:
-        assistant = await asyncio.to_thread(client.beta.assistants.retrieve, OPENAI_ASSISTANT_ID)
+def _response_options():
+    if OPENAI_PROMPT_ID:
+        prompt = {"id": OPENAI_PROMPT_ID}
+        if OPENAI_PROMPT_VERSION:
+            prompt["version"] = OPENAI_PROMPT_VERSION
+        return {"prompt": prompt}
 
-        run = await asyncio.to_thread(
-            client.beta.threads.runs.create,
-            thread_id=thread.id,
-            assistant_id=assistant.id,
-            # instructions=f"You are having a conversation with {name}",
-        )
-        logging.info(f"Thread id: {thread.id}")
+    options = {"model": OPENAI_MODEL}
+    if OPENAI_INSTRUCTIONS:
+        options["instructions"] = OPENAI_INSTRUCTIONS
+    if OPENAI_VECTOR_STORE_ID:
+        options["tools"] = [{"type": "file_search", "vector_store_ids": [OPENAI_VECTOR_STORE_ID]}]
+    return options
 
-        while run.status not in ["completed", "failed", "cancelled", "expired"]:
-            await asyncio.sleep(0.5)
-            logging.info(f"Consultando para Thread id: {thread.id}")
-            logging.info(f"Run status: {run.status}")
-            run = await asyncio.to_thread(client.beta.threads.runs.retrieve, thread_id=thread.id, run_id=run.id)
-
-        if run.status in ["failed", "cancelled", "expired"]:
-            logging.error(f"Failed to run assistant for thread {thread.id}")
-            failed_message = "Lo sentimos, algo ha fallado, por favor inténtelo de nuevo más tarde."
-            return failed_message
-
-        messages = await asyncio.to_thread(client.beta.threads.messages.list, thread_id=thread.id)
-        new_message = messages.data[0].content[0].text.value
-        logging.info(f"Generated message: {new_message}")
-        return new_message
-    except Exception as e:
-        logging.error(f"Error en run_assistant: {e}")
-        return "Lo sentimos, ocurrió un error al procesar tu solicitud."
 
 async def generate_response(message_body, user_id, name):
     try:
-        async with thread_lock:
-            thread_id = await check_if_thread_exists(user_id)
-            if thread_id is None:
-                logging.info(f"Creating new thread for {name} with user_id {user_id}")
-                thread = await asyncio.to_thread(client.beta.threads.create)
-                await store_thread(user_id, thread.id)
-                thread_id = thread.id
-            else:
-                logging.info(f"Retrieving existing thread for {name} with user_id {user_id}")
-                thread = await asyncio.to_thread(client.beta.threads.retrieve, thread_id)
-                await store_thread(user_id, thread_id)
+        async with _user_locks[user_id]:
+            conversation_id = await get_conversation_id(user_id)
+            if conversation_id is None:
+                logging.info(f"Creando conversación nueva para {user_id}")
+                conversation = await client.conversations.create(metadata={"wa_id": user_id})
+                conversation_id = conversation.id
 
-            # Añadir mensaje al thread
-            message = await asyncio.to_thread(
-                client.beta.threads.messages.create,
-                thread_id=thread_id,
-                role="user",
-                content=message_body,
+            response = await client.responses.create(
+                conversation=conversation_id,
+                input=[{"role": "user", "content": message_body}],
+                **_response_options(),
             )
+            await store_conversation(user_id, conversation_id)
 
-            # Ejecutar el asistente y obtener el nuevo mensaje
-            new_message = await run_assistant(thread, name)
-            return new_message
-    except Exception as e:
-        logging.error(f"Error al generar respuesta: {e}")
-        return "Lo sentimos, ocurrió un error al procesar tu solicitud."
+            if response.status != "completed" or not response.output_text:
+                logging.error(f"Respuesta incompleta para {user_id}: status={response.status}")
+                return FAILED_MESSAGE
+            return response.output_text
+    except Exception:
+        logging.exception(f"Error al generar respuesta para {user_id}")
+        return FAILED_MESSAGE

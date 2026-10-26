@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, BackgroundTasks, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
 from app.utils.whatsapp_utils import process_whatsapp_message, is_valid_whatsapp_message
 from app.utils.security import verify_signature
+import hmac
 import os
 import logging
 
@@ -13,9 +14,10 @@ async def verify(request: Request):
     mode = params.get("hub.mode")
     token = params.get("hub.verify_token")
     challenge = params.get("hub.challenge")
-    
+    verify_token = os.getenv("VERIFY_TOKEN")
+
     if mode and token:
-        if mode == "subscribe" and token == os.getenv("VERIFY_TOKEN"):
+        if mode == "subscribe" and verify_token and hmac.compare_digest(token, verify_token):
             logging.info("WEBHOOK_VERIFIED")
             return PlainTextResponse(content=challenge, status_code=200)
         else:
@@ -26,11 +28,17 @@ async def verify(request: Request):
         raise HTTPException(status_code=400, detail="Missing parameters")
 
 @webhook_router.post("/webhook")
-async def webhook_post(request: Request, verified: None = Depends(verify_signature)):
-    body = await request.json()
+async def webhook_post(request: Request, background_tasks: BackgroundTasks, verified: None = Depends(verify_signature)):
+    try:
+        body = await request.json()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    # Meta exige un 200 rápido; si tarda, reintenta y el cliente recibiría respuestas duplicadas.
+    # Por eso la respuesta de OpenAI se genera en segundo plano.
     if is_valid_whatsapp_message(body):
-        await process_whatsapp_message(body)
-        return {"status": "ok"}
+        background_tasks.add_task(process_whatsapp_message, body)
     else:
-        logging.error("Not a WhatsApp API event")
-        raise HTTPException(status_code=404, detail="Not a WhatsApp API event")
+        # Notificaciones de estado (enviado, entregado, leído): se confirman sin hacer nada
+        logging.debug("Evento de WhatsApp sin mensaje entrante")
+    return {"status": "ok"}
