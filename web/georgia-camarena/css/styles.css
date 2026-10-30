@@ -303,6 +303,7 @@ fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 .socials { display: flex; gap: 10px; }
 .socials a { width: 38px; height: 38px; border-radius: 50%; background: var(--c8); display: grid; place-items: center; color: var(--c4); font-size: 13px; font-weight: 700; text-decoration: none; }
 .socials a:hover { background: var(--c1); color: #ffffff; }
+.socials svg { width: 18px; height: 18px; }
 .crisis { font-size: 13px; margin-top: 12px; }
 @media (max-width: 999px) {
   .foot-top .wrap, .foot-mid .wrap { grid-template-columns: 1fr; text-align: center; justify-items: center; }
