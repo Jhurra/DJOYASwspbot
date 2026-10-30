@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://jorgeurra.com/sitemap.xml
