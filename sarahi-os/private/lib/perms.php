@@ -74,7 +74,7 @@ final class Perm
             case 'meta': return $id === 'main';
             case 'boards': return $this->boardVisible($id, $d);
             case 'items': return $this->boardIdVisible($d->board ?? null);
-            case 'updates': return $this->boardIdVisible($d->board ?? $this->itemBoard($d->item ?? null));
+            case 'updates': return $this->boardIdVisible($this->itemBoard($d->item ?? null) ?? ($d->board ?? null));
             case 'notes': return ($d->authorId ?? null) === $this->meId() || !empty($d->shared) || $this->linkVisible($d->link ?? null);
             case 'transcripts': return $this->linkVisible($d->link ?? null);
         }

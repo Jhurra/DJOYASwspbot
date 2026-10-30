@@ -9,6 +9,8 @@ return [
     'anthropic_api_key' => '',
     'ai_model' => 'claude-opus-5-5',
     'ai_effort' => 'low',
+    // Resúmenes con IA por día para quienes no son administradores
+    'ai_daily_limit' => 20,
     // Dirección pública, por ejemplo https://os.sarahiagency.com (vacía = se detecta sola)
     'base_url' => '',
     // Sitios cuyos formularios pueden enviar leads

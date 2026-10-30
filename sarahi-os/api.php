@@ -107,6 +107,12 @@ switch ($action) {
         $in = read_json_body();
         $prompt = (string) ($in->prompt ?? '');
         if ($prompt === '' || strlen($prompt) > 400000) fail('Texto no válido');
+        if (!$perm->isAdmin()) {
+            $key = 'ai:' . $user['id'] . ':' . date('Y-m-d');
+            $used = (int) kv_get($key, '0');
+            if ($used >= (int) config('ai_daily_limit', 20)) fail('Llegaste al límite diario de resúmenes con IA', 429);
+            kv_set($key, (string) ($used + 1));
+        }
         try {
             $text = ai_complete($prompt);
             send_json(!empty($in->json) ? ['json' => ai_parse_json($text)] : ['text' => $text]);
@@ -201,6 +207,6 @@ function import_seed(): int
         $n++;
     }
     db()->exec('COMMIT');
-    rename($file, $file . '.importado');
+    unlink($file);
     return $n;
 }
