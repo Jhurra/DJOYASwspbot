@@ -2,6 +2,8 @@
 /* SARAHI OS — núcleo: estado, utilidades, capa de datos, render y enrutado.
    Este código es idéntico en el artefacto y en el servidor; solo cambia window.SOS_ADAPTER. */
 'use strict';
+// Versión día: siempre en tema claro
+document.documentElement.setAttribute('data-theme', 'light');
 const A = window.SOS_ADAPTER;
 const COLLECTIONS = ['meta', 'boards', 'items', 'updates', 'notes', 'transcripts'];
 const S = {
