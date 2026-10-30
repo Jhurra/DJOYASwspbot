@@ -15,7 +15,7 @@ en Claude, ahora instalable en tu hosting con inicio de sesión por email y cont
 |---|---|---|
 | Administrador (Jorge) | Todo: ventas, CRM, leads, clientes, usuarios y ajustes | Todo |
 | Equipo | Todo menos los tableros de ventas y las columnas marcadas como ocultas (por ejemplo, el fee) | Elementos y estructura de lo que ve |
-| Solo clientes (Osvaldo) | Los tableros de cada cliente, la ficha de clientes y los tableros que le compartas | Tareas, comentarios y notas, pero no columnas, grupos ni tableros |
+| Solo clientes (Osvaldo) | Todos los clientes, o solo los que elijas, con sus fichas, comentarios y reuniones; más los tableros que le compartas | Tareas, comentarios y notas, pero no columnas, grupos ni tableros |
 
 El servidor aplica estos permisos: aunque alguien manipule el navegador, no recibe ni puede escribir lo que no le toca.
 
@@ -32,7 +32,8 @@ El servidor aplica estos permisos: aunque alguien manipule el navegador, no reci
 5. En cPanel → **SSL/TLS Status**, emite el certificado del subdominio (HTTPS).
 6. Abre `https://os.sarahiagency.com`: aparece **Instalación**. Escribe el código, tu nombre, tu email y una
    contraseña, deja marcado **Cargar mis tableros, clientes y reuniones** y pulsa **Instalar y entrar**.
-7. **Ajustes → Usuarios y permisos → Nuevo usuario**: crea a Osvaldo con el rol **Solo clientes**.
+7. **Ajustes → Usuarios y permisos → Nuevo usuario**: crea a Osvaldo con el rol **Solo clientes**. Deja marcado
+   **Todos los clientes** o desmárcalo y elige solo algunos. Se puede cambiar cuando quieras con **Editar**.
 
 ### Activar los resúmenes con IA (opcional)
 En `private/config.php` pon tu clave de [console.anthropic.com](https://console.anthropic.com) en `anthropic_api_key`.

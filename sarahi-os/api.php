@@ -174,7 +174,9 @@ function save_user(?int $id, object $in, bool $first = false, int $actingId = 0)
     if (!in_array($role, ROLES, true)) throw new RuntimeException('Rol no válido');
     if (($id === null || $pass !== '') && mb_strlen($pass) < 10) throw new RuntimeException('La contraseña debe tener al menos 10 caracteres');
     $boards = array_values(array_filter(array_map('strval', (array) ($in->boards ?? [])), 'valid_id'));
-    $access = json_out(['boards' => $boards]);
+    // null = todos los clientes (también los nuevos); lista = solo esos tableros de cliente
+    $clients = isset($in->clients) && is_array($in->clients) ? array_values(array_filter(array_map('strval', $in->clients), 'valid_id')) : null;
+    $access = json_out(['boards' => $boards, 'clients' => $clients]);
     $st = db()->prepare('SELECT id FROM users WHERE email = ? AND id != ?');
     $st->execute([$email, $id ?? 0]);
     if ($st->fetchColumn()) throw new RuntimeException('Ya existe un usuario con ese email');

@@ -122,6 +122,8 @@ def run(base, seeded):
                     {"op": "set", "c": "boards", "id": "bcli", "d": {"name": "CLIENTES SARAHI", "folder": "f1", "columns": [{"id": "status", "type": "status", "title": "Estado", "labels": [{"id": "0", "label": "Activo", "color": "#00c875"}]}], "groups": [{"id": "g1", "title": "Activos"}]}},
                     {"op": "set", "c": "boards", "id": "bbrin", "d": {"name": "Brincus", "folder": "f1", "clientItem": "icli", "columns": [], "groups": [{"id": "g1", "title": "Tareas"}]}},
                     {"op": "set", "c": "items", "id": "icli", "d": {"board": "bcli", "group": "g1", "name": "Brincus", "values": {}}},
+                    {"op": "set", "c": "boards", "id": "bdjo", "d": {"name": "DJOYAS", "folder": "f1", "clientItem": "icli2", "columns": [], "groups": [{"id": "g1", "title": "Tareas"}]}},
+                    {"op": "set", "c": "items", "id": "icli2", "d": {"board": "bcli", "group": "g1", "name": "DJOYAS", "values": {}}},
                     {"op": "set", "c": "boards", "id": "bcrm", "d": {"name": "Pipeline comercial SARAHI", "columns": [{"id": "st", "type": "status", "title": "Estado", "labels": [{"id": "7", "label": "Nuevo", "color": "#579bfc"}]}, {"id": "email", "type": "email", "title": "Email"}, {"id": "ct", "type": "text", "title": "Contacto"}, {"id": "nt", "type": "long_text", "title": "Notas"}], "groups": [{"id": "topics", "title": "Nuevo lead"}]}},
                     {"op": "set", "c": "boards", "id": "v2026cl", "d": {"name": "Ventas 2026 Chile", "sales": {"year": 2026}, "columns": [], "groups": []}})
 
@@ -170,6 +172,28 @@ def run(base, seeded):
     check(st == 403, "no puede borrar tableros")
     st, _ = osvaldo.write({"op": "update", "c": "boards", "id": client_board, "d": {"weekly": {"week": "2026-10-26"}}})
     check(st == 200, "puede guardar el resumen de la semana del cliente")
+
+    print("Acceso solo a algunos clientes")
+    st, r = jorge.api("POST", "call", {"name": "users"})
+    oid = next(u["id"] for u in r["users"] if u["email"] == "osvaldo@sarahi.cl")
+    client_boards = [i for i in oboards if i != cli]
+    other_board = next(i for i in client_boards if i != client_board)
+    st, _ = jorge.api("POST", "call", {"name": "user_save", "args": {"id": oid, "name": "Osvaldo", "email": "osvaldo@sarahi.cl", "role": "clients", "clients": [client_board]}})
+    check(st == 200, "se limita a Osvaldo a un solo cliente")
+    st, ob2 = osvaldo.api("GET", "boot")
+    b2 = {d["id"] for d in ob2["docs"] if d["c"] == "boards"}
+    check(b2 == {cli, client_board}, "ahora ve solo ese cliente y la ficha de clientes")
+    fichas = [d for d in ob2["docs"] if d["c"] == "items" and d["d"]["board"] == cli]
+    check([d["id"] for d in fichas] == [boards[client_board]["clientItem"]], "en la ficha de clientes solo aparece ese cliente")
+    item_ids = {d["id"] for d in ob2["docs"] if d["c"] == "items"}
+    check(all(d["d"]["item"] in item_ids for d in ob2["docs"] if d["c"] == "updates"), "solo recibe comentarios de lo que ve")
+    tx_links = [d["d"].get("link") or {} for d in ob2["docs"] if d["c"] == "transcripts"]
+    check(all(l.get("item") in item_ids or l.get("board") in b2 for l in tx_links), "solo recibe reuniones de ese cliente")
+    st, _ = osvaldo.write({"op": "set", "c": "items", "id": "itest3", "d": {"board": other_board, "group": "g1", "name": "No debería", "values": {}}})
+    check(st == 403, "no puede escribir en otro cliente")
+    jorge.api("POST", "call", {"name": "user_save", "args": {"id": oid, "name": "Osvaldo", "email": "osvaldo@sarahi.cl", "role": "clients", "clients": None}})
+    st, ob3 = osvaldo.api("GET", "boot")
+    check({d["id"] for d in ob3["docs"] if d["c"] == "boards"} == set(oboards), "con «Todos los clientes» vuelve a verlos todos")
 
     print("Columnas privadas (rol Equipo)")
     equipo = Client(base)

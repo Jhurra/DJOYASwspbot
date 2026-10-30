@@ -2121,7 +2121,7 @@ async function loadUsers() {
   try {
     const r = await A.call('users');
     box.classList.remove('muted');
-    box.innerHTML = '<div style="overflow-x:auto"><table class="tbl-simple"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Último acceso</th><th></th></tr></thead><tbody>' + r.users.map((u) => '<tr><td>' + esc(u.name) + '</td><td>' + esc(u.email) + '</td><td>' + esc(ROLE_NAMES[u.role] || u.role) + (u.role === 'clients' && u.access && (u.access.boards || []).length ? ' <span class="muted">+ ' + u.access.boards.length + ' tablero' + (u.access.boards.length === 1 ? '' : 's') + '</span>' : '') + '</td><td class="muted">' + (u.last_login ? relTime(u.last_login) : 'nunca') + '</td><td style="white-space:nowrap"><button class="btn sm ghost" data-a="user-edit" data-id="' + u.id + '">Editar</button>' + (String(u.id) !== String(S.me.id) ? '<button class="btn sm ghost danger" data-a="user-del" data-id="' + u.id + '" data-n="' + esc(u.name) + '">Quitar</button>' : '') + '</td></tr>').join('') + '</tbody></table></div>';
+    box.innerHTML = '<div style="overflow-x:auto"><table class="tbl-simple"><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Último acceso</th><th></th></tr></thead><tbody>' + r.users.map((u) => '<tr><td>' + esc(u.name) + '</td><td>' + esc(u.email) + '</td><td>' + esc(ROLE_NAMES[u.role] || u.role) + (u.role === 'clients' && u.access && Array.isArray(u.access.clients) ? ' <span class="muted">· ' + u.access.clients.length + (u.access.clients.length === 1 ? ' cliente' : ' clientes') + '</span>' : '') + (u.role === 'clients' && u.access && (u.access.boards || []).length ? ' <span class="muted">+ ' + u.access.boards.length + ' tablero' + (u.access.boards.length === 1 ? '' : 's') + '</span>' : '') + '</td><td class="muted">' + (u.last_login ? relTime(u.last_login) : 'nunca') + '</td><td style="white-space:nowrap"><button class="btn sm ghost" data-a="user-edit" data-id="' + u.id + '">Editar</button>' + (String(u.id) !== String(S.me.id) ? '<button class="btn sm ghost danger" data-a="user-del" data-id="' + u.id + '" data-n="' + esc(u.name) + '">Quitar</button>' : '') + '</td></tr>').join('') + '</tbody></table></div>';
     S.users = r.users;
   } catch (e) { box.textContent = 'No se pudo cargar la lista: ' + (e.message || e); }
 }
@@ -2131,11 +2131,23 @@ function userModal(u) {
     body: '<label class="fld"><span>Nombre</span><input name="name" value="' + esc(u ? u.name : '') + '" required></label><label class="fld"><span>Email</span><input name="email" type="email" value="' + esc(u ? u.email : '') + '" required></label>' +
       '<label class="fld"><span>' + (u ? 'Nueva contraseña (déjala vacía para no cambiarla)' : 'Contraseña (mínimo 10 caracteres)') + '</span><input name="password" type="password" autocomplete="new-password"' + (u ? '' : ' required') + '></label>' +
       '<label class="fld"><span>Rol</span><select name="role" id="u-role">' + ['clients', 'member', 'admin'].map((r) => '<option value="' + r + '"' + ((u ? u.role : 'clients') === r ? ' selected' : '') + '>' + ROLE_NAMES[r] + '</option>').join('') + '</select></label>' +
+      (() => {
+        const all = !u || !u.access || !Array.isArray(u.access.clients);
+        const cbs = boardsSorted().filter((b) => isClientBoard(b));
+        return '<fieldset class="fld" id="u-clients"' + ((u ? u.role : 'clients') === 'clients' ? '' : ' hidden') + '><legend>Clientes a los que tiene acceso</legend>' +
+          '<label class="chk-all"><input type="checkbox" name="allClients" id="u-all"' + (all ? ' checked' : '') + '> Todos los clientes (también los que se agreguen después)</label>' +
+          '<div class="chk-list" id="u-client-list">' + cbs.map((b) => '<label><input type="checkbox" name="clients" value="' + esc(b.id) + '"' + (all || u.access.clients.includes(b.id) ? ' checked' : '') + (all ? ' disabled' : '') + '> ' + esc(b.name) + '</label>').join('') + '</div></fieldset>';
+      })() +
       '<fieldset class="fld" id="u-extra"' + ((u ? u.role : 'clients') === 'clients' ? '' : ' hidden') + '><legend>Además de los clientes, puede ver estos tableros</legend><div class="chk-list">' +
       boardsSorted().filter((b) => !b.sales && !isClientBoard(b) && b.id !== settings().clientsBoard).map((b) => '<label><input type="checkbox" name="boards" value="' + esc(b.id) + '"' + (u && u.access && (u.access.boards || []).includes(b.id) ? ' checked' : '') + '> ' + esc(b.name) + '</label>').join('') + '</div></fieldset>',
-    onOpen: (m) => { const r = m.querySelector('#u-role'); const x = m.querySelector('#u-extra'); if (r && x) r.addEventListener('change', () => { x.hidden = r.value !== 'clients'; }); },
+    onOpen: (m) => {
+      const r = m.querySelector('#u-role'); const x = m.querySelector('#u-extra'); const cl = m.querySelector('#u-clients');
+      if (r) r.addEventListener('change', () => { x.hidden = r.value !== 'clients'; cl.hidden = r.value !== 'clients'; });
+      const all = m.querySelector('#u-all');
+      if (all) all.addEventListener('change', () => { m.querySelectorAll('#u-client-list input').forEach((c) => { c.disabled = all.checked; if (all.checked) c.checked = true; }); });
+    },
     submit: async (fd) => {
-      try { await A.call('user_save', { id: u ? u.id : null, name: fd.get('name'), email: fd.get('email'), password: fd.get('password'), role: fd.get('role'), boards: fd.getAll('boards') }); toast('Usuario guardado'); loadUsers(); if (fd.get('name') && !team().includes(String(fd.get('name')).split(' ')[0])) patchMeta({ team: team().concat([String(fd.get('name')).split(' ')[0]]) }); }
+      try { await A.call('user_save', { id: u ? u.id : null, name: fd.get('name'), email: fd.get('email'), password: fd.get('password'), role: fd.get('role'), boards: fd.getAll('boards'), clients: fd.get('allClients') ? null : fd.getAll('clients') }); toast('Usuario guardado'); loadUsers(); if (fd.get('name') && !team().includes(String(fd.get('name')).split(' ')[0])) patchMeta({ team: team().concat([String(fd.get('name')).split(' ')[0]]) }); }
       catch (e) { toast(e.message || 'No se pudo guardar'); return true; }
     },
   });

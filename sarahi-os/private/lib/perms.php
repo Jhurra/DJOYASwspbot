@@ -42,9 +42,46 @@ final class Perm
         if ($this->role === 'member') return empty($b->sales);
         if (!empty($b->sales)) return false;
         if ($id === ($this->settings->clientsBoard ?? null)) return true;
-        if (self::isClientBoard($id, $b, $this->settings)) return true;
+        if (self::isClientBoard($id, $b, $this->settings)) return $this->clientBoardAllowed($id);
         $shared = $this->user['access']->boards ?? [];
         return is_array($shared) && in_array($id, $shared, true);
+    }
+
+    /** null = todos los clientes; lista = solo esos tableros de cliente. */
+    public function allowedClients(): ?array
+    {
+        if ($this->role !== 'clients') return null;
+        $c = $this->user['access']->clients ?? null;
+        return is_array($c) ? $c : null;
+    }
+
+    private function clientBoardAllowed(string $boardId): bool
+    {
+        $allowed = $this->allowedClients();
+        return $allowed === null || in_array($boardId, $allowed, true);
+    }
+
+    /* Una ficha del tablero de clientes se ve si su tablero de cliente está permitido. */
+    private function clientRecordAllowed(?string $itemId): bool
+    {
+        if ($this->allowedClients() === null) return true;
+        if (!$itemId) return false;
+        $it = doc_get('items', $itemId);
+        if ($it && !empty($it->parent)) return $this->clientRecordAllowed($it->parent);
+        foreach ($this->boards as $bid => $b) {
+            if (!empty($b->isTemplate)) continue;
+            if (($b->clientItem ?? null) === $itemId || ($it && norm($b->name ?? '') === norm($it->name ?? ''))) return $this->clientBoardAllowed((string) $bid);
+        }
+        return false;
+    }
+
+    private function itemVisible(?string $itemId, ?object $it = null): bool
+    {
+        if (!$itemId) return false;
+        $it = $it ?? doc_get('items', $itemId);
+        if (!$it || !$this->boardIdVisible($it->board ?? null)) return false;
+        if (($it->board ?? null) === ($this->settings->clientsBoard ?? null)) return $this->clientRecordAllowed(!empty($it->parent) ? $it->parent : $itemId);
+        return true;
     }
 
     public function boardIdVisible(?string $id): bool
@@ -52,18 +89,11 @@ final class Perm
         return $id !== null && ($this->visible[$id] ?? false);
     }
 
-    private function itemBoard(?string $itemId): ?string
-    {
-        if (!$itemId) return null;
-        $it = doc_get('items', $itemId);
-        return $it->board ?? null;
-    }
-
     private function linkVisible($link): bool
     {
         if (!is_object($link)) return false;
-        if (!empty($link->board)) return $this->boardIdVisible($link->board);
-        return $this->boardIdVisible($this->itemBoard($link->item ?? null));
+        if (!empty($link->item)) return $this->itemVisible($link->item);
+        return $this->boardIdVisible($link->board ?? null);
     }
 
     public function docVisible(string $c, string $id, ?object $d): bool
@@ -73,8 +103,8 @@ final class Perm
         switch ($c) {
             case 'meta': return $id === 'main';
             case 'boards': return $this->boardVisible($id, $d);
-            case 'items': return $this->boardIdVisible($d->board ?? null);
-            case 'updates': return $this->boardIdVisible($this->itemBoard($d->item ?? null) ?? ($d->board ?? null));
+            case 'items': return $this->itemVisible($id, $d);
+            case 'updates': return !empty($d->item) && doc_get('items', $d->item) ? $this->itemVisible($d->item) : $this->boardIdVisible($d->board ?? null);
             case 'notes': return ($d->authorId ?? null) === $this->meId() || !empty($d->shared) || $this->linkVisible($d->link ?? null);
             case 'transcripts': return $this->linkVisible($d->link ?? null);
         }

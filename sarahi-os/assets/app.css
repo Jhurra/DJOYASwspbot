@@ -834,3 +834,7 @@ button.kpi:hover { border-color: var(--line-strong); box-shadow: var(--shadow-sm
 .main-body > .cw.page { padding-top: 18px; }
 .cw-head h2 { font: 500 24px/32px var(--title-font); }
 
+
+.chk-all { display: flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 500; margin-bottom: 6px; }
+.fld .chk-all input[type=checkbox] { width: 16px; height: 16px; padding: 0; margin: 0; flex: none; }
+.modal-form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
