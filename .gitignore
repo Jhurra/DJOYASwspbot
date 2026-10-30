@@ -5,5 +5,3 @@ __pycache__/
 venv/
 .pytest_cache/
 *.db
-crm.db
-test_crm.db

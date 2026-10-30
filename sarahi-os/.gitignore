@@ -1,0 +1,6 @@
+private/config.php
+private/vendor/
+private/data/*
+!private/data/.htaccess
+composer.lock
+dist/

@@ -1,7 +1,0 @@
-fastapi==0.115.12
-gunicorn==23.0.0
-httpx==0.28.1
-psycopg2-binary==2.9.10
-python-dotenv==1.1.0
-SQLAlchemy==2.0.41
-uvicorn[standard]==0.34.2

@@ -1,0 +1,13 @@
+# SARAHI OS
+Options -Indexes
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+# Nada fuera de las páginas públicas y assets/
+<FilesMatch "^(composer\.(json|lock)|README\.md)$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(private|tests|tools)(/|$) - [F,L]
+</IfModule>
