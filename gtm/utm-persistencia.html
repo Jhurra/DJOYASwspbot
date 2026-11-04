@@ -1,0 +1,75 @@
+<script>
+/*
+  UTM - Persistencia x SARAHI
+  Etiqueta HTML personalizada para Google Tag Manager.
+  Activador: Initialization - All Pages (o All Pages), una vez por página.
+
+  Qué hace:
+  - Lee utm_source, utm_medium, utm_campaign, utm_term, utm_content, utm_id,
+    gclid, gbraid, wbraid, fbclid y ttclid de la URL.
+  - Guarda dos cookies de primera parte en el dominio raíz:
+      sx_utm_first : primer toque (no se sobrescribe mientras viva la cookie)
+      sx_utm_last  : último toque con UTM o ID de clic (se actualiza en cada visita nueva con parámetros)
+  - Las páginas siguientes, sin UTM en la URL, leen las cookies.
+  - Publica un evento "utm_ready" en el dataLayer con los valores, para usarlos en
+    etiquetas, formularios o como parámetros de la compra.
+  No modifica los enlaces de la tienda ni las URL.
+*/
+(function () {
+  var DIAS = 90;
+  var KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id',
+              'gclid', 'gbraid', 'wbraid', 'fbclid', 'ttclid'];
+
+  function rootDomain() {
+    var parts = location.hostname.split('.');
+    // distribuidoradejoyas.cl -> .distribuidoradejoyas.cl
+    return parts.length > 2 ? '.' + parts.slice(-2).join('.') : '.' + location.hostname;
+  }
+
+  function setCookie(name, value) {
+    var exp = new Date(Date.now() + DIAS * 864e5).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + exp +
+      '; path=/; domain=' + rootDomain() + '; SameSite=Lax' +
+      (location.protocol === 'https:' ? '; Secure' : '');
+  }
+
+  function getCookie(name) {
+    var m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+    if (!m) return null;
+    try { return JSON.parse(decodeURIComponent(m[1])); } catch (e) { return null; }
+  }
+
+  function clean(v) {
+    return String(v).replace(/[<>"']/g, '').slice(0, 150);
+  }
+
+  // 1. Parámetros de la URL actual
+  var params = new URLSearchParams(location.search);
+  var fromUrl = {};
+  var hasAny = false;
+  KEYS.forEach(function (k) {
+    var v = params.get(k);
+    if (v) { fromUrl[k] = clean(v); hasAny = true; }
+  });
+
+  // 2. Guardar si la URL trae parámetros
+  if (hasAny) {
+    fromUrl.landing_page = clean(location.pathname);
+    fromUrl.ts = new Date().toISOString();
+    setCookie('sx_utm_last', JSON.stringify(fromUrl));
+    if (!getCookie('sx_utm_first')) setCookie('sx_utm_first', JSON.stringify(fromUrl));
+  }
+
+  // 3. Valores vigentes (los de la URL o los guardados)
+  var last = hasAny ? fromUrl : (getCookie('sx_utm_last') || {});
+  var first = getCookie('sx_utm_first') || last;
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: 'utm_ready',
+    utm_last: last,
+    utm_first: first,
+    utm_from_url: hasAny
+  });
+})();
+</script>
