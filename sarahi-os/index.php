@@ -15,6 +15,13 @@ header('Content-Security-Policy: default-src \'self\'; script-src \'self\' https
 <meta name="robots" content="noindex, nofollow">
 <title>SARAHI OS</title>
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="assets/manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#eceff8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SARAHI OS">
+<meta name="application-name" content="SARAHI OS">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap">
 <link rel="stylesheet" href="assets/app.css?v=<?= $v ?>">

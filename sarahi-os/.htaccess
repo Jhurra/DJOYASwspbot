@@ -11,3 +11,5 @@ Options -Indexes
   RewriteEngine On
   RewriteRule ^(private|tests|tools)(/|$) - [F,L]
 </IfModule>
+# Archivo de la aplicación (para instalarla en el Mac o el celular)
+AddType application/manifest+json .webmanifest
